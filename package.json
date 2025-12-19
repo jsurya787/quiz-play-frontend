@@ -1,14 +1,25 @@
 {
   "name": "learn-ground",
-  "version": "1.0.0",
-  "private": true,
-  "engines": {
-    "node": ">=18 <=20"
-  },
+  "version": "0.0.0",
   "scripts": {
-    "start": "ng serve",
-    "build": "ng build"
+    "build": "ng build",
+    "build:ssr": "ng build && ng run your-project-name:server",
+    "serve:ssr": "node dist/your-project-name/server/main.js"
   },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.6.2",
   "dependencies": {
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
