@@ -1,0 +1,40 @@
+<section class="py-24 bg-white px-6">
+  <div class="max-w-6xl mx-auto text-center">
+
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">
+      About LearnGround
+    </h2>
+
+    <p class="text-gray-600 max-w-3xl mx-auto mb-16">
+      LearnGround is built to make assessments engaging, interactive,
+      and meaningful. We believe learning should feel exciting —
+      not stressful.
+    </p>
+
+    <!-- Team -->
+    <div class="grid gap-10 md:grid-cols-3">
+      <div
+        *ngFor="let member of team"
+        class="bg-gray-50 rounded-2xl p-8 shadow-sm
+               hover:-translate-y-2 transition text-center"
+      >
+        <div class="text-5xl mb-4">
+          {{ member.avatar }}
+        </div>
+
+        <h3 class="text-xl font-semibold">
+          {{ member.name }}
+        </h3>
+
+        <p class="text-indigo-600 text-sm font-medium mt-1">
+          {{ member.role }}
+        </p>
+
+        <p class="text-gray-600 mt-4 text-sm">
+          {{ member.bio }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>

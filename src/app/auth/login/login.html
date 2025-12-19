@@ -1,0 +1,63 @@
+
+<section
+  class="relative min-h-screen flex items-center justify-center
+         overflow-hidden px-6
+         bg-gradient-to-br from-indigo-100/60 via-white to-sky-100/60
+         animate-page">
+
+  <!-- Login Card -->
+  <div
+    class="w-full max-w-md
+           rounded-2xl
+           bg-white/70 backdrop-blur
+           p-10
+           shadow-xl
+           animate-slide-up">
+
+    <h2
+      class="text-3xl font-bold mb-6 text-center text-gray-900
+             animate-fade-in delay-100">
+      Login
+    </h2>
+
+    <!-- Email -->
+    <input
+      class="input animate-fade-in delay-150"
+      placeholder="Email" />
+
+    <!-- Password -->
+    <input
+      class="input mt-4 animate-fade-in delay-200"
+      placeholder="Password"
+      type="password" />
+
+    <!-- Login Button -->
+    <button
+      class="btn-primary w-full mt-6
+             transition-all duration-200
+             hover:shadow-lg
+             active:scale-95
+             animate-fade-in delay-300"
+      >
+      Login
+    </button>
+
+    <!-- Google Login -->
+    <div class="mt-6 animate-fade-in delay-400">
+      <div id="googleBtn" class="flex justify-center"></div>
+    </div>
+
+    <!-- Footer -->
+    <p
+      class="text-center text-sm mt-6 text-gray-600
+             animate-fade-in delay-500">
+      New here?
+      <a
+        routerLink="/signup"
+        class="text-indigo-600 font-semibold hover:underline">
+        Create account
+      </a>
+    </p>
+
+  </div>
+</section>

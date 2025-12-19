@@ -1,0 +1,19 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Angular build output
+dist/
+.angular/
+.cache/
+
+# Environment files (optional)
+src/environments/environment.local.ts
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

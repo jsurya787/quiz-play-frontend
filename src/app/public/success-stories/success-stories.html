@@ -1,0 +1,36 @@
+<section class="py-32 bg-gray-50 px-6">
+  <div class="max-w-7xl mx-auto text-center">
+
+    <h2 class="text-4xl font-extrabold mb-6">
+      Student Success Stories
+    </h2>
+
+    <p class="text-gray-600 mb-20">
+      Real students. Real improvements.
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-10">
+      <div *ngFor="let s of stories"
+           class="bg-white rounded-3xl p-8 shadow-xl
+                  hover:-translate-y-4 transition">
+
+        <img [src]="s.image"
+             class="w-24 h-24 mx-auto rounded-full mb-6"
+             alt="student"/>
+
+        <h3 class="font-semibold text-lg">
+          {{ s.name }}
+        </h3>
+
+        <p class="text-sm text-gray-500">
+          {{ s.class }}
+        </p>
+
+        <p class="mt-4 font-semibold text-indigo-600">
+          {{ s.score }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
