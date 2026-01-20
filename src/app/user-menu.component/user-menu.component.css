@@ -1,0 +1,121 @@
+/* BACKDROP */
+.ua-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+/* DROPDOWN CARD */
+.ua-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 340px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  z-index: 101;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* LIST */
+.ua-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+}
+
+/* ROW */
+.ua-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  font-size: 16px;
+  color: #3c4852;
+  cursor: pointer;
+}
+
+.ua-item:hover {
+  background: #f6f7f8;
+}
+
+/* ICON CIRCLE */
+.ua-icon {
+  width: 34px;
+  height: 34px;
+  background: #e9edf1;
+  border-radius: 50%;
+}
+
+/* TEXT */
+.ua-text {
+  flex: 1;
+}
+
+/* TOGGLE ROW */
+.ua-toggle-row {
+  justify-content: space-between;
+}
+
+/* SWITCH */
+.ua-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+}
+
+.ua-switch input {
+  display: none;
+}
+
+.ua-slider {
+  position: absolute;
+  inset: 0;
+  background: #cfd8dc;
+  border-radius: 20px;
+}
+
+.ua-slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* LOGOUT */
+.ua-logout {
+  color: #e53935;
+}
+
+/* FOOTER */
+.ua-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #7b8794;
+  line-height: 1.6;
+}
+
+/* SOCIAL ICONS */
+.ua-socials {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.ua-socials span {
+  width: 30px;
+  height: 30px;
+  background: #e9edf1;
+  border-radius: 8px;
+}
+
+/* COPYRIGHT */
+.ua-copy {
+  font-size: 12px;
+}

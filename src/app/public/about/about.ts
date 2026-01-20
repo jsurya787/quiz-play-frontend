@@ -11,12 +11,12 @@ export class AboutComponent {
   team = [
     {
       name: 'Jaisurya Kataria',
-      role: 'Founder & Frontend Engineer',
-      bio: 'Building intuitive learning experiences with Angular.',
+      role: 'Founder & FullStack Engineer',
+      bio: 'Building intuitive learning experiences with Angular/NestJS.',
       avatar: '👨‍💻'
     },
     {
-      name: 'Anita Sharma',
+      name: 'Shephali Kalia',
       role: 'Education Advisor',
       bio: 'Helping shape meaningful assessment systems.',
       avatar: '👩‍🏫'

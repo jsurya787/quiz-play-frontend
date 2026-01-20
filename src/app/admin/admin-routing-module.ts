@@ -32,8 +32,8 @@ const routes: Routes = [
       // { path: 'chapters/:chapterId/sections/new', component: SectionAdminForm },
       // { path: 'sections/:id/edit', component: SectionAdminForm },
 
-      // Default
-     // { path: '', redirectTo: 'subjects', pathMatch: 'full' },
+     // Default
+     { path: '', redirectTo: 'subjects', pathMatch: 'full' },
     ],
   },
 ];

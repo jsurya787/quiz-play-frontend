@@ -240,3 +240,133 @@
     }
   }
 }
+
+  /* -------------------------
+     Quiz List Enhancements
+     ------------------------- */
+
+  /* Quiz card entrance (slight lift + fade) */
+  @keyframes quizCardIn {
+    from {
+      opacity: 0.01;
+      transform: translate3d(0, 16px, 0) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .animate-quiz-card {
+    animation: quizCardIn 0.55s ease-out both;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  /* Gradient glow ring on hover (theme-safe) */
+  .quiz-glow {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .quiz-glow::before {
+    content: '';
+    position: absolute;
+    inset: -10px; /* more spread, less edge */
+    border-radius: 2rem;
+
+    /* very soft radial glow */
+    background: radial-gradient(
+      circle at top,
+      rgba(99, 102, 241, 0.22),   /* stronger indigo core */
+      rgba(139, 92, 246, 0.14),  /* violet transition */
+      rgba(56, 189, 248, 0.12),  /* sky blue edge */
+      transparent 70%
+    );
+
+    filter: blur(14px);
+    opacity: 0.9;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+  }
+
+
+
+  .quiz-glow:hover::before {
+    opacity: 1;
+  }
+
+  /* Button pulse micro-interaction */
+  @keyframes btnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .btn-pulse:hover {
+    animation: btnPulse 0.6s ease-in-out;
+  }
+
+  @layer utilities {
+  .menu-row {
+    @apply flex items-center gap-4 px-6 py-4
+           cursor-pointer
+           transition-all duration-200
+           hover:bg-white/60
+           hover:backdrop-blur
+           hover:translate-x-0.5;
+  }
+
+  .menu-icon {
+    @apply w-9 h-9 rounded-full
+           flex items-center justify-center
+           transition-transform duration-200
+           group-hover:scale-110;
+  }
+
+  .menu-text {
+    @apply text-[14px] text-gray-600 font-medium;
+  }
+
+  .social-pill {
+    @apply w-8 h-8 rounded-lg bg-gray-200/80;
+  }
+
+  .animate-user-menu {
+    animation: userMenuIn 220ms cubic-bezier(.22,1,.36,1);
+  }
+
+  @keyframes userMenuIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+@layer utilities {
+  .stat-card {
+    @apply bg-gray-50 rounded-xl p-4 shadow-sm;
+  }
+
+  .stat-label {
+    @apply text-xs text-gray-500;
+  }
+
+  .stat-value {
+    @apply text-lg font-bold;
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out both;
+  }
+}

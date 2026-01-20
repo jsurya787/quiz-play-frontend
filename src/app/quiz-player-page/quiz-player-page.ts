@@ -1,11 +1,171 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { QuizPlayerService } from '../services/quiz-player.service';
 
 @Component({
   selector: 'app-quiz-player-page',
-  imports: [],
   templateUrl: './quiz-player-page.html',
-  styleUrl: './quiz-player-page.css',
 })
-export class QuizPlayerPage {
+export class QuizPlayerPageComponent implements OnInit {
+  quizId!: string;
+  attemptId = signal<string | null>(null);
 
+  quiz = signal<any>(null);
+  currentIndex = signal(0);
+
+  answerForm!: FormGroup;
+
+  /* =======================
+     COMPUTED DATA
+     ======================= */
+
+  totalQuestions = computed(() =>
+    this.quiz()?.questions?.length ?? 0,
+  );
+
+  currentQuestion = computed(() =>
+    this.quiz()?.questions[this.currentIndex()],
+  );
+
+  progressPercent = computed(() =>
+    this.totalQuestions()
+      ? Math.round(((this.currentIndex() + 1) / this.totalQuestions()) * 100)
+      : 0,
+  );
+
+  /* =======================
+     TIMER (⏱)
+     ======================= */
+
+  totalTime = signal<number>(0);     // seconds
+  elapsedTime = signal<number>(0);
+
+  remainingTime = computed(() => {
+    const remaining = Math.max(this.totalTime() - this.elapsedTime(), 0);
+    const min = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const sec = (remaining % 60).toString().padStart(2, '0');
+    return `${min}:${sec}`;
+  });
+
+  private timerRef: any;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder,
+    private quizService: QuizPlayerService,
+  ) {}
+
+  /* =======================
+     LIFECYCLE
+     ======================= */
+
+  ngOnInit(): void {
+    this.quizId = this.route.snapshot.paramMap.get('quizId')!;
+    this.initForm();
+    this.loadQuiz();
+  }
+
+  /* =======================
+     INIT
+     ======================= */
+
+  initForm() {
+    this.answerForm = this.fb.group({
+      selectedOptionIndex: [null],
+    });
+  }
+
+  loadQuiz() {
+    this.quizService.getQuiz(this.quizId).subscribe(res => {
+      this.quiz.set(res.data);
+
+      // ⏱ init timer
+      this.totalTime.set(res.data.timeLimit * 60);
+      this.startTimer();
+
+      this.startAttempt();
+    });
+  }
+
+  startAttempt() {
+    this.quizService
+      .startAttempt(this.quizId, '695f7eceebf73de912504bc3')
+      .subscribe(res => {
+        this.attemptId.set(res.attemptId);
+      });
+  }
+
+  /* =======================
+     TIMER LOGIC
+     ======================= */
+
+  startTimer() {
+    this.timerRef = setInterval(() => {
+      this.elapsedTime.update(v => v + 1);
+
+      if (this.elapsedTime() >= this.totalTime()) {
+        clearInterval(this.timerRef);
+        this.submitQuiz(); // auto submit
+      }
+    }, 1000);
+  }
+
+  /* =======================
+     ANSWER ACTIONS
+     ======================= */
+
+  selectOption(index: number) {
+    this.answerForm.patchValue({ selectedOptionIndex: index });
+
+    this.quizService.saveAnswer({
+      attemptId: this.attemptId()!,
+      questionId: this.currentQuestion()._id,
+      selectedOptionIndex: index,
+    }).subscribe();
+  }
+
+  /* =======================
+     NAVIGATION
+     ======================= */
+
+  next() {
+    if (this.currentIndex() < this.totalQuestions() - 1) {
+      this.currentIndex.update(v => v + 1);
+      this.answerForm.reset();
+    }
+  }
+
+  prev() {
+    if (this.currentIndex() > 0) {
+      this.currentIndex.update(v => v - 1);
+      this.answerForm.reset();
+    }
+  }
+
+  jumpTo(index: number) {
+    if (index >= 0 && index < this.totalQuestions()) {
+      this.currentIndex.set(index);
+      this.answerForm.reset();
+    }
+  }
+
+  /* =======================
+     SUBMIT
+     ======================= */
+
+  submitQuiz() {
+    if (this.timerRef) {
+      clearInterval(this.timerRef);
+    }
+
+    this.quizService
+      .submitQuiz(this.attemptId()!)
+      .subscribe(res => {
+        this.quizService.resultResponse = res;
+        this.router.navigate(['/quiz-result']);
+       // alert(`Score: ${res.score}/${res.totalMarks}`);
+      });
+  }
 }

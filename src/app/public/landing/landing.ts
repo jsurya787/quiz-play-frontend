@@ -26,7 +26,7 @@ import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
     HeroComponent,
     FeaturesComponent,
     TestimonialsComponent,
-    AboutComponent,
+   // AboutComponent,
     FooterComponent,
     SubjectsComponent,
     DarkHighlightComponent,
@@ -44,12 +44,12 @@ import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
 export class LandingComponent {
 
 constructor(private meta: Meta, private title: Title) {
-  this.title.setTitle('LearnGround – Class 10 & 12 Quiz Platform');
+  this.title.setTitle('QuizPlay – Class 10 & 12 Quiz Platform');
 
   this.meta.addTags([
     { name: 'description', content: 'Practice Math, Physics & Chemistry quizzes for CBSE & ICSE students.' },
     { name: 'keywords', content: 'CBSE quiz, ICSE quiz, class 10 quiz, class 12 quiz' },
-    { property: 'og:title', content: 'LearnGround – Smart Quiz Platform' },
+    { property: 'og:title', content: 'QuizPlay – Smart Quiz Platform' },
     { property: 'og:description', content: 'Interactive quizzes for board exam preparation.' }
   ]);
 }

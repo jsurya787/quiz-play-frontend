@@ -2,8 +2,9 @@ import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
-declare const google: any;
+import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../../environment';
+import { endpoints } from '../../../endpoints';
 
 @Component({
   standalone: true,
@@ -24,8 +25,8 @@ declare const google: any;
       </button>
 
       <!-- GOOGLE LOGIN BUTTON -->
-      <div class="mt-6">
-        <div id="googleBtn"></div>
+      <div class="mt-6 flex justify-center">
+        <div id="googleBtn" class="w-full flex justify-center"></div>
       </div>
 
       <p class="text-center text-sm mt-4">
@@ -42,47 +43,39 @@ declare const google: any;
 export class LoginComponent implements AfterViewInit {
 
   constructor(
-    private router: Router,
-    private http: HttpClient
+    private authService: AuthService,
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   ngAfterViewInit(): void {
-    google.accounts.id.initialize({
-      client_id:
-        '258326031404-hdqc40qajfvrlvi6v85ua8la1ncds6fe.apps.googleusercontent.com',
-      callback: (response: any) => {
-        this.handleGoogleLogin(response.credential);
-      },
-    });
-
-    google.accounts.id.renderButton(
-      document.getElementById('googleBtn'),
-      {
-        theme: 'outline',
-        size: 'large',
-        width: 320,
+    this.authService.initGoogleLogin(
+      environment.googleClientId,
+      (response: any) => {
+        this.onGoogleLogin(response.credential);
       }
     );
+
+    this.authService.renderButton('googleBtn');
   }
 
-  handleGoogleLogin(idToken: string) {
+  private onGoogleLogin(idToken: string): void {
     this.http
-      .post('http://localhost:3000/auth/google', {
-        idToken,
-      })
+      .post(environment.apiUrl + endpoints.auth.loginWithGoogle, { idToken })
       .subscribe({
         next: (res: any) => {
-          // store JWT (for now localStorage; later HttpOnly cookie)
-          localStorage.setItem('accessToken', res.accessToken);
+          console.log('res ====>', res);
+          this.authService.storeToken(res.accessToken);
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error('Google login failed', err);
+          alert(err?.error?.message || 'Google login failed');
         },
       });
   }
 
-  login() {
+  login(): void {
     this.router.navigate(['/dashboard']);
   }
 }

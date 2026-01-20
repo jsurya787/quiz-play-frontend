@@ -3,67 +3,116 @@
   class="fixed top-0 left-0 w-full z-50
          bg-white/70 backdrop-blur-xl
          border-b border-gray-200/60
-         shadow-sm">
-
+         shadow-sm"
+>
   <div
     class="max-w-7xl mx-auto px-4 sm:px-6
            h-14 sm:h-16
-           flex items-center justify-between">
-
+           flex items-center justify-between"
+  >
     <!-- Logo -->
     <div
       class="flex items-center gap-2
              text-lg sm:text-xl font-extrabold
              text-indigo-600 cursor-pointer
              transition hover:opacity-90"
-      [routerLink]="['']">
-
-      <!-- Optional dot / accent -->
-      <span
-        class="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-500">
-      </span>
-
+      [routerLink]="['']"
+    >
+      <span class="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
       QuizPlay
     </div>
 
-    <!-- Right Actions -->
+    <!-- ================= RIGHT ACTIONS ================= -->
     <div class="flex items-center gap-3 sm:gap-4">
+      <!-- 🔐 NOT AUTHENTICATED -->
+      @if (!_authService.isAuthenticated()) {
 
-      <!-- Login -->
+        <button
+          class="hidden sm:inline-flex items-center
+                 text-sm font-semibold text-gray-700
+                 hover:text-indigo-600 transition"
+          [routerLink]="['/login']"
+        >
+          Login
+        </button>
+
+        <span class="hidden sm:block h-5 w-px bg-gray-200"></span>
+
+        <button
+          class="inline-flex items-center gap-1.5
+                 px-4 sm:px-6
+                 py-1.5 sm:py-2
+                 text-xs sm:text-sm
+                 font-semibold text-white
+                 rounded-full bg-indigo-600
+                 shadow-sm transition-all
+                 hover:bg-indigo-700 hover:shadow-md
+                 active:scale-95"
+          [routerLink]="['/dashboard']"
+        >
+          Get Started →
+        </button>
+
+      }
+
+    <!-- 👤 AUTHENTICATED -->
+    @else {
+
+      <!-- User Avatar Button -->
       <button
-        class="hidden sm:inline-flex items-center
-               text-sm font-semibold text-gray-700
-               hover:text-indigo-600
-               transition"
-        [routerLink]="['login']">
-        Login
+        class="h-9 w-9 rounded-full
+              bg-indigo-100 border border-indigo-200
+              flex items-center justify-center
+              text-indigo-600
+              hover:bg-indigo-200 transition"
+        (click)="isUserMenuOpen = true"
+        aria-label="User menu"
+      >
+        <!-- User SVG Icon -->
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 6a3.75 3.75 0 11-7.5 0
+              3.75 3.75 0 017.5 0z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.5 20.25a7.5 7.5 0 0115 0"
+          />
+        </svg>
       </button>
 
-      <!-- Divider (desktop only) -->
-      <span class="hidden sm:block h-5 w-px bg-gray-200"></span>
-
-      <!-- Sign Up (Primary CTA) -->
-      <button
-        class="inline-flex items-center gap-1.5
-               px-4 sm:px-6
-               py-1.5 sm:py-2
-               text-xs sm:text-sm
-               font-semibold text-white
-               rounded-full
-               bg-indigo-600
-               shadow-sm
-               transition-all
-               hover:bg-indigo-700
-               hover:shadow-md
-               active:scale-95" [routerLink]="['login']">
-        Get Started →
-      </button>
+    }
 
     </div>
   </div>
 </header>
 
+<!-- ================= USER MENU ================= -->
+<div class="relative">
+  <!-- USER ICON -->
+  <button
+    (click)="isUserMenuOpen = !isUserMenuOpen"
+  >
+  </button>
+
+  <!-- USER MENU -->
+  <app-user-menu
+    [open]="isUserMenuOpen"
+    (close)="isUserMenuOpen = false"
+  >
+  </app-user-menu>
+</div>
+
 <!-- ================= PAGE CONTENT ================= -->
-<main class="pt-16 sm:pt-20">
+<main class="pt-5 sm:pt-5">
   <router-outlet></router-outlet>
 </main>

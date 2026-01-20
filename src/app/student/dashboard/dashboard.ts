@@ -1,33 +1,49 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Subject, SubjectService } from '../../services/subject.service';
+import { QuizService } from '../../services/quiz.service';
+import { AdminRoutingModule } from "../../admin/admin-routing-module";
 
 @Component({
   standalone: true,
-  template: `
-  <section class="py-20 px-6 max-w-7xl mx-auto">
-
-    <h1 class="text-4xl font-bold mb-10">
-      Welcome back 👋
-    </h1>
-
-    <div class="grid md:grid-cols-3 gap-8">
-
-      <div class="card">
-        <h3>Math Quiz</h3>
-        <button class="btn-primary mt-4">Start</button>
-      </div>
-
-      <div class="card">
-        <h3>Physics Quiz</h3>
-        <button class="btn-primary mt-4">Start</button>
-      </div>
-
-      <div class="card">
-        <h3>Chemistry Quiz</h3>
-        <button class="btn-primary mt-4">Start</button>
-      </div>
-
-    </div>
-  </section>
-  `
+  templateUrl:'./dashboard.html',
+  styleUrls: ['./dashboard.css'],
+  imports: [AdminRoutingModule],
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+
+  private subjectService = inject(SubjectService);
+  private quizService = inject(QuizService);
+  subjects = signal<Subject[]>([]);
+  quizess = signal<any[]>([]);
+  constructor(){
+    this.loadSubjects();
+    this.loadQuizes();
+  }
+
+  
+
+  loadSubjects(): void {
+    this.subjectService.getSubjects().subscribe({
+      next: res => {
+        if (res.success) {
+          this.subjects.set(res.data);
+        }
+      },
+      error: err =>
+        console.error(err.error?.message || 'Failed to load subjects'),
+    });
+  }
+
+  loadQuizes(): void {
+    this.quizService.getQuizes().subscribe({
+      next: res => {
+        if (res.success) {
+          this.quizess.set(res.data);
+        }
+      },
+      error: err =>
+        console.error(err.error?.message || 'Failed to load subjects'),
+    });
+  }
+  
+}
