@@ -1,81 +1,71 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
-import { environment } from '../../../../environment';
-import { endpoints } from '../../../endpoints';
 
 @Component({
   standalone: true,
   imports: [CommonModule],
   template: `
-  <section class="min-h-screen flex items-center justify-center bg-gray-50 px-6">
-    <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md">
+<section
+  class="relative min-h-screen flex items-center justify-center
+         overflow-hidden px-6
+         bg-gradient-to-br from-indigo-100/60 via-white to-sky-100/60">
 
-      <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
+  <div
+    class="w-full max-w-md rounded-2xl
+           bg-white/80 backdrop-blur
+           p-10 shadow-xl">
 
-      <input class="input" placeholder="Email" />
-      <input class="input mt-4" placeholder="Password" type="password"/>
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-900">
+      Login
+    </h2>
 
-      <button
-        class="btn-primary w-full mt-6"
-        (click)="login()">
-        Login
-      </button>
+    <input class="input mb-4" placeholder="Email / Phone" />
+    <input class="input mb-6" placeholder="Password" type="password" />
 
-      <!-- GOOGLE LOGIN BUTTON -->
-      <div class="mt-6 flex justify-center">
-        <div id="googleBtn" class="w-full flex justify-center"></div>
-      </div>
+    <button class="btn-primary w-full mb-6">
+      Login
+    </button>
 
-      <p class="text-center text-sm mt-4">
-        New here?
-        <a routerLink="/signup" class="text-indigo-600 font-semibold">
-          Create account
-        </a>
-      </p>
+    <!-- ✅ GOOGLE LOGIN (SAME TAB, GUARANTEED) -->
+    <button
+      class="w-full
+             flex items-center justify-center gap-3
+             border border-gray-300
+             rounded-xl py-3
+             bg-white hover:bg-gray-50
+             shadow-sm transition"
+      (click)="loginWithGoogle()">
 
-    </div>
-  </section>
+      <img
+        src="https://developers.google.com/identity/images/g-logo.png"
+        class="w-5 h-5"
+        alt="Google" />
+
+      <span class="font-semibold text-gray-700">
+        Continue with Google
+      </span>
+    </button>
+
+    <p class="text-center text-sm mt-6 text-gray-600">
+      New here?
+      <a routerLink="/signup" class="text-indigo-600 font-semibold hover:underline">
+        Create account
+      </a>
+    </p>
+
+  </div>
+</section>
   `
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent {
 
   constructor(
-    private authService: AuthService,
-    private http: HttpClient,
-    private router: Router
+    private authService: AuthService
   ) {}
 
-  ngAfterViewInit(): void {
-    this.authService.initGoogleLogin(
-      environment.googleClientId,
-      (response: any) => {
-        this.onGoogleLogin(response.credential);
-      }
-    );
-
-    this.authService.renderButton('googleBtn');
+  loginWithGoogle(): void {
+    this.authService.loginWithGoogle();
   }
 
-  private onGoogleLogin(idToken: string): void {
-    this.http
-      .post(environment.apiUrl + endpoints.auth.loginWithGoogle, { idToken })
-      .subscribe({
-        next: (res: any) => {
-          console.log('res ====>', res);
-          this.authService.storeToken(res.accessToken);
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          console.error('Google login failed', err);
-          alert(err?.error?.message || 'Google login failed');
-        },
-      });
-  }
-
-  login(): void {
-    this.router.navigate(['/dashboard']);
-  }
 }

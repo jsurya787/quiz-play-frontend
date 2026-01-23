@@ -1,68 +1,89 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../environment';
+import { endpoints } from '../../endpoints';
 
-declare const google: any;
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'quizapp_google_id_token';
-  public userId = "695f7eceebf73de912504bc3";
+  private accessToken$ = new BehaviorSubject<string | null>(null);
 
-  constructor(private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
-  /** Initialize Google Login */
-  initGoogleLogin(clientId: string, callback: (response: any) => void) {
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback,
+  // ============================
+  // 🔑 GOOGLE LOGIN (REDIRECT)
+  // ============================
+  loginWithGoogle(): void {
+    const params = new URLSearchParams({
+      client_id: environment.googleClientId,
+      redirect_uri: `${window.location.origin}/auth/google/callback`,
+      response_type: 'code',
+      scope: 'openid email profile',
+      access_type: 'offline',
+      prompt: 'select_account',
     });
+
+    // ✅ Same-tab redirect (SSR-safe)
+    window.location.href =
+      `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 
-  /** Render Google Sign-In button */
-  renderButton(elementId: string) {
-    google.accounts.id.renderButton(
-      document.getElementById(elementId),
-      {
-        theme: 'outline',
-        size: 'large',
-        width: 300,
-      }
+  // ============================
+  // 🔐 TOKEN MANAGEMENT
+  // ============================
+  setAccessToken(token: string) {
+    this.accessToken$.next(token);
+  }
+
+  getAccessToken(): string | null {
+    return this.accessToken$.value;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.accessToken$.value;
+  }
+
+  refreshToken() {
+    return this.http.post<{ accessToken: string }>(
+      environment.apiUrl + endpoints.auth.refresh,
+      {},
+      { withCredentials: true },
+    ).pipe(
+      tap(res => this.setAccessToken(res.accessToken))
     );
   }
 
-  /** Handle login success */
-  loginWithGoogle(response: any): void {
-    if (response?.credential) {
-      localStorage.setItem(this.TOKEN_KEY, response.credential);
-      this.router.navigate(['/dashboard']);
-    }
+  bootstrapAuth(): Promise<void> {
+    return new Promise(resolve => {
+      this.refreshToken().subscribe({
+        next: () => resolve(),
+        error: () => resolve(),
+        complete: () => resolve(),
+      });
+
+      setTimeout(resolve, 300); // SSR safety
+    });
   }
 
-  /** Logout */
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-
-    // Optional: Google logout
-    if (google?.accounts?.id) {
-      google.accounts.id.disableAutoSelect();
-    }
-
-    this.router.navigate(['/login']);
+    this.http
+      .post(environment.apiUrl + endpoints.auth.logout, {}, {
+        withCredentials: true,
+      })
+      .subscribe({
+        complete: () => {
+          this.accessToken$.next(null);
+          this.router.navigate(['/login']);
+        },
+      });
   }
 
-  /** Check auth status */
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  /** Get token */
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  storeToken(token: string): void {
-  localStorage.setItem(this.TOKEN_KEY, token);
-  }
 }
+
+
+

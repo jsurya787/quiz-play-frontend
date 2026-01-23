@@ -2,7 +2,9 @@ export const  endpoints = {
     auth: {
         login: '/auth/login',
         loginWithGoogle: '/auth/google', 
-        signup: '/auth/signup'
+        signup: '/auth/signup',
+        refresh: '/auth/refresh',
+        logout:'/auth/logout'
     },
     student: {
         dashboard: '/student/dashboard'

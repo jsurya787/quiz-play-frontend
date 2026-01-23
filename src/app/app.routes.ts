@@ -1,33 +1,114 @@
 import { Routes } from '@angular/router';
-import { LandingComponent } from './public/landing/landing';
-import { LoginComponent } from './auth/login/login';
-import { SignupComponent } from './auth/signup/signup';
-import { DashboardComponent } from './student/dashboard/dashboard';
-import { SubjectPage } from './subject-page/subject-page';
-import { QuizPlayerPageComponent } from './quiz-player-page/quiz-player-page';
-import { CreateQuizPage } from './create-quiz-page/create-quiz-page';
-import { ChapterPagePage } from './chapter-page-page/chapter-page-page';
 import { AuthGuard } from './guards/auth.guard';
-import { QuizResultPageComponent } from './quiz-result-page-component/quiz-result-page-component';
+import { PublicGuard } from './guards/public.guard';
 
+// ==============================
+// ROUTES (SSR OPTIMIZED + SECURE)
+// ==============================
 export const routes: Routes = [
+
+  // --------------------------------------------------
+  // 🔐 GOOGLE OAUTH CALLBACK (MUST BE FIRST)
+  // --------------------------------------------------
   {
-    path: 'admin',
-    loadChildren: () =>
-      import('./admin/admin-module').then(m => m.AdminModule),
+    path: 'auth/google/callback',
+    loadComponent: () =>
+      import('./auth/google-callback/google-callback')
+        .then(m => m.GoogleCallbackComponent),
+  },
+
+  // --------------------------------------------------
+  // 🔑 AUTH PAGES (PUBLIC ONLY)
+  // ❌ BLOCK IF ALREADY LOGGED IN
+  // --------------------------------------------------
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./auth/login/login')
+        .then(m => m.LoginComponent),
+    canActivate: [PublicGuard],
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./auth/signup/signup')
+        .then(m => m.SignupComponent),
+    canActivate: [PublicGuard],
+  },
+
+  // --------------------------------------------------
+  // 🏠 PUBLIC PAGES (SSR FIRST RENDER)
+  // --------------------------------------------------
+  {
+    path: '',
+    loadComponent: () =>
+      import('./public/landing/landing')
+        .then(m => m.LandingComponent),
+  },
+
+  // --------------------------------------------------
+  // 🎓 PROTECTED STUDENT AREA
+  // --------------------------------------------------
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./student/dashboard/dashboard')
+        .then(m => m.DashboardComponent),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'subject-page',
+    loadComponent: () =>
+      import('./subject-page/subject-page')
+        .then(m => m.SubjectPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'chapter-page',
+    loadComponent: () =>
+      import('./chapter-page-page/chapter-page-page')
+        .then(m => m.ChapterPagePage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'quiz-player-page/:quizId',
+    loadComponent: () =>
+      import('./quiz-player-page/quiz-player-page')
+        .then(m => m.QuizPlayerPageComponent),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'quiz-result',
+    loadComponent: () =>
+      import('./quiz-result-page-component/quiz-result-page-component')
+        .then(m => m.QuizResultPageComponent),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'create-quiz-page',
+    loadComponent: () =>
+      import('./create-quiz-page/create-quiz-page')
+        .then(m => m.CreateQuizPage),
     canActivate: [AuthGuard],
   },
 
-  { path: '', component: LandingComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: 'subject-page', component: SubjectPage },
-  { path: 'create-quiz-page', component: CreateQuizPage },
-  { path: 'quiz-player-page/:quizId', component: QuizPlayerPageComponent },
-  { path: 'quiz-result', component: QuizResultPageComponent},
-  { path: 'chapter-page', component: ChapterPagePage },
-  { path: 'dashboard', component: DashboardComponent },
+  // --------------------------------------------------
+  // 🛠️ ADMIN (LAZY MODULE)
+  // --------------------------------------------------
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./admin/admin-module')
+        .then(m => m.AdminModule),
+    canActivate: [AuthGuard],
+  },
 
-  /** ✅ Fallback route (ALWAYS LAST) */
-  { path: '**', redirectTo: '', pathMatch: 'full' },
+  // --------------------------------------------------
+  // 🚨 FALLBACK (ALWAYS LAST)
+  // --------------------------------------------------
+  {
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full',
+  },
 ];

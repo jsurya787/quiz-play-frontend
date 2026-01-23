@@ -1,21 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { CanActivate, Router, UrlTree } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { filter, map, Observable, take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard implements CanActivate {
-
+export class PublicGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
 
   canActivate(): boolean {
     if (this.auth.isAuthenticated()) {
-      return true;
+      this.router.navigate(['/dashboard']);
+      return false;
     }
-
-    this.router.navigate(['/login']);
-    return false;
+    return true;
   }
-
 }
 
