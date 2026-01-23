@@ -1,4 +1,8 @@
 <!-- ================= HEADER ================= -->
+
+@if (_loaderService.loading()) {
+  <app-loader />
+}
 <header
   class="fixed top-0 left-0 w-full z-50
          bg-white/70 backdrop-blur-xl

@@ -7,12 +7,16 @@ import {
 import { App } from './app/app';
 import { appConfig } from './app/app.config';
 import { authInterceptor } from './app/interceptors/auth.interceptor';
+import { loaderInterceptor } from './app/interceptors/loader.interceptor';
 
 bootstrapApplication(App, {
   providers: [
     provideHttpClient(
-      withFetch(),                    // SSR-safe
-      withInterceptors([authInterceptor]) // 🔥 Angular 20 way
+      withFetch(), // ✅ SSR-safe
+      withInterceptors([
+        authInterceptor,
+        loaderInterceptor, // ✅ function interceptor
+      ])
     ),
     ...(appConfig.providers ?? []),
   ],

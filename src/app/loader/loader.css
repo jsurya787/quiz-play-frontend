@@ -1,0 +1,107 @@
+/* =========================================
+   🎬 CINEMATIC LOADER ANIMATIONS
+   QuizPlay – Production Ready
+   ========================================= */
+
+/* ------------------------------
+   Fade + Scale IN (entry)
+-------------------------------- */
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ------------------------------
+   Fade + Scale OUT (exit)
+-------------------------------- */
+@keyframes fadeScaleOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+/* ------------------------------
+   Slow smooth spin (premium feel)
+-------------------------------- */
+@keyframes slowSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------
+   Floating blobs (background)
+-------------------------------- */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -20px, 0);
+  }
+}
+
+@keyframes floatSlower {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-15px, 25px, 0);
+  }
+}
+
+/* =========================================
+   🎞️ UTILITY CLASSES
+   ========================================= */
+
+.animate-fade-scale-in {
+  animation: fadeScaleIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.animate-fade-scale-out {
+  animation: fadeScaleOut 0.35s ease both;
+  will-change: opacity, transform;
+}
+
+.animate-slow-spin {
+  animation: slowSpin 1.6s linear infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-slower {
+  animation: floatSlower 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* =========================================
+   ♿ ACCESSIBILITY – REDUCED MOTION
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-scale-in,
+  .animate-fade-scale-out,
+  .animate-slow-spin,
+  .animate-float-slow,
+  .animate-float-slower {
+    animation: none !important;
+    transform: none !important;
+  }
+}

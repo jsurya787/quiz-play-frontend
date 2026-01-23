@@ -10,6 +10,7 @@ import { AuthService } from '../services/auth.service';
 export class UserMenuComponent {
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
+  year: any = new Date().getFullYear();
 
   constructor(
     private auth: AuthService,
