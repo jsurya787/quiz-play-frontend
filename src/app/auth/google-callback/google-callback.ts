@@ -44,7 +44,8 @@ export class GoogleCallbackComponent implements OnInit {
       next: (res) => {
         console.log('OAuth success:', res);
         this.auth.setAccessToken(res.accessToken);
-        this.router.navigate(['/dashboard']);
+       // this.router.navigate(['/dashboard']);
+       this.router.navigate(['/login-success']);
       },
       error: (err) => {
         console.error('OAuth failed:', err);

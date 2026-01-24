@@ -9,6 +9,7 @@ import { endpoints } from '../../endpoints';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private accessToken$ = new BehaviorSubject<string | null>(null);
+  private authReady$ = new BehaviorSubject(false);
 
   constructor(
     private http: HttpClient,
@@ -48,13 +49,20 @@ export class AuthService {
     return !!this.accessToken$.value;
   }
 
+  isReady(): boolean {
+    return this.authReady$.value;
+  }
+
   refreshToken() {
     return this.http.post<{ accessToken: string }>(
       environment.apiUrl + endpoints.auth.refresh,
       {},
       { withCredentials: true },
     ).pipe(
-      tap(res => this.setAccessToken(res.accessToken))
+      tap(res => {
+        this.setAccessToken(res.accessToken);
+        this.authReady$.next(true);
+      })
     );
   }
 
@@ -62,11 +70,17 @@ export class AuthService {
     return new Promise(resolve => {
       this.refreshToken().subscribe({
         next: () => resolve(),
-        error: () => resolve(),
-        complete: () => resolve(),
+        error: () => {
+          this.authReady$.next(true);
+          resolve();
+        },
       });
 
-      setTimeout(resolve, 300); // SSR safety
+      // fallback safety
+      setTimeout(() => {
+        this.authReady$.next(true);
+        resolve();
+      }, 500);
     });
   }
 

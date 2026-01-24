@@ -1,0 +1,48 @@
+/* ✨ Sparkles */
+.sparkle {
+  position: absolute;
+  font-size: 18px;
+  opacity: 0;
+  animation: sparkleFloat 3s ease-in-out infinite;
+}
+
+.sparkle-1 { top: 35%; left: 48%; animation-delay: 0s; }
+.sparkle-2 { top: 42%; left: 55%; animation-delay: .8s; }
+.sparkle-3 { top: 48%; left: 45%; animation-delay: 1.6s; }
+
+@keyframes sparkleFloat {
+  0%   { transform: translateY(6px) scale(.6); opacity: 0; }
+  40%  { opacity: .9; }
+  100% { transform: translateY(-16px) scale(1); opacity: 0; }
+}
+
+/* 🎬 Card entrance */
+@keyframes cardPop {
+  0%   { opacity: 0; transform: scale(.94) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-card-pop {
+  animation: cardPop .45s cubic-bezier(.22,1,.36,1);
+}
+
+/* ✅ Check bounce */
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.animate-check-pop {
+  animation: checkPop .4s ease-out;
+}
+
+/* 🌟 Glow breathing */
+@keyframes pulseSlow {
+  0%,100% { opacity: .45; }
+  50% { opacity: .75; }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3.5s ease-in-out infinite;
+}

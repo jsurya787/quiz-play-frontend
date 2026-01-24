@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -61,11 +62,22 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
 
   constructor(
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private router: Router
+  ) {
+    const check = setInterval(() => {
+      if (this.authService.isReady()) {
+        clearInterval(check);
+
+        if (this.authService.isAuthenticated()) {
+          this.router.navigate(['/dashboard']);
+        }
+      }
+    }, 50);
+  }
 
   loginWithGoogle(): void {
     this.authService.loginWithGoogle();
   }
-
+  
 }
