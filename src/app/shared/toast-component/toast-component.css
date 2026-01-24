@@ -1,0 +1,92 @@
+/* ===============================
+   🎬 TOAST BASE
+================================ */
+.toast-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 280px;
+  padding: 14px 18px;
+
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.82);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  overflow: hidden;
+}
+
+/* ===============================
+   ✨ GLOW LAYER
+================================ */
+.toast-glow {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.45;
+  z-index: -1;
+}
+
+/* ===============================
+   🔵 DOT
+================================ */
+.toast-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* ===============================
+   📝 TEXT
+================================ */
+.toast-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+/* ===============================
+   🎨 TYPES
+================================ */
+.toast-success .toast-dot { background: #22c55e; }
+.toast-success .toast-glow { background: #22c55e; }
+
+.toast-error .toast-dot { background: #ef4444; }
+.toast-error .toast-glow { background: #ef4444; }
+
+.toast-info .toast-dot { background: #3b82f6; }
+.toast-info .toast-glow { background: #3b82f6; }
+
+.toast-warning .toast-dot { background: #f59e0b; }
+.toast-warning .toast-glow { background: #f59e0b; }
+
+/* ===============================
+   🎥 ENTRY ANIMATION
+================================ */
+.toast-enter {
+  animation: toastEnter 420ms cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+    filter: blur(6px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}

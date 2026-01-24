@@ -42,36 +42,57 @@
     <!-- FILTER BAR -->
     <div
       class="mb-10 flex flex-col md:flex-row gap-4 justify-between
-             bg-white/70 backdrop-blur-lg
-             rounded-2xl shadow-md p-4
-             animate-quiz-card">
+            bg-white/70 backdrop-blur-lg
+            rounded-2xl shadow-md p-4
+            animate-quiz-card">
 
+      <!-- 🔍 SEARCH -->
       <input
         type="text"
         placeholder="Search quizzes..."
         class="input md:w-1/3"
-      />
+        [value]="search()"
+        (input)="search.set($any($event.target).value); applyFilters()" />
 
-      <select class="input md:w-48">
-        <option>All Subjects</option>
-        <option>Math</option>
-        <option>Physics</option>
-        <option>Chemistry</option>
+      <!-- 📚 SUBJECT -->
+      <select
+        class="input md:w-48"
+        (change)="selectedSubject.set($any($event.target).value || null); applyFilters()">
+
+        <option value="">All Subjects</option>
+        @for (item of subjects(); track item._id) {
+          <option [value]="item._id">
+            {{ item.name }}
+          </option>
+        }
       </select>
 
-      <select class="input md:w-48">
-        <option>All Levels</option>
-        <option>Easy</option>
-        <option>Medium</option>
-        <option>Hard</option>
+      <!-- 🎯 DIFFICULTY -->
+      <select
+        class="input md:w-48"
+        (change)="difficulty.set($any($event.target).value || null); applyFilters()">
+
+        <option value="">All Levels</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
       </select>
+
+      <!-- 🔄 RESET -->
+      <button
+        class="btn-secondary md:w-32"
+        (click)="resetFilters()">
+        Reset
+      </button>
+
     </div>
+
 
     <!-- QUIZ GRID -->
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 
       <!-- QUIZ CARD -->
-      <div
+      <!-- <div
         class="quiz-glow animate-quiz-card
                bg-white/80 backdrop-blur-lg
                rounded-3xl shadow-lg p-6
@@ -101,10 +122,10 @@
         <button class="btn-primary btn-pulse w-full mt-6">
           Start Quiz
         </button>
-      </div>
+      </div> -->
 
       <!-- QUIZ CARD -->
-      <div
+      <!-- <div
         class="quiz-glow animate-quiz-card
                bg-white/80 backdrop-blur-lg
                rounded-3xl shadow-lg p-6
@@ -134,10 +155,10 @@
         <button class="btn-primary btn-pulse w-full mt-6">
           Start Quiz
         </button>
-      </div>
+      </div> -->
 
       <!-- QUIZ CARD -->
-      <div
+      <!-- <div
         class="quiz-glow animate-quiz-card
                bg-white/80 backdrop-blur-lg
                rounded-3xl shadow-lg p-6
@@ -168,7 +189,7 @@
         <button class="btn-primary btn-pulse w-full mt-6">
           Start Quiz
         </button>
-      </div>
+      </div> -->
 
       @for (item of quizess(); track $index) {
               <div

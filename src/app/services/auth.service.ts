@@ -97,6 +97,25 @@ export class AuthService {
       });
   }
 
+  setPassword(password: string) {
+    return this.http.post(
+      environment.apiUrl + endpoints.auth.setPassword,
+      { password },
+      { withCredentials: true }
+    );
+  }
+
+  loginWithPassword(email: string, password: string) {
+  return this.http.post<any>(
+    environment.apiUrl + '/auth/login',
+    { email, password },
+    { withCredentials: true }
+  ).pipe(
+    tap(res => this.setAccessToken(res.accessToken))
+  );
+}
+
+
 }
 
 

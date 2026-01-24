@@ -1,5 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { QuizPlayerService } from '../services/quiz-player.service';
+import { Router } from '@angular/router';
 
 /* ================= TYPES ================= */
 type QuestionStatus = 'correct' | 'wrong' | 'skipped';
@@ -29,6 +30,7 @@ export class QuizResultPageComponent implements OnInit {
 
   constructor(
     private quizService: QuizPlayerService,
+    private router: Router
   ) {}
 
   /* ================= MOCK RESPONSE (YOUR EXACT DATA) ================= */
@@ -102,6 +104,15 @@ export class QuizResultPageComponent implements OnInit {
 
     this.loading.set(false);
   }
+
+  goToDashboard() {
+  this.router.navigate(['/dashboard']);
+}
+
+goToHome() {
+  this.router.navigate(['/']);
+}
+
 
   /* ================= FUTURE API REPLACEMENT ================= */
   /*

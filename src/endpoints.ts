@@ -4,7 +4,8 @@ export const  endpoints = {
         loginWithGoogle: '/auth/google', 
         signup: '/auth/signup',
         refresh: '/auth/refresh',
-        logout:'/auth/logout'
+        logout:'/auth/logout',
+        setPassword: '/auth/set-password'
     },
     student: {
         dashboard: '/student/dashboard'

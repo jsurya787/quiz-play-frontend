@@ -281,12 +281,12 @@
         </div>
       </div>
     </div>
-
+<!-- 
     <button
       routerLink="/dashboard"
       class="header-btn">
       🏠 Dashboard
-    </button>
+    </button> -->
 
   </header>
 
@@ -356,13 +356,19 @@
 
       <!-- ACTION BUTTONS -->
       <div class="action-buttons">
-        <button class="btn-primary" routerLink="/quiz/start">
+        <button
+          class="btn-primary"
+          (click)="goToDashboard()">
           🚀 Start New Quiz
         </button>
-        <button class="btn-secondary" routerLink="/dashboard">
-          🏠 Go to Dashboard
+
+        <button
+          class="btn-secondary"
+          (click)="goToHome()">
+          🏠 Go to Home
         </button>
       </div>
+
 
     </div>
 

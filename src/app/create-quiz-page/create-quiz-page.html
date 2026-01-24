@@ -1,39 +1,39 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 pt-7">
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 pt-6">
 
   <!-- =======================
        MOBILE QUIZ INFO
        ======================= -->
   <form
     [formGroup]="quizForm"
-    class="lg:hidden bg-white/80 backdrop-blur-md shadow-md rounded-b-3xl p-4"
-  >
-    <h2 class="text-lg font-bold text-indigo-600 mb-2">
+    class="lg:hidden
+           bg-white/85 backdrop-blur-xl
+           shadow-[0_20px_40px_rgba(0,0,0,0.08)]
+           rounded-b-3xl
+           p-5">
+
+    <h2 class="text-lg font-extrabold text-indigo-700 mb-3">
       Create Quiz
     </h2>
 
-    <!-- Title + Description -->
     <div class="space-y-3">
       <input
-        class="input"
+        class="input focus:ring-2 focus:ring-indigo-300"
         placeholder="Quiz Title"
-        formControlName="title"
-      />
+        formControlName="title" />
 
       <textarea
         rows="2"
-        class="textarea"
+        class="textarea focus:ring-2 focus:ring-indigo-300"
         placeholder="Quiz Description"
-        formControlName="description"
-      ></textarea>
+        formControlName="description">
+      </textarea>
 
       <div class="grid grid-cols-2 gap-3">
         <select class="input" formControlName="subjectId">
           <option value="">Select Subject</option>
-        @for (subject of subjects(); track subject._id) {
-          <option [value]="subject._id">
-            {{ subject.name }}
-          </option>
-        }
+          @for (subject of subjects(); track subject._id) {
+            <option [value]="subject._id">{{ subject.name }}</option>
+          }
         </select>
 
         <select class="input" formControlName="difficulty">
@@ -45,16 +45,14 @@
           class="input col-span-2"
           type="number"
           placeholder="Time (min)"
-          formControlName="timeLimit"
-        />
+          formControlName="timeLimit" />
       </div>
     </div>
 
     <button
       type="button"
-      class="mt-4 w-full btn-primary"
-      (click)="saveDraft()"
-    >
+      class="mt-5 w-full btn-primary active:scale-[0.98]"
+      (click)="saveDraft()">
       Save Draft
     </button>
   </form>
@@ -66,38 +64,33 @@
 
     <!-- DESKTOP SIDEBAR -->
     <aside
-      class="hidden lg:flex w-80 bg-white/70 backdrop-blur-lg
-             rounded-3xl shadow-xl p-6 flex-col gap-6
-             sticky top-6 h-fit"
-    >
-      <h2 class="text-2xl font-bold text-indigo-600">
+      class="hidden lg:flex w-80
+             bg-white/75 backdrop-blur-xl
+             rounded-3xl
+             shadow-[0_30px_60px_rgba(0,0,0,0.12)]
+             p-6
+             flex-col gap-6
+             sticky top-6 h-fit">
+
+      <h2 class="text-2xl font-extrabold text-indigo-700">
         Create Quiz
       </h2>
 
       <form [formGroup]="quizForm" class="space-y-3">
+        <input class="input" placeholder="Quiz Title" formControlName="title" />
 
-        <input
-          class="input"
-          placeholder="Quiz Title"
-          formControlName="title"
-        />
-
-        <!-- ✅ Description adjusted -->
         <textarea
           rows="3"
           class="textarea"
           placeholder="Quiz Description"
-          formControlName="description"
-        ></textarea>
+          formControlName="description">
+        </textarea>
 
         <select class="input" formControlName="subjectId">
           <option value="">Select Subject</option>
-          <option
-            *ngFor="let subject of subjects()"
-            [value]="subject._id"
-          >
-            {{ subject.name }}
-          </option>
+          @for (item of subjects(); track $index) {
+            <option [value]="item._id">{{ item.name }}</option>
+          }
         </select>
 
         <select class="input" formControlName="difficulty">
@@ -110,29 +103,21 @@
           class="input"
           type="number"
           placeholder="Time (min)"
-          formControlName="timeLimit"
-        />
+          formControlName="timeLimit" />
       </form>
 
       <!-- SUMMARY -->
-      <div class="bg-indigo-100 rounded-2xl p-4 text-sm">
-        <p class="font-semibold">Quiz Summary</p>
-        <p class="text-gray-600">
-          Questions: {{ questionCount() }}
-        </p>
-        <p class="text-gray-600">
-          Total Marks: {{ totalMarks() }}
-        </p>
-        <p class="text-gray-600">
-          Total Time: {{ totalMarks() }}
-        </p>
+      <div class="bg-indigo-100/70 rounded-2xl p-4 text-sm space-y-1">
+        <p class="font-semibold text-indigo-700">Quiz Summary</p>
+        <p class="text-gray-600">Questions: {{ questionCount() }}</p>
+        <p class="text-gray-600">Total Marks: {{ totalMarks() }}</p>
+        <p class="text-gray-600">Total Time: {{ totalMarks() }}</p>
       </div>
 
       <button
-        class="btn-primary mt-auto"
+        class="btn-primary mt-auto active:scale-[0.98]"
         type="button"
-        (click)="saveDraft()"
-      >
+        (click)="saveDraft()">
         Save Draft
       </button>
     </aside>
@@ -142,53 +127,116 @@
          ======================= -->
     <main class="flex-1 space-y-6">
 
-      <!-- HEADER -->
-      <div class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6">
-        <h1 class="text-2xl font-bold">Quiz Builder</h1>
-        <p class="text-gray-500 text-sm">
-          Create engaging questions with ease
-        </p>
+      <!-- TOP BAR -->
+      <div
+        class="bg-white/80 backdrop-blur-xl
+               rounded-3xl
+               shadow-[0_20px_40px_rgba(0,0,0,0.1)]
+               p-6
+               flex flex-col sm:flex-row
+               gap-4
+               sm:items-center sm:justify-between">
+
+        <div>
+          <h1 class="text-2xl font-extrabold text-gray-900">
+            Quiz Builder
+          </h1>
+          <p class="text-gray-500 text-sm">
+            Create engaging questions with ease
+          </p>
+        </div>
+
+        <button
+          class="btn-success w-full sm:w-auto active:scale-[0.97]"
+          (click)="publishQuiz()">
+          Publish Quiz 🚀
+        </button>
       </div>
 
       <!-- QUESTION CARD -->
       <form
         [formGroup]="questionForm"
-        class="bg-white rounded-3xl shadow-xl
-               p-6 space-y-4 animate-fade-in"
-      >
+        class="bg-white/90 backdrop-blur
+               rounded-3xl
+               shadow-[0_30px_60px_rgba(0,0,0,0.12)]
+               p-6
+               space-y-5
+               animate-fade-in">
+
         <div class="flex justify-between items-center">
           <h2 class="font-semibold text-lg">
             Question {{ questionCount() + 1 }}
           </h2>
-          <span class="badge">+4 Marks</span>
+
+          <!-- MARKS CONTROL -->
+          <div
+            class="flex items-center gap-3
+                   rounded-2xl
+                   bg-white/80 backdrop-blur-md
+                   px-4 py-2
+                   shadow-[0_8px_20px_rgba(0,0,0,0.08)]
+                   border border-white/60">
+
+            <button
+              type="button"
+              class="h-9 w-9 flex items-center justify-center
+                     rounded-full bg-gray-100 text-gray-700 text-lg
+                     hover:bg-gray-200 active:scale-95
+                     transition-all duration-150
+                     disabled:opacity-40"
+              (click)="decreaseMarks()"
+              [disabled]="marksCtrl.value <= 1">
+              −
+            </button>
+
+            <span
+              class="relative px-4 py-1.5 rounded-full
+                     text-sm font-extrabold tracking-wide
+                     text-indigo-700 bg-indigo-100
+                     shadow-inner animate-pulse-once">
+              +{{ marksCtrl.value }} Marks
+              <span
+                class="absolute inset-0 -z-10 rounded-full
+                       bg-indigo-400/30 blur-lg">
+              </span>
+            </span>
+
+            <button
+              type="button"
+              class="h-9 w-9 flex items-center justify-center
+                     rounded-full bg-gray-100 text-gray-700 text-lg
+                     hover:bg-gray-200 active:scale-95
+                     transition-all duration-150
+                     disabled:opacity-40"
+              (click)="increaseMarks()"
+              [disabled]="marksCtrl.value >= 10">
+              +
+            </button>
+          </div>
         </div>
 
         <textarea
           rows="3"
           placeholder="Type your question..."
           class="textarea"
-          formControlName="questionText"
-        ></textarea>
+          formControlName="questionText">
+        </textarea>
 
         <!-- OPTIONS -->
-        <div
-          class="grid sm:grid-cols-2 gap-4"
-          formArrayName="options"
-        >
+        <div class="grid sm:grid-cols-2 gap-4" formArrayName="options">
           <div
             class="option"
             *ngFor="let _ of options.controls; let i = index"
-            [formGroupName]="i"
-          >
+            [formGroupName]="i">
+
             <input
               type="radio"
               name="correct"
-              (change)="selectCorrectOption(i)"
-            />
+              (change)="selectCorrectOption(i)" />
+
             <input
               placeholder="Option {{ i + 1 }}"
-              formControlName="text"
-            />
+              formControlName="text" />
           </div>
         </div>
 
@@ -199,12 +247,12 @@
           </button>
 
           <button
-            type="button"
-            class="btn-primary"
-            (click)="saveQuestion()"
-          >
-            Save Question
-          </button>
+        type="button"
+        class="btn-primary active:scale-[0.97]"
+        (click)="saveQuestion()">
+        {{ editingQuestionId() ? 'Update Question' : 'Save Question' }}
+      </button>
+
         </div>
       </form>
 
@@ -212,17 +260,101 @@
       <button
         class="w-full border-2 border-dashed border-indigo-400
                py-5 rounded-3xl text-indigo-600
-               font-semibold hover:bg-indigo-100 transition"
-      >
+               font-semibold hover:bg-indigo-100
+               transition active:scale-[0.98]">
         + Add Another Question
       </button>
 
-      <!-- PUBLISH -->
-      <div class="flex justify-end">
-        <button class="btn-success" (click)="publishQuiz()">
-          Publish Quiz 🚀
-        </button>
+      <!-- =======================
+     ADDED QUESTIONS LIST
+     ======================= -->
+    @if (questions().length > 0) {
+      <div
+        class="bg-white/80 backdrop-blur-xl
+              rounded-3xl
+              shadow-[0_20px_40px_rgba(0,0,0,0.1)]
+              p-5 space-y-4">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-extrabold text-gray-900">
+            Added Questions ({{ questions().length }})
+          </h3>
+
+          <span class="text-sm text-gray-500">
+            Click ✏️ to edit
+          </span>
+        </div>
+
+        <!-- Question Items -->
+        <ul class="space-y-3">
+          @for (q of questions(); let i = $index; track q._id) {
+            <li
+              class="flex items-center justify-between
+                    gap-4
+                    bg-white rounded-2xl
+                    px-4 py-3
+                    shadow-sm
+                    border border-gray-100
+                    hover:shadow-md
+                    transition">
+
+              <!-- Left -->
+              <div class="flex items-start gap-3 flex-1">
+                <span
+                  class="h-8 w-8 rounded-full
+                        bg-indigo-100 text-indigo-700
+                        flex items-center justify-center
+                        font-bold text-sm">
+                  {{ i + 1 }}
+                </span>
+
+                <div class="min-w-0">
+                  <p class="font-medium text-gray-800 truncate">
+                    {{ q.questionText }}
+                  </p>
+
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    {{ q.marks }} marks ·
+                    {{ q.options?.length || 0 }} options
+                  </p>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex items-center gap-3">
+                <!-- Edit -->
+                <button
+                  type="button"
+                  class="h-8 w-8 rounded-full
+                        bg-indigo-50 text-indigo-600
+                        hover:bg-indigo-100
+                        active:scale-95
+                        transition"
+                  title="Edit question"
+                  (click)="editQuestion(q)">
+                  ✏️
+                </button>
+
+                <!-- Delete -->
+                <button
+                  type="button"
+                  class="h-8 w-8 rounded-full
+                        bg-red-50 text-red-600
+                        hover:bg-red-100
+                        active:scale-95
+                        transition"
+                  title="Delete question"
+                  (click)="deleteQuestion(q._id)">
+                  🗑️
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
       </div>
+    }
+
 
     </main>
   </div>

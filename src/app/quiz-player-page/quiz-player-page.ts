@@ -2,8 +2,10 @@ import { Component, OnInit, signal, computed, effect } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuizPlayerService } from '../services/quiz-player.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
+  imports: [CommonModule],
   selector: 'app-quiz-player-page',
   templateUrl: './quiz-player-page.html',
 })
@@ -41,8 +43,13 @@ export class QuizPlayerPageComponent implements OnInit {
   totalTime = signal<number>(0);     // seconds
   elapsedTime = signal<number>(0);
 
+  // ✅ ADDED: remaining seconds (for warning logic)
+  remainingSeconds = computed(() =>
+    Math.max(this.totalTime() - this.elapsedTime(), 0)
+  );
+
   remainingTime = computed(() => {
-    const remaining = Math.max(this.totalTime() - this.elapsedTime(), 0);
+    const remaining = this.remainingSeconds();
     const min = Math.floor(remaining / 60).toString().padStart(2, '0');
     const sec = (remaining % 60).toString().padStart(2, '0');
     return `${min}:${sec}`;
@@ -165,7 +172,14 @@ export class QuizPlayerPageComponent implements OnInit {
       .subscribe(res => {
         this.quizService.resultResponse = res;
         this.router.navigate(['/quiz-result']);
-       // alert(`Score: ${res.score}/${res.totalMarks}`);
       });
+  }
+
+  /* =======================
+     UI HELPERS
+     ======================= */
+
+  isTimeLow(): boolean {
+    return this.remainingSeconds() <= 30;
   }
 }

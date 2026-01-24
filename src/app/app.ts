@@ -6,10 +6,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserMenuComponent } from "./user-menu.component/user-menu.component";
 import { LoaderService } from './services/loader-service';
 import { LoaderComponent } from "./loader/loader";
+import { ToastComponent } from "./shared/toast-component/toast-component";
+//import { ToastComponent } from "./shared/toast-component/toast-component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLinkWithHref, CommonModule, FormsModule, ReactiveFormsModule, UserMenuComponent, LoaderComponent],
+  imports: [RouterOutlet, RouterLinkWithHref, CommonModule, FormsModule, ReactiveFormsModule, UserMenuComponent, LoaderComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

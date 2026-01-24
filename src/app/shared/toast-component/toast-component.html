@@ -1,0 +1,26 @@
+<div
+  class="fixed top-6 right-6 z-[9999]
+         flex flex-col gap-3
+         pointer-events-none">
+
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="toast-card toast-enter"
+      [class.toast-success]="toast.type === 'success'"
+      [class.toast-error]="toast.type === 'error'"
+      [class.toast-info]="toast.type === 'info'"
+      [class.toast-warning]="toast.type === 'warning'">
+
+      <!-- glow layer -->
+      <span class="toast-glow"></span>
+
+      <!-- icon dot -->
+      <span class="toast-dot"></span>
+
+      <!-- text -->
+      <span class="toast-text">
+        {{ toast.message }}
+      </span>
+    </div>
+  }
+</div>
