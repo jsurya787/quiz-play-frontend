@@ -192,7 +192,14 @@ saveDraft(): void {
     } 
 
     this.quizService.publishQuiz(this.quizId()!).subscribe({
-      next: () => this.toast.success('Quiz published 🚀'), //alert('Quiz published 🚀'),
+      next: () => {
+        this.toast.success('Quiz published 🚀'); 
+        this.resetQuestionForm();
+        this.quizForm.reset();
+        this.quizId.set(null);
+        this.questions.set([]);
+        this.totalMarks.set(0);
+      },
       error: err =>
         this.toast.error(err.error?.message || 'Failed to publish quiz'),
        // alert(err.error?.message || 'Failed to publish quiz'),

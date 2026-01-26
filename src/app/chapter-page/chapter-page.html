@@ -1,0 +1,172 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-gray-50">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 grid lg:grid-cols-4 gap-8">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="hidden lg:block">
+      <div
+        class="sticky top-28
+               bg-white/80 backdrop-blur
+               rounded-2xl p-5
+               shadow-md">
+
+        <h3 class="font-semibold mb-4 text-gray-900">
+          📘 {{ chapter()?.name }}
+        </h3>
+
+        <ul class="space-y-3 text-sm">
+          @for (sec of sections(); track sec._id) {
+            <li
+              class="cursor-pointer text-gray-600 hover:text-indigo-600"
+              (click)="scrollTo(sec._id)">
+              {{ sec.title }}
+            </li>
+          }
+        </ul>
+
+      </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="lg:col-span-3">
+
+      <!-- HEADER -->
+      <div
+        class="mb-8 p-6 sm:p-8 rounded-2xl
+               bg-white/80 backdrop-blur
+               shadow-md">
+
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-3xl font-extrabold text-gray-900">
+              {{ chapter()?.name }}
+            </h1>
+            <p class="mt-2 text-gray-600">
+              {{ chapter()?.description }}
+            </p>
+          </div>
+
+          @if (isAdmin()) {
+            <button
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+              (click)="openAddSection()">
+              ➕ Add Section
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- ================= SECTIONS ================= -->
+      @for (section of sections(); track section._id) {
+        <section
+          class="mb-12"
+          id="section-{{ section._id }}">
+
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xl font-bold text-gray-900">
+              🔹 {{ section.title }}
+            </h2>
+
+            @if (isAdmin()) {
+              <div class="flex gap-2 text-sm">
+                <button (click)="openEditSection(section)">✏️</button>
+                <button
+                  class="text-red-600"
+                  (click)="confirmDeleteSection(section._id)">
+                  🗑
+                </button>
+              </div>
+            }
+          </div>
+
+          <div
+            class="bg-white rounded-2xl p-6 shadow-sm
+                   leading-relaxed text-gray-700 whitespace-pre-line"
+            [ngClass]="{
+              'border-l-4 border-indigo-500': section.type === 'theory',
+              'border-l-4 border-green-500': section.type === 'example',
+              'border-l-4 border-yellow-500': section.type === 'formula',
+              'border-l-4 border-gray-400': section.type === 'note'
+            }">
+
+            {{ section.content }}
+
+          </div>
+
+        </section>
+      }
+
+    </main>
+  </div>
+</div>
+
+<!-- ================= POPUP ================= -->
+@if (showPopup()) {
+  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+
+    <div
+      class="bg-white w-full max-w-md
+             rounded-2xl p-6
+             shadow-xl animate-fade-in">
+
+      <h3 class="text-lg font-bold mb-4">
+        {{ popupTitle() }}
+      </h3>
+
+      <!-- SECTION FORM -->
+      @if (popupType() === 'section') {
+
+        <input
+          class="input w-full mb-3"
+          placeholder="Section Title"
+          [(ngModel)]="formModel().title">
+
+        <select
+          class="input w-full mb-3"
+          [(ngModel)]="formModel().type">
+
+          <option value="theory">📘 Theory</option>
+          <option value="example">✍️ Example</option>
+          <option value="formula">🧮 Formula</option>
+          <option value="note">📝 Note</option>
+
+        </select>
+
+        <textarea
+          class="input w-full min-h-[160px]"
+          placeholder="Content"
+          [(ngModel)]="formModel().content"></textarea>
+      }
+
+      <!-- DELETE CONFIRM -->
+      @if (popupType() === 'confirmDelete') {
+        <p class="text-gray-600">
+          Are you sure you want to delete this section?
+        </p>
+      }
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          class="px-4 py-2 border rounded-lg"
+          (click)="closePopup()">
+          Cancel
+        </button>
+
+        @if (popupType() === 'confirmDelete') {
+          <button
+            class="px-4 py-2 bg-red-600 text-white rounded-lg"
+            (click)="performDelete()">
+            Delete
+          </button>
+        } @else {
+          <button
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+            (click)="saveForm()">
+            Save
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}

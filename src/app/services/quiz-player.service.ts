@@ -6,6 +6,7 @@ import { environment } from '../../../environment';
 export class QuizPlayerService {
   private baseUrl =  environment.apiUrl + '/quiz-player';
   public resultResponse : any;
+  public quizData : any;
 
   constructor(private http: HttpClient) {}
 

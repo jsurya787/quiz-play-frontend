@@ -20,6 +20,6 @@ export class LoginSuccessComponent {
       setTimeout(() => {
         this.router.navigate(['/dashboard']);
       }, 300);
-    }, 1200);
+    }, 1000);
   }
 }

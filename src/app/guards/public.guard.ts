@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class PublicGuard implements CanActivate {
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+  ) {}
 
-  constructor(private auth: AuthService, private router: Router) {}
-
-  canActivate(): boolean {
-
-    // ✅ ONE-LINE FIX: wait for auth bootstrap
-    if (!this.auth.isReady()) return true;
-
+  canActivate(): boolean | UrlTree {
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
-      return false;
+      // ✅ RETURN UrlTree instead of navigate()
+      return this.router.createUrlTree(['/dashboard']);
     }
-
     return true;
   }
 }
+
 

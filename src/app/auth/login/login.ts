@@ -21,14 +21,14 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    const check = setInterval(() => {
-      if (this.authService.isReady()) {
-        clearInterval(check);
-        if (this.authService.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
-        }
-      }
-    }, 50);
+    // const check = setInterval(() => {
+    //   if (this.authService.isReady()) {
+    //     clearInterval(check);
+    //     if (this.authService.isAuthenticated()) {
+    //      // this.router.navigate(['/dashboard']);
+    //     }
+    //   }
+    // }, 50);
   }
 
   login(): void {

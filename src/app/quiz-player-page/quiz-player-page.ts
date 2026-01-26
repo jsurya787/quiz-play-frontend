@@ -12,6 +12,8 @@ import { CommonModule } from '@angular/common';
 export class QuizPlayerPageComponent implements OnInit {
   quizId!: string;
   attemptId = signal<string | null>(null);
+  answeredMap = signal<Record<number, number>>({});
+
 
   quiz = signal<any>(null);
   currentIndex = signal(0);
@@ -123,15 +125,27 @@ export class QuizPlayerPageComponent implements OnInit {
      ANSWER ACTIONS
      ======================= */
 
-  selectOption(index: number) {
-    this.answerForm.patchValue({ selectedOptionIndex: index });
-
-    this.quizService.saveAnswer({
-      attemptId: this.attemptId()!,
-      questionId: this.currentQuestion()._id,
-      selectedOptionIndex: index,
-    }).subscribe();
+selectOption(index: number) {
+  if (this.answeredMap()[this.currentIndex()] === index) {
+    return; // 🛑 same option clicked again
   }
+
+  this.answerForm.patchValue({ selectedOptionIndex: index });
+
+  this.answeredMap.update(map => ({
+    ...map,
+    [this.currentIndex()]: index,
+  }));
+
+  this.quizService.saveAnswer({
+    attemptId: this.attemptId()!,
+    questionId: this.currentQuestion()._id,
+    selectedOptionIndex: index,
+  }).subscribe();
+}
+
+
+
 
   /* =======================
      NAVIGATION
@@ -171,6 +185,8 @@ export class QuizPlayerPageComponent implements OnInit {
       .submitQuiz(this.attemptId()!)
       .subscribe(res => {
         this.quizService.resultResponse = res;
+        this.quizService.quizData = this.quiz();
+
         this.router.navigate(['/quiz-result']);
       });
   }
@@ -182,4 +198,22 @@ export class QuizPlayerPageComponent implements OnInit {
   isTimeLow(): boolean {
     return this.remainingSeconds() <= 30;
   }
+
+showMobilePalette = false;
+
+openPalette() {
+  this.showMobilePalette = true;
+}
+
+closePalette() {
+  this.showMobilePalette = false;
+}
+
+jumpAndClose(i: number) {
+  this.jumpTo(i);
+  this.showMobilePalette = false;
+}
+hasAnswered(index: number): boolean {
+  return this.answeredMap()[index] !== undefined;
+}
 }

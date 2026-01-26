@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, effect } from '@angular/core';
 import { QuizPlayerService } from '../services/quiz-player.service';
 import { Router } from '@angular/router';
 
@@ -31,44 +31,13 @@ export class QuizResultPageComponent implements OnInit {
   constructor(
     private quizService: QuizPlayerService,
     private router: Router
-  ) {}
+  ) {
 
-  /* ================= MOCK RESPONSE (YOUR EXACT DATA) ================= */
-  private readonly resultResponse: QuizResultResponse = {
-    totalMarks: 20,
-    score: 12,
-    correct: 3,
-    wrong: 2,
-    skipped: 0,
-    accuracy: 60,
-    questions: [
-      {
-        questionId: '6961fa526e25a88e49eb5024',
-        status: 'correct',
-        marks: 4
-      },
-      {
-        questionId: '6961fa886e25a88e49eb5030',
-        status: 'correct',
-        marks: 4
-      },
-      {
-        questionId: '6961fac76e25a88e49eb5041',
-        status: 'wrong',
-        marks: 0
-      },
-      {
-        questionId: '6961fae86e25a88e49eb5057',
-        status: 'wrong',
-        marks: 0
-      },
-      {
-        questionId: '6961fb176e25a88e49eb5072',
-        status: 'correct',
-        marks: 4
-      }
-    ]
-  };
+    effect(() => {
+     this.applyResult(this.quizService.resultResponse);
+    });
+  }
+
 
   /* ================= UI STATE (Signals) ================= */
   quizTitle = signal('Maths Mock Test – 1');
@@ -92,6 +61,7 @@ export class QuizResultPageComponent implements OnInit {
 
   /* ================= APPLY RESULT ================= */
   private applyResult(res: QuizResultResponse): void {
+    this.quizTitle.set(this.quizService.quizData.title);
     this.totalMarks.set(res.totalMarks);
     this.score.set(res.score);
 
@@ -112,6 +82,46 @@ export class QuizResultPageComponent implements OnInit {
 goToHome() {
   this.router.navigate(['/']);
 }
+
+showQuestionPopup = signal(false);
+activeQuestionIndex = signal<number | null>(null);
+activeQuestion = signal<any>(null);
+
+openQuestionPopup(question: any, index: number) {
+  this.activeQuestionIndex.set(index);
+  this.activeQuestion.set(question);
+  this.showQuestionPopup.set(true);
+}
+
+closeQuestionPopup() {
+  this.showQuestionPopup.set(false);
+  this.activeQuestionIndex.set(null);
+  this.activeQuestion.set(null);
+}
+
+/* ===============================
+   NAVIGATION
+================================ */
+setActiveQuestion(index: number) {
+  this.activeQuestionIndex.set(index);
+  this.activeQuestion.set(this.questions()[index]);
+}
+
+goToNextQuestion() {
+  const next = this.activeQuestionIndex()! + 1;
+  if (next < this.questions().length) {
+    this.setActiveQuestion(next);
+  }
+}
+
+goToPreviousQuestion() {
+  const prev = this.activeQuestionIndex()! - 1;
+  if (prev >= 0) {
+    this.setActiveQuestion(prev);
+  }
+}
+
+
 
 
   /* ================= FUTURE API REPLACEMENT ================= */

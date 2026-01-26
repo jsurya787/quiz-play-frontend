@@ -1,13 +1,14 @@
-import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
-import { RouterOutlet, RouterLinkWithHref } from '@angular/router';
-import { AuthService } from './services/auth.service';
+import { Component, Inject, PLATFORM_ID} from '@angular/core';
+import { RouterOutlet, RouterLinkWithHref, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserMenuComponent } from "./user-menu.component/user-menu.component";
-import { LoaderService } from './services/loader-service';
 import { LoaderComponent } from "./loader/loader";
 import { ToastComponent } from "./shared/toast-component/toast-component";
-//import { ToastComponent } from "./shared/toast-component/toast-component";
+import { Title } from '@angular/platform-browser';
+import { filter } from 'rxjs';
+import { AuthService } from './services/auth.service';
+import { LoaderService } from './services/loader-service';
 
 @Component({
   selector: 'app-root',
@@ -16,22 +17,23 @@ import { ToastComponent } from "./shared/toast-component/toast-component";
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('QuizPlay');
   public isUserMenuOpen = false;
-  private sessionRestored = false;
 
   constructor(
-    public _authService : AuthService,
+    private router: Router,
+    private title: Title,
+    public _authService:AuthService,
+    public _loaderService: LoaderService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    public _loaderService: LoaderService
   ) {
-     // ✅ Restore session ONLY in browser
-    if (isPlatformBrowser(this.platformId) && !this.sessionRestored) {
-      this.sessionRestored = true;
-      // ⏳ allow browser to attach cookies
-      setTimeout(() => {
-        this._authService.refreshToken().subscribe();
-      }, 500);
+    this.title.setTitle('QuizPlay – Learn with Fun');
+    // ✅ Browser-only code
+    if (isPlatformBrowser(this.platformId)) {
+      this.router.events
+        .pipe(filter(e => e instanceof NavigationEnd))
+        .subscribe((e: NavigationEnd) => {
+          sessionStorage.setItem('lastUrl', e.urlAfterRedirects);
+        });
     }
   }
   

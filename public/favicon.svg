@@ -1,0 +1,27 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#facc15"/>
+      <stop offset="60%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="50" cy="50" r="48" fill="url(#glow)">
+    <animate attributeName="r" values="46;48;46" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <text x="50" y="62" text-anchor="middle"
+        font-size="42" font-weight="800"
+        fill="white"
+        font-family="Arial, Helvetica, sans-serif">
+    QP
+    <animateTransform attributeName="transform"
+      type="scale"
+      values="1;1.05;1"
+      dur="2.5s"
+      repeatCount="indefinite"
+      additive="sum"/>
+  </text>
+</svg>

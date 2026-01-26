@@ -44,7 +44,7 @@ import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
 export class LandingComponent {
 
 constructor(private meta: Meta, private title: Title) {
-  this.title.setTitle('QuizPlay – Class 10 & 12 Quiz Platform');
+  this.title.setTitle('QuizPlay – Learn with Fun');
 
   this.meta.addTags([
     { name: 'description', content: 'Practice Math, Physics & Chemistry quizzes for CBSE & ICSE students.' },

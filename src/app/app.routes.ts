@@ -64,17 +64,17 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'subject-page',
+    path: 'subject-page/:subjectId',
     loadComponent: () =>
       import('./subject-page/subject-page')
         .then(m => m.SubjectPage),
     canActivate: [AuthGuard],
   },
-  {
-    path: 'chapter-page',
+    {
+    path: 'chapter-page/:chapterId',
     loadComponent: () =>
-      import('./chapter-page-page/chapter-page-page')
-        .then(m => m.ChapterPagePage),
+      import('./chapter-page/chapter-page')
+        .then(m => m.ChapterPage),
     canActivate: [AuthGuard],
   },
   {

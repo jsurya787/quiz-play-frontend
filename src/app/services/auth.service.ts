@@ -1,19 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID, TransferState, StateKey, makeStateKey  } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { environment } from '../../../environment';
 import { endpoints } from '../../endpoints';
+import { isPlatformBrowser } from '@angular/common';
+import { BehaviorSubject, firstValueFrom, tap } from 'rxjs';
+
+
+const ACCESS_TOKEN_KEY: StateKey<string | null> =
+  makeStateKey<string | null>('access-token');
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private accessToken$ = new BehaviorSubject<string | null>(null);
-  private authReady$ = new BehaviorSubject(false);
+  private refreshPromise: Promise<void> | null = null;
+
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private transferState: TransferState,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   // ============================
@@ -49,9 +57,6 @@ export class AuthService {
     return !!this.accessToken$.value;
   }
 
-  isReady(): boolean {
-    return this.authReady$.value;
-  }
 
   refreshToken() {
     return this.http.post<{ accessToken: string }>(
@@ -59,30 +64,44 @@ export class AuthService {
       {},
       { withCredentials: true },
     ).pipe(
-      tap(res => {
-        this.setAccessToken(res.accessToken);
-        this.authReady$.next(true);
-      })
+      tap(res => this.setAccessToken(res.accessToken)),
     );
   }
 
-  bootstrapAuth(): Promise<void> {
-    return new Promise(resolve => {
-      this.refreshToken().subscribe({
-        next: () => resolve(),
-        error: () => {
-          this.authReady$.next(true);
-          resolve();
-        },
-      });
-
-      // fallback safety
-      setTimeout(() => {
-        this.authReady$.next(true);
-        resolve();
-      }, 500);
-    });
+  // ============================
+  // 🚀 BOOTSTRAP (APP_INITIALIZER)
+  // ============================
+bootstrapAuth(): Promise<void> {
+  // ❌ NEVER refresh on server
+  if (!isPlatformBrowser(this.platformId)) {
+    return Promise.resolve();
   }
+
+  // 🚀 FAST PATH: token from SSR
+  const tokenFromSSR =
+    this.transferState.get(ACCESS_TOKEN_KEY, null);
+
+  if (tokenFromSSR) {
+    this.setAccessToken(tokenFromSSR);
+    this.transferState.remove(ACCESS_TOKEN_KEY);
+    return Promise.resolve();
+  }
+
+  // 🔒 Prevent double refresh
+  if (!this.refreshPromise) {
+    this.refreshPromise = firstValueFrom(
+      this.refreshToken()
+    )
+      .then(() => undefined)   // ✅ FORCE Promise<void>
+      .catch(() => {})         // unauth user
+      .finally(() => {
+        this.refreshPromise = null;
+      });
+  }
+
+  return this.refreshPromise;
+}
+
 
   logout(): void {
     this.http

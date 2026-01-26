@@ -1,253 +1,3 @@
-<style>
-  /* ================= GLOBAL ================= */
-  @keyframes slide-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes score-pulse {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-
-  /* ================= SPARKLES ================= */
-  .sparkle {
-    position: absolute;
-    font-size: 38px;
-    opacity: 0;
-    z-index: 15;
-    animation: sparkle-float 3s ease-in-out infinite;
-  }
-  .sparkle-1 { top: 18%; left: 15%; animation-delay: 0s; }
-  .sparkle-2 { top: 28%; right: 18%; animation-delay: .6s; }
-  .sparkle-3 { bottom: 32%; left: 22%; animation-delay: 1.2s; }
-  .sparkle-4 { bottom: 22%; right: 16%; animation-delay: 1.8s; }
-
-  @keyframes sparkle-float {
-    0% { opacity: 0; transform: translateY(10px) scale(.6); }
-    40% { opacity: 1; }
-    60% { transform: translateY(-10px) scale(1.2); }
-    100% { opacity: 0; transform: translateY(-30px) scale(.8); }
-  }
-
-  /* ================= ROCKET ================= */
-  .rocket-launch {
-    font-size: 48px;
-    animation: rocket 2.5s ease-out infinite;
-  }
-
-  @keyframes rocket {
-    0% { transform: translate(-50%, 100px); opacity: 0; }
-    40% { opacity: 1; }
-    100% { transform: translate(-50%, -500px); opacity: 0; }
-  }
-
-  /* ================= QUESTION DOT ================= */
-  .question-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-
-    opacity: 0;
-    transform: scale(.6) translateY(10px);
-    animation: pop-in .5s cubic-bezier(.34,1.56,.64,1) forwards;
-  }
-
-  .question-dot.correct {
-    background: linear-gradient(135deg,#10b981,#34d399);
-    color: #fff;
-    animation: pop-in .5s cubic-bezier(.34,1.56,.64,1) forwards,
-               bounce .6s ease .5s;
-  }
-
-  .question-dot.wrong {
-    background: linear-gradient(135deg,#ef4444,#f87171);
-    color: #fff;
-    animation: pop-in .5s cubic-bezier(.34,1.56,.64,1) forwards,
-               shake .4s ease .45s;
-  }
-
-  .question-dot.skipped {
-    background: #e5e7eb;
-    color: #374151;
-    animation: pop-in .5s cubic-bezier(.34,1.56,.64,1) forwards,
-               pulse 1.4s ease-in-out .6s infinite;
-  }
-
-  .question-dot:hover {
-    transform: scale(1.12);
-    transition: transform .2s ease;
-    cursor: pointer;
-  }
-
-  @keyframes pop-in { to { opacity: 1; transform: scale(1) translateY(0); } }
-  @keyframes bounce { 30% { transform: scale(1.15); } 60% { transform: scale(.95); } }
-  @keyframes shake { 25% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
-  @keyframes pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(107,114,128,.4); }
-    50% { box-shadow: 0 0 0 6px rgba(107,114,128,0); }
-  }
-
-  /* ================= STAT CARDS ================= */
-  .stat-card {
-    background: rgba(255,255,255,.75);
-    border-radius: 18px;
-    padding: 16px;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(20px) scale(.95);
-    animation: stat-in .6s ease forwards;
-  }
-
-  .stat-card:nth-child(1) { animation-delay: .1s; }
-  .stat-card:nth-child(2) { animation-delay: .25s; }
-  .stat-card:nth-child(3) { animation-delay: .4s; }
-  .stat-card:nth-child(4) { animation-delay: .55s; }
-
-  .stat-card:hover {
-    transform: translateY(-6px) scale(1.05);
-    transition: transform .25s ease;
-  }
-
-  .stat-card.correct:hover { box-shadow: 0 0 25px rgba(16,185,129,.45); }
-  .stat-card.wrong:hover { box-shadow: 0 0 25px rgba(239,68,68,.45); }
-  .stat-card.skipped:hover { box-shadow: 0 0 25px rgba(107,114,128,.35); }
-  .stat-card.accuracy:hover { box-shadow: 0 0 25px rgba(99,102,241,.45); }
-
-  @keyframes stat-in {
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  /* ================= ACTION BUTTONS ================= */
-  .action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    margin-top: 48px;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    padding: 14px 30px;
-    border-radius: 18px;
-    background: linear-gradient(135deg,#6366f1,#22c55e);
-    color: #fff;
-    font-weight: 700;
-    box-shadow: 0 14px 30px rgba(99,102,241,.35);
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-4px) scale(1.06);
-    box-shadow: 0 20px 40px rgba(99,102,241,.45);
-  }
-
-  .btn-secondary {
-    padding: 14px 30px;
-    border-radius: 18px;
-    background: #ffffffcc;
-    border: 2px solid #e5e7eb;
-    font-weight: 700;
-    transition: all .25s ease;
-  }
-
-  .btn-secondary:hover {
-    transform: translateY(-2px);
-    border-color: #6366f1;
-    color: #4338ca;
-  }
-
-  /* ================= ATTRACTIVE HEADER ================= */
-.result-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-
-  background: linear-gradient(
-    135deg,
-    rgba(99,102,241,0.9),
-    rgba(34,197,94,0.9)
-  );
-  backdrop-filter: blur(12px);
-
-  padding: 16px 24px;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  color: white;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-
-  animation: header-drop 0.6s ease forwards;
-}
-
-@keyframes header-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.header-icon {
-  font-size: 32px;
-  animation: trophy-bounce 1.8s ease-in-out infinite;
-}
-
-@keyframes trophy-bounce {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.header-title {
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.header-subtitle {
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.header-btn {
-  padding: 10px 18px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.18);
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  transition: all 0.25s ease;
-}
-
-.header-btn:hover {
-  background: rgba(255,255,255,0.3);
-  transform: translateY(-2px) scale(1.05);
-}
-
-</style>
 
 @if (loading()) {
   <div class="min-h-screen flex items-center justify-center">
@@ -257,7 +7,7 @@
   </div>
 } @else {
 
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50 pt-3.5 relative overflow-hidden">
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50 pt-4 relative overflow-hidden">
 
   <!-- 🎉 CELEBRATION -->
   <div class="absolute inset-0 z-10 pointer-events-none">
@@ -385,7 +135,8 @@
               [class.correct]="q.status === 'correct'"
               [class.wrong]="q.status === 'wrong'"
               [class.skipped]="q.status === 'skipped'"
-              [style.animation-delay.ms]="i * 80">
+              [style.animation-delay.ms]="i * 80"
+              (click)="openQuestionPopup(q, i)">
               {{ i + 1 }}
             </div>
           }
@@ -397,5 +148,107 @@
   </div>
 </div>
 
+}
+
+@if (showQuestionPopup()) {
+  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+
+    <!-- 🔹 POPUP CONTAINER -->
+    <div
+      class="bg-white w-full max-w-xl rounded-2xl p-6 shadow-xl
+             animate-fade-in popup-container">
+
+      <!-- ================= HEADER ================= -->
+      <div class="flex justify-between items-start mb-4">
+
+        <h3 class="text-lg font-bold">
+          Question {{ activeQuestionIndex()! + 1 }}
+        </h3>
+
+        <!-- SAME CLOSE STYLE -->
+        <button
+          class="text-gray-400 hover:text-gray-600
+                 text-xl font-bold transition"
+          (click)="closeQuestionPopup()">
+          ✕
+        </button>
+
+      </div>
+
+      <!-- 🔹 SCROLLABLE BODY -->
+      <div class="popup-body">
+
+        <!-- ================= QUESTION ================= -->
+        <p class="text-gray-900 font-medium mb-4">
+          {{ activeQuestion()?.question }}
+        </p>
+
+        <!-- ================= OPTIONS ================= -->
+        <div class="space-y-2">
+
+          @for (opt of activeQuestion()?.options; track $index; let idx = $index) {
+            <div
+              class="p-3 rounded-lg border text-sm flex items-start gap-2
+                     transition-all"
+
+              [class.border-green-500]="idx === activeQuestion()?.correctOptionIndex"
+              [class.bg-green-50]="idx === activeQuestion()?.correctOptionIndex"
+
+              [class.border-red-500]="opt.isSelected && idx !== activeQuestion()?.correctOptionIndex"
+              [class.bg-red-50]="opt.isSelected && idx !== activeQuestion()?.correctOptionIndex"
+            >
+
+              <span class="font-semibold">
+                {{ idx + 1 }}.
+              </span>
+
+              <span class="flex-1">
+                {{ opt.text }}
+              </span>
+
+              <!-- TAGS -->
+              @if (idx === activeQuestion()?.correctOptionIndex) {
+                <span class="text-green-600 font-semibold text-xs">
+                  ✓ Correct
+                </span>
+              }
+
+              @if (opt.isSelected && idx !== activeQuestion()?.correctOptionIndex) {
+                <span class="text-red-600 font-semibold text-xs">
+                  ✕ Your Answer
+                </span>
+              }
+
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- 🔹 FOOTER (STICKY ON MOBILE) -->
+      <div class="popup-footer">
+
+        <div class="popup-nav">
+
+          <button
+            class="popup-nav-btn popup-prev"
+            [disabled]="activeQuestionIndex() === 0"
+            (click)="goToPreviousQuestion()">
+            ← Previous
+          </button>
+
+          <button
+            class="popup-nav-btn popup-next"
+            [disabled]="activeQuestionIndex() === questions().length - 1"
+            (click)="goToNextQuestion()">
+            Next →
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 }
 
