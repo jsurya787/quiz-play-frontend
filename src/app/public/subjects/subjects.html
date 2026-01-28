@@ -28,12 +28,27 @@
       to Class 10 & 12 syllabus.
     </p>
 
+        <!-- ✅ ADD SUBJECT BUTTON (SINGLE, CLEAN BUTTON) -->
+         @if (authService.isAdmin()) {
+          <div class="mb-12 flex justify-center">
+            <button
+              class="px-6 py-3 rounded-xl
+                    bg-indigo-600 text-white
+                    text-sm font-semibold
+                    hover:bg-indigo-700
+                    transition"
+              (click)="openAdd()">
+              + Add Subject
+            </button>
+          </div>
+         }
+
     <!-- SUBJECT GRID -->
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 
       <!-- SUBJECT CARD -->
       <div
-        *ngFor="let s of subjects"
+        *ngFor="let s of primarySubjects"
         class="group relative rounded-2xl
                bg-white/80 backdrop-blur
                border border-gray-100
@@ -45,7 +60,7 @@
         <!-- Accent Strip -->
         <div
           class="h-1.5 rounded-t-2xl"
-          [ngClass]="s.color">
+          [ngClass]="s.color|| 'from-emerald-500 to-green-600'">
         </div>
 
         <div class="p-6 text-left">
@@ -54,7 +69,7 @@
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <img
-                [src]="s.image"
+                [src]="'assets/'+s.name+'.png'"
                 alt=""
                 class="w-12 h-12" />
 
@@ -63,7 +78,7 @@
                   {{ s.name }}
                 </h3>
                 <p class="text-xs text-gray-500">
-                  {{ s.class }}
+                  {{ s.subjectClass }}
                 </p>
               </div>
             </div>
@@ -77,8 +92,7 @@
 
           <!-- Description -->
           <p class="text-sm text-gray-600 mb-4">
-            Chapter-wise practice, mock tests & revision questions
-            to strengthen fundamentals.
+            {{ s.description }}
           </p>
 
           <!-- Chapter Preview -->
@@ -88,18 +102,11 @@
             </p>
 
             <div class="flex flex-wrap gap-2">
-              <span class="px-2.5 py-1 rounded-full text-xs
-                           bg-gray-100 text-gray-700">
-                Algebra
-              </span>
-              <span class="px-2.5 py-1 rounded-full text-xs
-                           bg-gray-100 text-gray-700">
-                Geometry
-              </span>
-              <span class="px-2.5 py-1 rounded-full text-xs
-                           bg-gray-100 text-gray-700">
-                Trigonometry
-              </span>
+               @for (item of s.keyPoints; track $index) {
+                <span class="px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                 {{ item }}
+                </span>  
+                }
             </div>
           </div>
 
@@ -111,7 +118,7 @@
                    transition-all
                    hover:bg-indigo-700
                    group-hover:gap-3"
-            [routerLink]="['subject-page/6976648a9f265a1f0dcb5e02']">
+            [routerLink]="['subject-page/', s._id, ]">
             Start Practicing →
           </button>
 
@@ -122,3 +129,14 @@
 
   </div>
 </section>
+
+ @if (authService.isAdmin()) {
+  <!-- ✅ ADD SUBJECT MODAL -->
+  <app-subject-form-modal
+    [visible]="showModal"
+    [isEdit]="false"
+    [subject]="null"
+    (closeModal)="closeModal()"
+    (submitForm)="saveSubject($event)">
+  </app-subject-form-modal>
+}

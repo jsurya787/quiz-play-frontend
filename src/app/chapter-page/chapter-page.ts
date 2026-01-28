@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SubjectService } from '../services/subject.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-chapter-page',
@@ -18,6 +19,7 @@ export class ChapterPage {
   ================================ */
   private route = inject(ActivatedRoute);
   private chapterService = inject(SubjectService);
+  private authService = inject(AuthService);
 
   /* ===============================
      STATE
@@ -28,7 +30,7 @@ export class ChapterPage {
   loading = signal(true);
 
   /* 🔐 TEMP ADMIN FLAG */
-  isAdmin = signal(true);
+  isAdmin = signal(false);
 
   /* ===============================
      POPUP STATE
@@ -46,7 +48,7 @@ export class ChapterPage {
     effect(() => {
       const id = this.route.snapshot.paramMap.get('chapterId');
       if (!id) return;
-
+      this.isAdmin.set(this.authService.isAdmin());
       this.chapterId.set(id);
       this.loadChapter(id);
     });

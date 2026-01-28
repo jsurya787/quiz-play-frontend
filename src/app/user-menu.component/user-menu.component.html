@@ -22,7 +22,7 @@
     <ul class="py-3" >
 
       <!-- PROFILE -->
-      <li class="menu-row" (click)="close.emit()">
+      <li class="menu-row" (click)="openUserProfile()">
         <span class="menu-icon bg-indigo-100 text-indigo-600">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -35,7 +35,7 @@
       </li>
 
       <!-- DARK MODE -->
-      <li class="menu-row" (click)="close.emit()">
+      <!-- <li class="menu-row" (click)="close.emit()">
         <span class="menu-icon bg-sky-100 text-sky-600">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -65,7 +65,7 @@
             </span>
           </span>
         </label>
-      </li>
+      </li> -->
 
       <!-- SETTINGS -->
       <!-- <li class="menu-row" (click)="close.emit()">
@@ -266,5 +266,28 @@
     </div>
   </div>
 }
+
+<!-- ================= USER PROFILE MODAL ================= -->
+@if (showUserProfile()) {
+  <div
+    class="fixed inset-0 z-[9999]
+           flex items-center justify-center
+           bg-black/30 backdrop-blur-md
+           animate-fade-scale-in"
+    (click)="closeUserProfile()">
+
+    <!-- STOP CLICK -->
+    <div
+      class="relative"
+      (click)="$event.stopPropagation()">
+
+      <app-user-profile
+        (close)="closeUserProfile()">
+      </app-user-profile>
+
+    </div>
+  </div>
+}
+
 
 

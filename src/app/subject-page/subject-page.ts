@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SubjectService } from '../services/subject.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-subject-page',
@@ -13,6 +14,7 @@ import { SubjectService } from '../services/subject.service';
 export class SubjectPage {
   private route = inject(ActivatedRoute);
   private subjectService = inject(SubjectService);
+  private authService = inject(AuthService);
 
   subjectId = signal<string | null>(null);
   subject = signal<any>(null);
@@ -21,7 +23,7 @@ export class SubjectPage {
   quizzes = signal<any[]>([]);
   loading = signal(true);
 
-  isAdmin = signal(true); // 🔐 replace later with AuthService
+  isAdmin = signal(false); // 🔐 replace later with AuthService
 
   /* ================= POPUP ================= */
   showPopup = signal(false);
@@ -37,6 +39,7 @@ export class SubjectPage {
       this.subjectId.set(id);
       this.loadSubjectPage(id);
     });
+    this.isAdmin.set(this.authService.isAdmin());
   }
 
   private loadSubjectPage(id: string) {

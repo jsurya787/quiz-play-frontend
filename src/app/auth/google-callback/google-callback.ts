@@ -28,7 +28,6 @@ export class GoogleCallbackComponent implements OnInit {
     }
 
     const code = this.route.snapshot.queryParamMap.get('code');
-    console.log('OAuth code:', code);
 
     if (!code) {
       this.router.navigate(['/login']);
@@ -42,7 +41,7 @@ export class GoogleCallbackComponent implements OnInit {
     )
     .subscribe({
       next: (res) => {
-        console.log('OAuth success:', res);
+        this.auth.userData = res.user;
         this.auth.setAccessToken(res.accessToken);
        // this.router.navigate(['/dashboard']);
        this.router.navigate(['/login-success']);

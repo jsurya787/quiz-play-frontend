@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environment';
+import { AuthService } from './auth.service';
 
 export interface CreateQuizPayload {
   title: string;
@@ -19,6 +20,7 @@ export interface AddQuestionPayload {
 @Injectable({ providedIn: 'root' })
 export class QuizService {
   private http = inject(HttpClient);
+  private _auth = inject(AuthService);
   private readonly API =  environment.apiUrl + '/quizzes';
 
   // getQuizes(): Observable<any> {
@@ -26,7 +28,11 @@ export class QuizService {
   // }
 
   createQuiz(payload: CreateQuizPayload): Observable<any> {
-    return this.http.post(this.API, payload);
+    let api = this.API
+    if(!this._auth.userData){
+      api = this.API + '/public'
+    }
+    return this.http.post(api, payload);
   }
 
   addQuestion(
@@ -73,5 +79,15 @@ export class QuizService {
     { params }
   );
 }
+
+  getCountofQuizes(): Observable<any>  {
+    return this.http.get<any>(`${this.API}/createdByUser`);
+  }
+
+  getAttemptedQuizzesCount(): Observable<{ success: boolean; count: number }> {
+    return this.http.get<{ success: boolean; count: number }>(
+      `${environment.apiUrl}/quiz-player/attempted/count`
+    );
+  }
 
 }

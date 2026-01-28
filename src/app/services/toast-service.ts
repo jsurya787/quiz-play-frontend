@@ -46,8 +46,8 @@ export class ToastService {
     this.show(msg, 'error', 3500);
   }
 
-  info(msg: string) {
-    this.show(msg, 'info');
+  info(msg: string, duration? : number) {
+    this.show(msg, 'info', duration);
   }
 
   warning(msg: string) {

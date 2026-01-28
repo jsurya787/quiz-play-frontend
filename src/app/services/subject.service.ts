@@ -12,6 +12,7 @@ export interface Subject {
   name: string;
   description?: string;
   isActive: boolean;
+  isPrimary: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,6 +73,12 @@ export class SubjectService {
     );
   }
 
+  getPrimarySubjects(): Observable<{ success: boolean; data: Subject[] }> {
+    return this.http.get<{ success: boolean; data: Subject[] }>(
+      this.SUBJECT_API + '/primary'
+    );
+  }
+
   /* ===============================
      PAGE API
   ================================ */
@@ -79,6 +86,10 @@ export class SubjectService {
     return this.http.get<SubjectPageResponse>(
       `${this.SUBJECT_INFO_API}/${subjectId}/page`
     );
+  }
+
+  createNewSubject(payload: Subject): Observable<any> {
+    return this.http.post(this.SUBJECT_API, payload);
   }
 
   /* ===============================

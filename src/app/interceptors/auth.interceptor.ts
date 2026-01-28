@@ -11,25 +11,37 @@ import {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
 
+  // ✅ ADD ONLY THIS (client origin)
+  const clientOrigin =
+    typeof window !== 'undefined' ? window.location.origin : '';
+
+  const originReq = clientOrigin
+    ? req.clone({
+        setHeaders: {
+          'X-Client-Origin': clientOrigin,
+        },
+      })
+    : req;
+
   // 🚨 Never attach token to auth endpoints
   if (
-    req.url.includes('/auth/google') ||
-    req.url.includes('/auth/refresh')
+    originReq.url.includes('/auth/google') ||
+    originReq.url.includes('/auth/refresh')
   ) {
-    return next(req.clone({ withCredentials: true }));
+    return next(originReq.clone({ withCredentials: true }));
   }
 
   const token = auth.getAccessToken();
 
   // Attach token only once
   const authReq = token
-    ? req.clone({
+    ? originReq.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       })
-    : req.clone({ withCredentials: true });
+    : originReq.clone({ withCredentials: true });
 
   return next(authReq).pipe(
     catchError(err => {
@@ -37,7 +49,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      // 🔁 Refresh ONCE (via APP_INITIALIZER logic)
       return from(auth.bootstrapAuth()).pipe(
         switchMap(() => {
           const newToken = auth.getAccessToken();
@@ -47,9 +58,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return throwError(() => err);
           }
 
-          // 🔄 Retry ORIGINAL request with new token
           return next(
-            req.clone({
+            originReq.clone({
               setHeaders: {
                 Authorization: `Bearer ${newToken}`,
               },

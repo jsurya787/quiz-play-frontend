@@ -54,7 +54,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./student/dashboard/dashboard')
         .then(m => m.DashboardComponent),
-    canActivate: [AuthGuard],
+   // canActivate: [AuthGuard],
   },
   {
   path: 'login-success',
@@ -68,35 +68,35 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./subject-page/subject-page')
         .then(m => m.SubjectPage),
-    canActivate: [AuthGuard],
+   // canActivate: [AuthGuard],
   },
     {
     path: 'chapter-page/:chapterId',
     loadComponent: () =>
       import('./chapter-page/chapter-page')
         .then(m => m.ChapterPage),
-    canActivate: [AuthGuard],
+   // canActivate: [AuthGuard],
   },
   {
     path: 'quiz-player-page/:quizId',
     loadComponent: () =>
       import('./quiz-player-page/quiz-player-page')
         .then(m => m.QuizPlayerPageComponent),
-    canActivate: [AuthGuard],
+   // canActivate: [AuthGuard],
   },
   {
     path: 'quiz-result',
     loadComponent: () =>
       import('./quiz-result-page-component/quiz-result-page-component')
         .then(m => m.QuizResultPageComponent),
-    canActivate: [AuthGuard],
+   // canActivate: [AuthGuard],
   },
   {
     path: 'create-quiz-page',
     loadComponent: () =>
       import('./create-quiz-page/create-quiz-page')
         .then(m => m.CreateQuizPage),
-    canActivate: [AuthGuard],
+  //  canActivate: [AuthGuard],
   },
 
   // --------------------------------------------------

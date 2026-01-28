@@ -1,0 +1,101 @@
+@if (visible()) {
+  <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div class="bg-white rounded-2xl w-full max-w-md p-6">
+
+      <h3 class="text-lg font-bold mb-4">
+        {{ isEdit() ? 'Update Subject' : 'Add Subject' }}
+      </h3>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <!-- NAME -->
+        <input
+          class="w-full border rounded-lg px-3 py-2 mb-1"
+          placeholder="Subject name"
+          formControlName="name" />
+
+        @if (showErrors() && form.controls.name.invalid) {
+          <p class="text-xs text-red-500 mb-2">
+            Subject name is required
+          </p>
+        }
+
+          <!-- CLASS -->
+        <input
+          class="w-full border rounded-lg px-3 py-2 mb-1"
+          placeholder="Class"
+          formControlName="subjectClass" />
+        @if (showErrors() && form.controls.subjectClass.invalid) {
+          <p class="text-xs text-red-500 mb-2">
+            Class is required
+          </p>
+        }
+
+        <!-- DESCRIPTION -->
+        <textarea
+          class="w-full border rounded-lg px-3 py-2 mb-1"
+          placeholder="Description"
+          formControlName="description">
+        </textarea>
+
+        @if (showErrors() && form.controls.description.invalid) {
+          <p class="text-xs text-red-500 mb-2">
+            Description is required
+          </p>
+        }
+
+        <!-- KEY POINTS -->
+        <div class="mb-3">
+          <div class="flex gap-2 mb-2">
+            <input
+              class="flex-1 border rounded-lg px-3 py-2"
+              [(ngModel)]="keyPoint"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Add key point"
+              (keydown.enter)="$event.preventDefault(); addKeyPoint()" />
+
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
+              (click)="addKeyPoint()">
+              Add
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mb-1">
+            @for (k of keyPoints; track $index) {
+              <span>
+                {{ k }}
+                <button type="button" (click)="removeKeyPoint($index)">✕</button>
+              </span>
+            }
+          </div>
+
+          @if (showErrors() && !hasMinKeyPoints) {
+            <p class="text-xs text-red-500">
+              Please add at least 4 key points
+            </p>
+          }
+        </div>
+
+        <!-- ACTIVE -->
+        <label class="flex gap-2 mb-4">
+          <input type="checkbox" formControlName="isActive" />
+          Active
+        </label>
+
+        <!-- ACTIONS -->
+        <div class="flex justify-end gap-3">
+          <button type="button" (click)="close()">Cancel</button>
+
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">
+            {{ isEdit() ? 'Update' : 'Create' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

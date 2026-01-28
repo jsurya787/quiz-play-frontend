@@ -1,4 +1,3 @@
-// loader.interceptor.ts
 import { inject } from '@angular/core';
 import {
   HttpInterceptorFn,
@@ -14,7 +13,12 @@ export const loaderInterceptor: HttpInterceptorFn = (
 ) => {
   const loader = inject(LoaderService);
 
-  // ⛔ skip loader if explicitly disabled
+  // ⛔ Skip loader for quiz answer API
+  if (req.url.includes('/quiz-player/answer')) {
+    return next(req);
+  }
+
+  // ⛔ Skip loader if explicitly disabled via header
   if (req.headers.has('X-No-Loader')) {
     return next(req);
   }

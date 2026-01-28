@@ -9,6 +9,9 @@ import { QuizService } from '../services/quiz.service';
   import { SubjectService, Subject } from '../services/subject.service';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../services/toast-service';
+import { RetryAttemptService } from '../services/retry-attempt-service';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-quiz-page',
@@ -21,6 +24,9 @@ export class CreateQuizPage {
   private quizService = inject(QuizService);
   private subjectService = inject(SubjectService);
   private toast = inject(ToastService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private _retryAttemptService = inject(RetryAttemptService);
 
   // 🔢 marks per question
   marks = signal(4);
@@ -77,6 +83,7 @@ export class CreateQuizPage {
 
 
 loadSubjects(): void {
+  this._retryAttemptService.resetAll();
   this.subjectService.getSubjects().subscribe({
     next: res => {
       if (res.success) {
@@ -91,6 +98,13 @@ loadSubjects(): void {
 
 
 saveDraft(): void {
+  if(!this.authService.isAuthenticated() && !this._retryAttemptService.canCreate()) {
+      this.toast.info('Quiz creation limit reached. Log in with Google to continue OR try again after 24 hours.', 4000);
+      setTimeout(() => {
+        this.router.navigate(['/dashboard']);
+      }, 4500);
+      return;
+  }
   if (this.quizForm.invalid){
     this.toast.warning('Please fill all the fields');
     return;
@@ -199,6 +213,9 @@ saveDraft(): void {
         this.quizId.set(null);
         this.questions.set([]);
         this.totalMarks.set(0);
+        if(!this.authService.isAuthenticated()){
+            this._retryAttemptService.increaseQuizCreated();
+        }
       },
       error: err =>
         this.toast.error(err.error?.message || 'Failed to publish quiz'),

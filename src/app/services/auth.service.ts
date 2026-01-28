@@ -15,6 +15,7 @@ const ACCESS_TOKEN_KEY: StateKey<string | null> =
 export class AuthService {
   private accessToken$ = new BehaviorSubject<string | null>(null);
   private refreshPromise: Promise<void> | null = null;
+  public userData: any;
 
 
   constructor(
@@ -59,12 +60,12 @@ export class AuthService {
 
 
   refreshToken() {
-    return this.http.post<{ accessToken: string }>(
+    return this.http.post<{ accessToken: string , user: any}>(
       environment.apiUrl + endpoints.auth.refresh,
       {},
       { withCredentials: true },
     ).pipe(
-      tap(res => this.setAccessToken(res.accessToken)),
+      tap(res => {this.setAccessToken(res.accessToken); this.userData = res.user;}),
     );
   }
 
@@ -130,10 +131,13 @@ bootstrapAuth(): Promise<void> {
     { email, password },
     { withCredentials: true }
   ).pipe(
-    tap(res => this.setAccessToken(res.accessToken))
+    tap(res => {this.setAccessToken(res.accessToken); this.userData = res.user;}),
   );
 }
 
+  isAdmin(): boolean {
+    return this.userData?.role === 'ADMIN';
+  }
 
 }
 

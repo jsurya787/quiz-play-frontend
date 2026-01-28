@@ -1,8 +1,11 @@
-import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuizPlayerService } from '../services/quiz-player.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
+import { RetryAttemptService } from '../services/retry-attempt-service';
+import { ToastService } from '../services/toast-service';
 
 @Component({
   imports: [CommonModule],
@@ -13,6 +16,8 @@ export class QuizPlayerPageComponent implements OnInit {
   quizId!: string;
   attemptId = signal<string | null>(null);
   answeredMap = signal<Record<number, number>>({});
+  private _retryAttemptService = inject(RetryAttemptService);
+  private _toastService = inject(ToastService);
 
 
   quiz = signal<any>(null);
@@ -64,6 +69,7 @@ export class QuizPlayerPageComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private quizService: QuizPlayerService,
+    private authService: AuthService
   ) {}
 
   /* =======================
@@ -74,6 +80,13 @@ export class QuizPlayerPageComponent implements OnInit {
     this.quizId = this.route.snapshot.paramMap.get('quizId')!;
     this.initForm();
     this.loadQuiz();
+    if(!this.authService.isAuthenticated() && !this._retryAttemptService.canAttempt()) {
+      this._toastService.info('You’ve reached the maximum attempts. Log in with Google to continue, or try again after 24 hours.', 4000);
+      setTimeout(() => {
+        this.router.navigate(['/dashboard']);
+      }, 4500);
+    }
+    this._retryAttemptService.resetAll();
   }
 
   /* =======================
@@ -97,10 +110,11 @@ export class QuizPlayerPageComponent implements OnInit {
       this.startAttempt();
     });
   }
+// 695f7eceebf73de912504bc3 for static user
 
   startAttempt() {
     this.quizService
-      .startAttempt(this.quizId, '695f7eceebf73de912504bc3')
+      .startAttempt(this.quizId, this.authService?.userData?.id || '695f7eceebf73de912504bc3')
       .subscribe(res => {
         this.attemptId.set(res.attemptId);
       });
@@ -186,7 +200,9 @@ selectOption(index: number) {
       .subscribe(res => {
         this.quizService.resultResponse = res;
         this.quizService.quizData = this.quiz();
-
+        if(!this.authService.isAuthenticated()){
+            this._retryAttemptService.increaseAttempt();
+        }
         this.router.navigate(['/quiz-result']);
       });
   }
