@@ -8,7 +8,7 @@ export class RetryAttemptService {
   private platformId = inject(PLATFORM_ID);
 
   private readonly ATTEMPT_KEY = 'quiz_attempt_count';
-  private readonly MAX_ATTEMPTS = 2;
+  private readonly MAX_ATTEMPTS = 10;
   private readonly QUIZ_CREATE_KEY = 'quiz_create_count';
   private readonly MAX_QUIZ_CREATED = 2;
   private readonly SAVED_TIME_KEY = 'saved_time';

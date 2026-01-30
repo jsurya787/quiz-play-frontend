@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+
 import { SubjectService } from '../../services/subject.service';
 import { SubjectFormModalComponent } from '../../shared/modals/subject-form-modal/subject-form-modal';
 import { AuthService } from '../../services/auth.service';
@@ -12,78 +13,107 @@ import { ToastService } from '../../services/toast-service';
   imports: [CommonModule, RouterLink, SubjectFormModalComponent],
   templateUrl: './subjects.html',
 })
-export class SubjectsComponent {
-  private subjectService = inject(SubjectService);
+export class SubjectsComponent implements OnInit {
+
+  // ===============================
+  // 🔹 Injected Services
+  // ===============================
+  public subjectService = inject(SubjectService);
   public authService = inject(AuthService);
   private toastService = inject(ToastService);
-  primarySubjects: any[] = [];
 
-  constructor() {
-    this.getPrimarySubjects();
-  }
-  // subjects = [
-  //   {
-  //     name: 'Mathematics',
-  //     class: 'Class 10 & 12',
-  //     image: 'assets/math.png',
-  //     color: 'from-indigo-500 to-purple-600',
-  //   },
-  //   {
-  //     name: 'Physics',
-  //     class: 'Class 11 & 12',
-  //     image: 'assets/physics.png',
-  //     color: 'from-blue-500 to-cyan-500',
-  //   },
-  //   {
-  //     name: 'Chemistry',
-  //     class: 'Class 11 & 12',
-  //     image: 'assets/chemistry.png',
-  //     color: 'from-emerald-500 to-green-600',
-  //   },
-  // ];
+  // ===============================
+  // 🔹 State (Signals)
+  // ===============================
+  loading = signal<boolean>(true);
 
-  showModal = false;
-  isEdit = false;
-  selectedSubject: any = null;
 
-  openAdd() {
-    this.isEdit = false;
-    this.selectedSubject = null;
-    this.showModal = true;
+  // ===============================
+  // 🔹 Modal State
+  // ===============================
+  showModal = signal(false);
+  isEdit = signal(false);
+  selectedSubject = signal<any | null>(null);
+
+  // ===============================
+  // 🔹 Lifecycle
+  // ===============================
+  ngOnInit(): void {
+    if(this.subjectService.subjects().length === 0){
+      this.getPrimarySubjects();
+    }else{
+      this.loading.set(false);
+    }
+
   }
 
-  openEdit(subject: any) {
-    this.isEdit = true;
-    this.selectedSubject = subject;
-    this.showModal = true;
+  // ===============================
+  // 🔹 Modal Actions
+  // ===============================
+  openAdd(): void {
+    this.isEdit.set(false);
+    this.selectedSubject.set(null);
+    this.showModal.set(true);
   }
 
-  closeModal() {
-    this.showModal = false;
+  openEdit(subject: any): void {
+    this.isEdit.set(true);
+    this.selectedSubject.set(subject);
+    this.showModal.set(true);
   }
 
-  saveSubject(payload: any) {
-    if (!this.isEdit) {
-      this.subjectService.createNewSubject(payload).subscribe(() => {
-        this.toastService.success('Subject created successfully.');
-        this.closeModal();
+  closeModal(): void {
+    this.showModal.set(false);
+  }
+
+  // ===============================
+  // 🔹 Save Subject
+  // ===============================
+  saveSubject(payload: any): void {
+    if (!this.isEdit()) {
+      this.subjectService.createNewSubject(payload).subscribe({
+        next: () => {
+          this.toastService.success('Subject created successfully.');
+          this.getPrimarySubjects(); // refresh list
+          this.closeModal();
+        },
+        error: () => {
+          this.toastService.error('Failed to create subject.');
+        },
       });
     } else {
-      this.subjectService
-        .updateSubject(this.selectedSubject._id, payload)
-        .subscribe(() => this.closeModal());
+      const id = this.selectedSubject()?._id;
+      if (!id) return;
+
+      this.subjectService.updateSubject(id, payload).subscribe({
+        next: () => {
+          this.toastService.success('Subject updated successfully.');
+          this.getPrimarySubjects();
+          this.closeModal();
+        },
+        error: () => {
+          this.toastService.error('Failed to update subject.');
+        },
+      });
     }
   }
 
-  getPrimarySubjects() {
-    this.subjectService.getPrimarySubjects().subscribe(
-      (res) => {
-        this.primarySubjects = res.data;
+  // ===============================
+  // 🔹 Load Subjects
+  // ===============================
+  getPrimarySubjects(): void {
+    this.loading.set(true);
+    this.subjectService.getPrimarySubjects().subscribe({
+      next: (res) => {
+        this.subjectService.subjects.set(res?.data ?? []);
+        this.loading.set(false);
       },
-      (error) => {
+      error: (err) => {
+        console.error('Error fetching primary subjects:', err);
         this.toastService.error('Failed to load primary subjects.');
-        console.error('Error fetching primary subjects:', error);
+        this.subjectService.subjects.set([]);
+        this.loading.set(false);
       },
-    );
+    });
   }
 }

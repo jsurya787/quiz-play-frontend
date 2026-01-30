@@ -2,7 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { Subject, SubjectService } from '../../services/subject.service';
 import { QuizService } from '../../services/quiz.service';
 import { AdminRoutingModule } from "../../admin/admin-routing-module";
-import { debounce, debounceTime, Subject as _sb,  } from 'rxjs';
+import { debounceTime, Subject as _sb,  } from 'rxjs';
+import { ToastService } from '../../services/toast-service';
 
 @Component({
   standalone: true,
@@ -14,11 +15,13 @@ export class DashboardComponent {
 
   private subjectService = inject(SubjectService);
   private quizService = inject(QuizService);
+  private toastService = inject(ToastService);
   // 🔥 Debounce trigger
   private filterChange$ = new _sb<void>();
 
   subjects = signal<Subject[]>([]);
   quizess = signal<any[]>([]);
+  loading = signal(true);
 
   // 🔍 FILTER STATE
   search = signal('');
@@ -58,10 +61,14 @@ export class DashboardComponent {
       next: res => {
         if (res.success) {
           this.quizess.set(res.data);
+          this.loading.set(false);
         }
       },
-      error: err =>
-        console.error(err.error?.message || 'Failed to load quizzes'),
+      error: err => {
+        this.loading.set(false);
+        this.toastService.error('Failed to load quizzes. Please try again later.');
+        console.error(err.error?.message || 'Failed to load quizzes');
+      }
     });
   }
 

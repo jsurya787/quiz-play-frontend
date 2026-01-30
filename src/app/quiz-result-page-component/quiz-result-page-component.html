@@ -1,10 +1,75 @@
 
 @if (loading()) {
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="text-lg font-semibold text-gray-500 animate-pulse">
-      Loading results...
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50">
+
+  <!-- HEADER SKELETON -->
+  <header class="result-header">
+
+    <div class="header-left">
+      <div class="h-12 w-12 rounded-full skeleton-shimmer"></div>
+
+      <div class="space-y-2">
+        <div class="h-5 w-32 rounded skeleton-shimmer"></div>
+        <div class="h-4 w-48 rounded skeleton-shimmer"></div>
+      </div>
     </div>
+
+  </header>
+
+  <div class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- SCORE CARD SKELETON -->
+    <div
+      class="bg-white/80 backdrop-blur rounded-3xl p-8 shadow-xl text-center">
+
+      <div class="flex justify-center mb-6">
+        <div
+          class="w-40 h-40 rounded-full skeleton-shimmer">
+        </div>
+      </div>
+
+      <div class="h-6 w-40 mx-auto rounded skeleton-shimmer mb-2"></div>
+      <div class="h-4 w-56 mx-auto rounded skeleton-shimmer"></div>
+
+      <!-- STATS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+
+        <div class="h-20 rounded-2xl skeleton-shimmer"></div>
+        <div class="h-20 rounded-2xl skeleton-shimmer"></div>
+        <div class="h-20 rounded-2xl skeleton-shimmer"></div>
+        <div class="h-20 rounded-2xl skeleton-shimmer"></div>
+
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+        <div class="h-11 w-40 rounded-xl skeleton-shimmer"></div>
+        <div class="h-11 w-36 rounded-xl skeleton-shimmer"></div>
+      </div>
+
+    </div>
+
+    <!-- QUESTION SUMMARY SKELETON -->
+    <div class="mt-14">
+
+      <div class="h-5 w-40 rounded skeleton-shimmer mb-4"></div>
+
+      <div class="bg-white/80 backdrop-blur rounded-2xl p-6 shadow-md">
+        <div class="grid grid-cols-6 sm:grid-cols-10 gap-3">
+
+          @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+            <div class="w-9 h-9 rounded-full skeleton-shimmer"></div>
+          }
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
+
+</div>
+
 } @else {
 
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50 pt-4 relative overflow-hidden">

@@ -22,6 +22,7 @@ export class QuizPlayerPageComponent implements OnInit {
 
   quiz = signal<any>(null);
   currentIndex = signal(0);
+  loading = signal(true);
 
   answerForm!: FormGroup;
 
@@ -101,6 +102,7 @@ export class QuizPlayerPageComponent implements OnInit {
 
   loadQuiz() {
     this.quizService.getQuiz(this.quizId).subscribe(res => {
+      this.loading.set(false);
       this.quiz.set(res.data);
 
       // ⏱ init timer
@@ -108,6 +110,12 @@ export class QuizPlayerPageComponent implements OnInit {
       this.startTimer();
 
       this.startAttempt();
+    }, err=>{
+      this.loading.set(true);
+      this._toastService.error('Failed to load quiz. Please try again later.');
+      setTimeout(() => {
+        this.router.navigate(['/dashboard']);
+      }, 2000);
     });
   }
 // 695f7eceebf73de912504bc3 for static user
@@ -191,20 +199,12 @@ selectOption(index: number) {
      ======================= */
 
   submitQuiz() {
-    if (this.timerRef) {
-      clearInterval(this.timerRef);
+    localStorage.setItem('lastAttemptId', this.attemptId()!);
+     this.quizService.quizData = this.quiz();
+      this.router.navigate(['/quiz-result']);
+    if(!this.authService.isAuthenticated()){
+        this._retryAttemptService.increaseAttempt();
     }
-
-    this.quizService
-      .submitQuiz(this.attemptId()!)
-      .subscribe(res => {
-        this.quizService.resultResponse = res;
-        this.quizService.quizData = this.quiz();
-        if(!this.authService.isAuthenticated()){
-            this._retryAttemptService.increaseAttempt();
-        }
-        this.router.navigate(['/quiz-result']);
-      });
   }
 
   /* =======================

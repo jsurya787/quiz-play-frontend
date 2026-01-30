@@ -1,6 +1,8 @@
-import { Component, signal, OnInit, effect } from '@angular/core';
+import { Component, signal, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { QuizPlayerService } from '../services/quiz-player.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../services/toast-service';
+import { isPlatformBrowser } from '@angular/common';
 
 /* ================= TYPES ================= */
 type QuestionStatus = 'correct' | 'wrong' | 'skipped';
@@ -28,17 +30,10 @@ interface QuizResultResponse {
 })
 export class QuizResultPageComponent implements OnInit {
 
-  constructor(
-    private quizService: QuizPlayerService,
-    private router: Router
-  ) {
-
-    effect(() => {
-     this.applyResult(this.quizService.resultResponse);
-    });
-  }
-
-
+  private router = inject(Router);
+  private quizService = inject(QuizPlayerService);
+  private toastService = inject(ToastService);
+  private platformId = inject(PLATFORM_ID);
   /* ================= UI STATE (Signals) ================= */
   quizTitle = signal('Maths Mock Test – 1');
 
@@ -51,12 +46,34 @@ export class QuizResultPageComponent implements OnInit {
 
   accuracy = signal(0);
   questions = signal<ResultQuestion[]>([]);
-
   loading = signal(true);
 
   /* ================= INIT ================= */
   ngOnInit(): void {
-    this.applyResult(this.quizService.resultResponse);
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const attemptId = localStorage.getItem('lastAttemptId');
+    console.log("attemptId -->", attemptId);
+
+    // ✅ Hard guard
+    if (!attemptId) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    this.quizService.submitQuiz(attemptId).subscribe({
+      next: (res) => {
+        this.applyResult(res);
+      },
+      error: () => {
+        this.toastService.error(
+          'Failed to load quiz result. Please try again later.'
+        );
+        this.router.navigate(['/dashboard']);
+      }
+    });
   }
 
   /* ================= APPLY RESULT ================= */

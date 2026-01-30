@@ -14,7 +14,7 @@ export const loaderInterceptor: HttpInterceptorFn = (
   const loader = inject(LoaderService);
 
   // ⛔ Skip loader for quiz answer API
-  if (req.url.includes('/quiz-player/answer')) {
+  if (req.url.includes('/chapters')) {
     return next(req);
   }
 

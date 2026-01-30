@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environment';
@@ -66,6 +66,8 @@ export class SubjectService {
   private readonly SUBJECT_INFO_API = `${environment.apiUrl}/subject-info`;
   private readonly CHAPTER_API = `${environment.apiUrl}/chapters`;
   private readonly QUIZ_API = `${environment.apiUrl}/quizzes`;
+
+    subjects = signal<any[]>([]);
 
   getSubjects(): Observable<{ success: boolean; data: Subject[] }> {
     return this.http.get<{ success: boolean; data: Subject[] }>(

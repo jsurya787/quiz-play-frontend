@@ -7,7 +7,7 @@ import {
 import { App } from './app/app';
 import { appConfig } from './app/app.config';
 import { authInterceptor } from './app/interceptors/auth.interceptor';
-import { loaderInterceptor } from './app/interceptors/loader.interceptor';
+//import { loaderInterceptor } from './app/interceptors/loader.interceptor';
 
 bootstrapApplication(App, {
   providers: [
@@ -15,7 +15,7 @@ bootstrapApplication(App, {
       withFetch(), // ✅ SSR-safe
       withInterceptors([
         authInterceptor,
-        loaderInterceptor, // ✅ function interceptor
+       // loaderInterceptor, // ✅ function interceptor
       ])
     ),
     ...(appConfig.providers ?? []),

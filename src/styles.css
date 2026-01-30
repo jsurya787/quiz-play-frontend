@@ -31,17 +31,21 @@
            transition-all;
   }
 
+  /* 🔧 UPDATED */
   .input {
     @apply w-full px-4 py-3 rounded-xl
-           bg-white/80 border
+           bg-white/80
+           border border-black/5
            outline-none
            focus:ring-2 focus:ring-indigo-400
            transition;
   }
 
+  /* 🔧 UPDATED */
   .textarea {
     @apply w-full px-4 py-3 rounded-2xl
-           border resize-none
+           border border-black/5
+           resize-none
            outline-none
            focus:ring-2 focus:ring-indigo-400
            transition;
@@ -67,11 +71,13 @@
            transition;
   }
 
+  /* 🔧 UPDATED */
   .option {
     @apply flex items-center gap-3
-           bg-slate-50 p-3 rounded-2xl border
+           bg-slate-50 p-3 rounded-2xl
+           border border-black/5
            cursor-pointer
-           hover:border-indigo-500
+           hover:border-indigo-500/60
            transition;
   }
 
@@ -92,6 +98,14 @@
            px-3 py-1 rounded-full
            text-sm font-semibold;
   }
+
+  /* 🆕 OPTIONAL (SAFE – NOT USED UNLESS YOU APPLY IT) */
+  .card-premium {
+    @apply rounded-2xl
+           bg-white/70 backdrop-blur
+           border border-black/5
+           transition;
+  }
 }
 
 /* =========================
@@ -99,13 +113,17 @@
    ========================= */
 @layer utilities {
 
-  /* -------------------------
-     iOS-SAFE KEYFRAMES
-     ------------------------- */
+  /* ---------- iOS-SAFE KEYFRAMES ---------- */
 
-  @keyframes fadeIn {
-    from { opacity: 0.01 }
-    to { opacity: 1 }
+  @keyframes fadeCinematic {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
   }
 
   @keyframes slideUp {
@@ -131,17 +149,24 @@
   }
 
   @keyframes marquee {
-    from { transform: translate3d(0, 0, 0) }
-    to { transform: translate3d(-50%, 0, 0) }
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
   }
 
-  /* -------------------------
-     Animation Classes
-     ------------------------- */
+  @keyframes floatCinematic {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(12px, -28px, 0);
+    }
+  }
+
+  /* ---------- Animation Classes ---------- */
 
   .animate-fade-in {
-    animation: fadeIn 0.4s ease-out both;
-    will-change: opacity;
+    animation: fadeCinematic 0.8s ease-out both;
+    will-change: transform, opacity;
   }
 
   .animate-slide-up {
@@ -158,8 +183,6 @@
 
   .animate-card {
     animation: slideUp 0.45s ease-out both;
-    will-change: transform, opacity;
-    transform: translateZ(0);
   }
 
   .animate-marquee {
@@ -167,31 +190,17 @@
     will-change: transform;
   }
 
-  @keyframes floatSlow {
-    0% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -20px, 0); }
-    100% { transform: translate3d(0, 0, 0); }
-  }
-
-  @keyframes floatSlower {
-    0% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -30px, 0); }
-    100% { transform: translate3d(0, 0, 0); }
-  }
-
   .animate-float-slow {
-    animation: floatSlow 12s ease-in-out infinite;
+    animation: floatCinematic 14s ease-in-out infinite;
     will-change: transform;
   }
 
   .animate-float-slower {
-    animation: floatSlower 18s ease-in-out infinite;
+    animation: floatCinematic 22s ease-in-out infinite;
     will-change: transform;
   }
 
-  /* -------------------------
-     Delay utilities
-     ------------------------- */
+  /* ---------- Delay Utilities ---------- */
   .delay-100 { animation-delay: 100ms }
   .delay-150 { animation-delay: 150ms }
   .delay-200 { animation-delay: 200ms }
@@ -199,9 +208,7 @@
   .delay-400 { animation-delay: 400ms }
   .delay-500 { animation-delay: 500ms }
 
-  /* -------------------------
-     iOS MOBILE FIXES
-     ------------------------- */
+  /* ---------- Mobile & Reduced Motion ---------- */
 
   @media (max-width: 640px) {
     .delay-100,
@@ -219,7 +226,9 @@
     .animate-slide-up,
     .animate-slide-down,
     .animate-card,
-    .animate-marquee {
+    .animate-marquee,
+    .animate-float-slow,
+    .animate-float-slower {
       animation: none !important;
       transition: none !important;
     }
@@ -229,7 +238,6 @@
 /* =========================
    Quiz List Enhancements
    ========================= */
-
 @keyframes quizCardIn {
   from {
     opacity: 0.01;
@@ -287,4 +295,24 @@
   .stat-value {
     @apply text-lg font-bold;
   }
+}
+
+/* =========================
+   Cinematic Skeleton
+   ========================= */
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(229,231,235,0.75) 25%,
+    rgba(243,244,246,1) 37%,
+    rgba(229,231,235,0.75) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer-cinematic 1.6s ease infinite;
+}
+
+@keyframes shimmer-cinematic {
+  0%   { background-position: 100% 0; }
+  100% { background-position: 0 0; }
 }

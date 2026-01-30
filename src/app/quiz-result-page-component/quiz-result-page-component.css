@@ -372,4 +372,7 @@
   .popup-container button.text-xl {
     font-size: 22px;
   }
+  .animate-fade-out {
+  animation: fadeOut .25s ease forwards;
+}
 }
