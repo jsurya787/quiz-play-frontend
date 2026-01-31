@@ -161,7 +161,7 @@
       </section>
     }
 
-    @if (!loading() && subjectInfo()?.hotTopics?.length) {
+    @if (!loading()) {
       <section class="mb-14">
         <h2 class="text-xl font-bold mb-5 flex items-center justify-between">
           🔥 Hot Topics
@@ -177,6 +177,7 @@
           }
         </h2>
 
+        @if (subjectInfo()?.hotTopics?.length) {
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           @for (topic of subjectInfo().hotTopics; track topic._id) {
             <div class="relative p-5 rounded-2xl
@@ -203,6 +204,7 @@
             </div>
           }
         </div>
+      }
       </section>
     }
 
@@ -226,7 +228,7 @@
       </section>
     }
 
-    @if (!loading() && chapters().length) {
+    @if (!loading()) {
       <section>
       <h2 class="text-xl font-bold mb-5 flex items-center justify-between">
         🧠 Practice by Chapter
@@ -242,6 +244,7 @@
         }
       </h2>
 
+      @if (chapters().length) {
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           @for (chapter of chapters(); track chapter._id) {
             <div
@@ -270,6 +273,7 @@
             </div>
           }
         </div>
+      }
       </section>
     }
 
