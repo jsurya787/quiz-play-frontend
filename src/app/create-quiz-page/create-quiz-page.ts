@@ -96,6 +96,9 @@ loadSubjects(): void {
 }
 
 
+isDraftSaved(): boolean {
+  return this.quizId() !== null;
+}
 
 saveDraft(): void {
   if(!this.authService.isAuthenticated() && !this._retryAttemptService.canCreate()) {
@@ -106,10 +109,28 @@ saveDraft(): void {
       return;
   }
   if (this.quizForm.invalid){
+    this.quizForm.markAllAsTouched();
+    this.quizForm.markAllAsDirty();
     this.toast.warning('Please fill all the fields');
     return;
   } 
 
+  if(this.isDraftSaved()){
+    // 🔥 UPDATE DRAFT
+    this.quizService
+    .updarteQuiz(this.quizId()!, this.quizForm.value as any)
+    .subscribe({
+      next: res => {
+        this.toast.success('Quiz draft updated');
+       // alert('Quiz draft created');
+      },
+      error: err =>
+        this.toast.error(err.error?.message || 'Failed to update quiz'),
+       // alert(err.error?.message || 'Failed to create quiz'),
+    });
+    return;
+  }
+  // ➕ CREATE DRAFT
   this.quizService
     .createQuiz(this.quizForm.value as any)
     .subscribe({
@@ -130,6 +151,8 @@ saveDraft(): void {
       if (!this.quizId()) {
         this.toast.warning('Please save the draft first');
       } else {
+        this.questionForm.markAllAsTouched();
+        this.questionForm.markAllAsDirty();
         this.toast.warning('Please fill all the fields');
       }
       return;
@@ -280,6 +303,21 @@ saveDraft(): void {
   get marksCtrl() {
     return this.questionForm.controls.marks;
   }
+
+  isInvalid(form: any, controlName: string) {
+    const control = form.get(controlName);
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+
+  getError(form: any, controlName: string, label: string) {
+    const control = form.get(controlName);
+    if (!control || !control.errors) return '';
+
+    if (control.errors['required']) return `${label} is required`;
+    if (control.errors['min']) return `${label} must be at least ${control.errors['min'].min}`;
+    return `Invalid ${label}`;
+  }
+
 
 
 }

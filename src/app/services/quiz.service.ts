@@ -35,6 +35,13 @@ export class QuizService {
     return this.http.post(api, payload);
   }
 
+  updarteQuiz(
+    quizId: string,
+    payload: Partial<CreateQuizPayload>,
+  ): Observable<any> {
+    return this.http.patch<any>(`${this.API}/${quizId}` + '/public', payload);
+  }
+
   addQuestion(
     quizId: string,
     payload: AddQuestionPayload,

@@ -1,60 +1,87 @@
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 pt-4">
-
   <!-- =======================
        MOBILE QUIZ INFO
        ======================= -->
   <form
     [formGroup]="quizForm"
-    class="lg:hidden
-           bg-white/85 backdrop-blur-xl
-           shadow-[0_20px_40px_rgba(0,0,0,0.08)]
-           rounded-b-3xl
-           p-5">
-
-    <h2 class="text-lg font-extrabold text-indigo-700 mb-3">
-      Create Quiz
-    </h2>
+    class="lg:hidden bg-white/85 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.08)] rounded-b-3xl p-5"
+  >
+    <h2 class="text-lg font-extrabold text-indigo-700 mb-3">Create Quiz</h2>
 
     <div class="space-y-3">
       <input
         class="input focus:ring-2 focus:ring-indigo-300"
         placeholder="Quiz Title"
-        formControlName="title" />
+        formControlName="title"
+      />
+      @if (isInvalid(quizForm, 'title')) {
+        <p class="text-xs text-red-500">
+          {{ getError(quizForm, 'title', 'Quiz title') }}
+        </p>
+      }
 
       <textarea
         rows="2"
         class="textarea focus:ring-2 focus:ring-indigo-300"
         placeholder="Quiz Description"
-        formControlName="description">
-      </textarea>
+        formControlName="description"
+      ></textarea>
+
+      @if (isInvalid(quizForm, 'description')) {
+        <p class="text-xs text-red-500">
+          {{ getError(quizForm, 'description', 'Description') }}
+        </p>
+      }
 
       <div class="grid grid-cols-2 gap-3">
-        <select class="input" formControlName="subjectId">
-          <option value="">Select Subject</option>
-          @for (subject of subjects(); track subject._id) {
-            <option [value]="subject._id">{{ subject.name }}</option>
+        <!-- SUBJECT -->
+        <div class="col-span-1">
+          <select class="input w-full" formControlName="subjectId">
+            <option value="">Select Subject</option>
+            @for (subject of subjects(); track subject._id) {
+              <option [value]="subject._id">{{ subject.name }}</option>
+            }
+          </select>
+
+          @if (isInvalid(quizForm, 'subjectId')) {
+            <p class="text-xs text-red-500 mt-1">Subject is required</p>
           }
-        </select>
+        </div>
 
-        <select class="input" formControlName="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-           <option value="hard">Hard</option>
-        </select>
+        <!-- DIFFICULTY -->
+        <div class="col-span-1">
+          <select class="input w-full" formControlName="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
 
-        <input
-          class="input col-span-2"
-          type="number"
-          placeholder="Time (min)"
-          formControlName="timeLimit" />
+        <!-- TIME LIMIT -->
+        <div class="col-span-2">
+          <input
+            class="input w-full"
+            type="number"
+            placeholder="Time (min)"
+            formControlName="timeLimit"
+          />
+
+          @if (isInvalid(quizForm, 'timeLimit')) {
+            <p class="text-xs text-red-500 mt-1">
+              {{ getError(quizForm, 'timeLimit', 'Time limit') }}
+            </p>
+          }
+        </div>
       </div>
     </div>
 
-    <button
-      type="button"
-      class="mt-5 w-full btn-primary active:scale-[0.98]"
-      (click)="saveDraft()">
-      Save Draft
+    <button type="button" class="mt-5 w-full btn-primary active:scale-[0.98]" (click)="saveDraft()">
+      @if (isDraftSaved()) {
+        <span>Update Draft</span>
+      }
+      @if (!isDraftSaved()) {
+        <span>Save Draft</span>
+      }
     </button>
   </form>
 
@@ -62,30 +89,32 @@
        DESKTOP LAYOUT
        ======================= -->
   <div class="max-w-7xl mx-auto p-4 flex gap-6">
-
     <!-- DESKTOP SIDEBAR -->
     <aside
-      class="hidden lg:flex w-80
-             bg-white/75 backdrop-blur-xl
-             rounded-3xl
-             shadow-[0_30px_60px_rgba(0,0,0,0.12)]
-             p-6
-             flex-col gap-6
-             sticky top-6 h-fit">
-
-      <h2 class="text-2xl font-extrabold text-indigo-700">
-        Create Quiz
-      </h2>
+      class="hidden lg:flex w-80 bg-white/75 backdrop-blur-xl rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] p-6 flex-col gap-6 sticky top-6 h-fit"
+    >
+      <h2 class="text-2xl font-extrabold text-indigo-700">Create Quiz</h2>
 
       <form [formGroup]="quizForm" class="space-y-3">
         <input class="input" placeholder="Quiz Title" formControlName="title" />
+        @if (isInvalid(quizForm, 'title')) {
+          <p class="text-xs text-red-500">
+            {{ getError(quizForm, 'title', 'Quiz title') }}
+          </p>
+        }
 
         <textarea
-          rows="3"
-          class="textarea"
+          rows="2"
+          class="textarea focus:ring-2 focus:ring-indigo-300"
           placeholder="Quiz Description"
-          formControlName="description">
-        </textarea>
+          formControlName="description"
+        ></textarea>
+
+        @if (isInvalid(quizForm, 'description')) {
+          <p class="text-xs text-red-500">
+            {{ getError(quizForm, 'description', 'Description') }}
+          </p>
+        }
 
         <select class="input" formControlName="subjectId">
           <option value="">Select Subject</option>
@@ -94,18 +123,24 @@
           }
         </select>
 
+        @if (isInvalid(quizForm, 'subjectId')) {
+          <p class="text-xs text-red-500">Subject is required</p>
+        }
+
         <select class="input" formControlName="difficulty">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
           <option value="hard">Hard</option>
         </select>
 
-        <input
-          class="input"
-          type="number"
-          placeholder="Time (min)"
-          formControlName="timeLimit" />
+        <input class="input" type="number" placeholder="Time (min)" formControlName="timeLimit" />
       </form>
+
+      @if (isInvalid(quizForm, 'timeLimit')) {
+        <p class="text-xs text-red-500">
+          {{ getError(quizForm, 'timeLimit', 'Time limit') }}
+        </p>
+      }
 
       <!-- SUMMARY -->
       <div class="bg-indigo-100/70 rounded-2xl p-4 text-sm space-y-1">
@@ -115,11 +150,13 @@
         <p class="text-gray-600">Total Time: {{ totalMarks() }}</p>
       </div>
 
-      <button
-        class="btn-primary mt-auto active:scale-[0.98]"
-        type="button"
-        (click)="saveDraft()">
-        Save Draft
+      <button class="btn-primary mt-auto active:scale-[0.98]" type="button" (click)="saveDraft()">
+        @if (isDraftSaved()) {
+          <span>Update Draft</span>
+        }
+        @if (!isDraftSaved()) {
+          <span>Save Draft</span>
+        }
       </button>
     </aside>
 
@@ -127,29 +164,16 @@
          MAIN BUILDER
          ======================= -->
     <main class="flex-1 space-y-6">
-
       <!-- TOP BAR -->
       <div
-        class="bg-white/80 backdrop-blur-xl
-               rounded-3xl
-               shadow-[0_20px_40px_rgba(0,0,0,0.1)]
-               p-6
-               flex flex-col sm:flex-row
-               gap-4
-               sm:items-center sm:justify-between">
-
+        class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] p-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between"
+      >
         <div>
-          <h1 class="text-2xl font-extrabold text-gray-900">
-            Quiz Builder
-          </h1>
-          <p class="text-gray-500 text-sm">
-            Create engaging questions with ease
-          </p>
+          <h1 class="text-2xl font-extrabold text-gray-900">Quiz Builder</h1>
+          <p class="text-gray-500 text-sm">Create engaging questions with ease</p>
         </div>
 
-        <button
-          class="btn-success w-full sm:w-auto active:scale-[0.97]"
-          (click)="publishQuiz()">
+        <button class="btn-success w-full sm:w-auto active:scale-[0.97]" (click)="publishQuiz()">
           Publish Quiz 🚀
         </button>
       </div>
@@ -157,210 +181,153 @@
       <!-- QUESTION CARD -->
       <form
         [formGroup]="questionForm"
-        class="bg-white/90 backdrop-blur
-               rounded-3xl
-               shadow-[0_30px_60px_rgba(0,0,0,0.12)]
-               p-6
-               space-y-5
-               animate-fade-in">
-
+        class="bg-white/90 backdrop-blur rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] p-6 space-y-5 animate-fade-in"
+      >
         <div class="flex justify-between items-center">
-          <h2 class="font-semibold text-lg">
-            Question {{ questionCount() + 1 }}
-          </h2>
+          <h2 class="font-semibold text-lg">Question {{ questionCount() + 1 }}</h2>
 
           <!-- MARKS CONTROL -->
           <div
-            class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3
-                  rounded-2xl
-                  bg-white/80 backdrop-blur-md
-                  px-3 sm:px-4 py-2
-                  shadow-[0_8px_20px_rgba(0,0,0,0.08)]
-                  border border-white/60">
-
+            class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 rounded-2xl bg-white/80 backdrop-blur-md px-3 sm:px-4 py-2 shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-white/60"
+          >
             <button
               type="button"
-              class="h-9 w-9 flex items-center justify-center
-                    rounded-full bg-gray-100 text-gray-700 text-lg
-                    hover:bg-gray-200 active:scale-95
-                    transition-all duration-150
-                    disabled:opacity-40"
+              class="h-9 w-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 text-lg hover:bg-gray-200 active:scale-95 transition-all duration-150 disabled:opacity-40"
               (click)="decreaseMarks()"
-              [disabled]="marksCtrl.value <= 1">
+              [disabled]="marksCtrl.value <= 1"
+            >
               −
             </button>
 
             <span
-              class="relative px-3 sm:px-4 py-1.5 rounded-full
-                    text-xs sm:text-sm
-                    font-extrabold tracking-wide
-                    text-indigo-700 bg-indigo-100
-                    shadow-inner animate-pulse-once
-                    whitespace-nowrap">
+              class="relative px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide text-indigo-700 bg-indigo-100 shadow-inner animate-pulse-once whitespace-nowrap"
+            >
               +{{ marksCtrl.value }} Marks
-              <span
-                class="absolute inset-0 -z-10 rounded-full
-                      bg-indigo-400/30 blur-lg">
-              </span>
+              <span class="absolute inset-0 -z-10 rounded-full bg-indigo-400/30 blur-lg"> </span>
             </span>
 
             <button
               type="button"
-              class="h-9 w-9 flex items-center justify-center
-                    rounded-full bg-gray-100 text-gray-700 text-lg
-                    hover:bg-gray-200 active:scale-95
-                    transition-all duration-150
-                    disabled:opacity-40"
+              class="h-9 w-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 text-lg hover:bg-gray-200 active:scale-95 transition-all duration-150 disabled:opacity-40"
               (click)="increaseMarks()"
-              [disabled]="marksCtrl.value >= 10">
+              [disabled]="marksCtrl.value >= 10"
+            >
               +
             </button>
-
           </div>
-
         </div>
-
         <textarea
           rows="3"
           placeholder="Type your question..."
           class="textarea"
-          formControlName="questionText">
-        </textarea>
+          formControlName="questionText"
+        ></textarea>
+
+        @if (isInvalid(questionForm, 'questionText')) {
+          <p class="text-xs text-red-500">Question text is required</p>
+        }
 
         <!-- OPTIONS -->
         <div class="grid sm:grid-cols-2 gap-4" formArrayName="options">
-          <div
-            class="option"
-            *ngFor="let _ of options.controls; let i = index"
-            [formGroupName]="i">
+          <div class="option" *ngFor="let _ of options.controls; let i = index" [formGroupName]="i">
+            <input type="radio" name="correct" (change)="selectCorrectOption(i)" />
 
-            <input
-              type="radio"
-              name="correct"
-              (change)="selectCorrectOption(i)" />
+            <input placeholder="Option {{ i + 1 }}" formControlName="text" />
 
-            <input
-              placeholder="Option {{ i + 1 }}"
-              formControlName="text" />
+            @if (
+              options.at(i).get('text')?.invalid &&
+              (options.at(i).get('text')?.touched || options.at(i).get('text')?.dirty)
+            ) {
+              <p class="text-xs text-red-500 mt-1">Option {{ i + 1 }} is required</p>
+            }
           </div>
         </div>
 
         <!-- ACTIONS -->
         <div class="flex justify-between items-center">
-          <button type="button" class="text-red-500 hover:underline">
-            Delete
+          <button type="button" class="text-red-500 hover:underline">Delete</button>
+
+          <button type="button" class="btn-primary active:scale-[0.97]" (click)="saveQuestion()">
+            {{ editingQuestionId() ? 'Update Question' : 'Save Question' }}
           </button>
-
-          <button
-        type="button"
-        class="btn-primary active:scale-[0.97]"
-        (click)="saveQuestion()">
-        {{ editingQuestionId() ? 'Update Question' : 'Save Question' }}
-      </button>
-
         </div>
       </form>
 
       <!-- ADD QUESTION -->
       <button
-        class="w-full border-2 border-dashed border-indigo-400
-               py-5 rounded-3xl text-indigo-600
-               font-semibold hover:bg-indigo-100
-               transition active:scale-[0.98]">
+        class="w-full border-2 border-dashed border-indigo-400 py-5 rounded-3xl text-indigo-600 font-semibold hover:bg-indigo-100 transition active:scale-[0.98]"
+      >
         + Add Another Question
       </button>
 
       <!-- =======================
      ADDED QUESTIONS LIST
      ======================= -->
-    @if (questions().length > 0) {
-      <div
-        class="bg-white/80 backdrop-blur-xl
-              rounded-3xl
-              shadow-[0_20px_40px_rgba(0,0,0,0.1)]
-              p-5 space-y-4">
+      @if (questions().length > 0) {
+        <div
+          class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] p-5 space-y-4"
+        >
+          <!-- Header -->
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-extrabold text-gray-900">
+              Added Questions ({{ questions().length }})
+            </h3>
 
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-extrabold text-gray-900">
-            Added Questions ({{ questions().length }})
-          </h3>
+            <span class="text-sm text-gray-500"> Click ✏️ to edit </span>
+          </div>
 
-          <span class="text-sm text-gray-500">
-            Click ✏️ to edit
-          </span>
-        </div>
+          <!-- Question Items -->
+          <ul class="space-y-3">
+            @for (q of questions(); let i = $index; track q._id) {
+              <li
+                class="flex items-center justify-between gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 hover:shadow-md transition"
+              >
+                <!-- Left -->
+                <div class="flex items-start gap-3 flex-1">
+                  <span
+                    class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm"
+                  >
+                    {{ i + 1 }}
+                  </span>
 
-        <!-- Question Items -->
-        <ul class="space-y-3">
-          @for (q of questions(); let i = $index; track q._id) {
-            <li
-              class="flex items-center justify-between
-                    gap-4
-                    bg-white rounded-2xl
-                    px-4 py-3
-                    shadow-sm
-                    border border-gray-100
-                    hover:shadow-md
-                    transition">
+                  <div class="min-w-0">
+                    <p class="font-medium text-gray-800 truncate">
+                      {{ q.questionText }}
+                    </p>
 
-              <!-- Left -->
-              <div class="flex items-start gap-3 flex-1">
-                <span
-                  class="h-8 w-8 rounded-full
-                        bg-indigo-100 text-indigo-700
-                        flex items-center justify-center
-                        font-bold text-sm">
-                  {{ i + 1 }}
-                </span>
-
-                <div class="min-w-0">
-                  <p class="font-medium text-gray-800 truncate">
-                    {{ q.questionText }}
-                  </p>
-
-                  <p class="text-xs text-gray-500 mt-0.5">
-                    {{ q.marks }} marks ·
-                    {{ q.options?.length || 0 }} options
-                  </p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                      {{ q.marks }} marks · {{ q.options?.length || 0 }} options
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Actions -->
-              <div class="flex items-center gap-3">
-                <!-- Edit -->
-                <button
-                  type="button"
-                  class="h-8 w-8 rounded-full
-                        bg-indigo-50 text-indigo-600
-                        hover:bg-indigo-100
-                        active:scale-95
-                        transition"
-                  title="Edit question"
-                  (click)="editQuestion(q)">
-                  ✏️
-                </button>
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                  <!-- Edit -->
+                  <button
+                    type="button"
+                    class="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95 transition"
+                    title="Edit question"
+                    (click)="editQuestion(q)"
+                  >
+                    ✏️
+                  </button>
 
-                <!-- Delete -->
-                <button
-                  type="button"
-                  class="h-8 w-8 rounded-full
-                        bg-red-50 text-red-600
-                        hover:bg-red-100
-                        active:scale-95
-                        transition"
-                  title="Delete question"
-                  (click)="deleteQuestion(q._id)">
-                  🗑️
-                </button>
-              </div>
-            </li>
-          }
-        </ul>
-      </div>
-    }
-
-
+                  <!-- Delete -->
+                  <button
+                    type="button"
+                    class="h-8 w-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition"
+                    title="Delete question"
+                    (click)="deleteQuestion(q._id)"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      }
     </main>
   </div>
 </div>
