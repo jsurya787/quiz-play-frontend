@@ -87,58 +87,61 @@
 
 } @else {
 
-    <div class="flex flex-wrap gap-4 justify-center">
-      @for (item of subjectService.subjects(); track item._id; let i = $index) {
-        <div
-          class="group relative cursor-pointer
-                px-5 py-2.5 rounded-full
-                bg-white/70 backdrop-blur-md
-                border border-black/5
-                ring-1 ring-black/5
-                text-sm font-semibold text-gray-800
-                shadow-[0_6px_20px_rgba(0,0,0,0.08)]
-                transition-all duration-500 ease-out
-                hover:-translate-y-1
-                hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
-                active:scale-95
-                animate-fade-in"
-          [style.animationDelay.ms]="i * 80"
-          (click)="navigateToQuizzes(item._id)">
+  <div class="flex flex-wrap justify-center gap-4">
+    @for (item of subjectService.subjects(); track item._id; let i = $index) {
+      <div
+        class="group relative cursor-pointer
+              px-6 py-3 rounded-full
+              bg-white/70 backdrop-blur-md
+              border border-black/5
+              ring-1 ring-black/5
+              text-sm font-semibold text-gray-800
+              shadow-[0_6px_20px_rgba(0,0,0,0.08)]
+              transform-gpu
+              transition-all duration-500 ease-out
+              hover:-translate-y-1
+              hover:shadow-[0_14px_45px_rgba(0,0,0,0.16)]
+              active:scale-95
+              animate-chip-in
+              animate-float-slower"
+        [style.animationDelay.ms]="i * 120"
+        (click)="navigateToQuizzes(item._id)">
 
-          <!-- cinematic light sweep -->
+        <!-- shimmer sweep -->
+        <span
+          class="pointer-events-none absolute inset-0 rounded-full
+                bg-gradient-to-r from-transparent via-white/60 to-transparent
+                opacity-0
+                translate-x-[-130%]
+                group-hover:opacity-100
+                group-hover:translate-x-[130%]
+                transition-all duration-700 ease-out">
+        </span>
+
+        <!-- soft glow -->
+        <span
+          class="pointer-events-none absolute inset-0 rounded-full
+                bg-indigo-300/20 blur-xl
+                opacity-0 group-hover:opacity-100
+                transition-opacity duration-500">
+        </span>
+
+        <!-- content -->
+        <span class="relative flex items-center gap-2">
           <span
-            class="pointer-events-none absolute inset-0 rounded-full
-                  bg-gradient-to-r from-transparent via-white/60 to-transparent
-                  opacity-0
-                  translate-x-[-120%]
-                  group-hover:opacity-100
-                  group-hover:translate-x-[120%]
-                  transition-all duration-700 ease-out">
+            class="text-indigo-600
+                  transition-transform duration-500
+                  group-hover:scale-125">
+            ⚡
           </span>
+          <span class="tracking-wide">
+            {{ item.name }}
+          </span>
+        </span>
+      </div>
+    }
+  </div>
 
-          <!-- subtle ambient glow -->
-          <span
-            class="pointer-events-none absolute inset-0 rounded-full
-                  bg-indigo-300/20 blur-lg
-                  opacity-0 group-hover:opacity-100
-                  transition-opacity duration-500">
-          </span>
-
-          <!-- content -->
-          <span class="relative flex items-center gap-2">
-            <span
-              class="text-indigo-600
-                    transition-transform duration-500
-                    group-hover:scale-125">
-              ⚡
-            </span>
-            <span class="tracking-wide">
-              {{ item.name }}
-            </span>
-          </span>
-        </div>
-      }
-    </div>
 
 
 }

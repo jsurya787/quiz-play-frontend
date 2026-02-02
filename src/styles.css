@@ -354,3 +354,19 @@ a:active {
 html {
   -webkit-text-size-adjust: 100%;
 }
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-chip-in {
+  animation: chip-in 0.7s cubic-bezier(.22,1,.36,1) both;
+}
+
