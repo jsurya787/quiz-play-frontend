@@ -77,13 +77,13 @@
   </div>
 </section>
 } 
-@if (!loading() && quizess().length === 0) {
+<!-- @if (!loading() && quizess().length === 0) {
   <div class="text-center py-12">
     <h2 class="text-2xl font-bold text-gray-900">No quizzes available</h2>
     <p class="mt-2 text-gray-600">There are no quizzes matching your current filters.</p>
   </div>
-}
-@if (!loading() && quizess().length > 0) {
+} -->
+@if (!loading()) {
 <section
   class="relative min-h-screen pt-28 px-6
          overflow-hidden
@@ -174,7 +174,8 @@
 
 
     <!-- QUIZ GRID -->
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+     @if (quizess().length > 0) {
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3" >
 
       <!-- QUIZ CARD -->
       <!-- <div
@@ -282,7 +283,7 @@
                bg-white/80 backdrop-blur-lg
                rounded-3xl shadow-lg p-6
                transition-all duration-300
-               hover:-translate-y-1 hover:shadow-xl">
+               hover:-translate-y-1 hover:shadow-xl" [routerLink]="['/quiz-player-page', item._id]">
 
         <span
           class="inline-block mb-3 px-3 py-1 rounded-full
@@ -318,6 +319,13 @@
       }
 
     </div>
+     }
+     @if (quizess().length === 0) {
+  <div class="text-center py-12">
+    <h2 class="text-2xl font-bold text-gray-900">No quizzes available</h2>
+    <p class="mt-2 text-gray-600">There are no quizzes matching your current filters.</p>
+  </div>
+}
   </div>
 </section>
 }

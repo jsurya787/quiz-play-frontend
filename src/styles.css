@@ -316,3 +316,41 @@
   0%   { background-position: 100% 0; }
   100% { background-position: 0 0; }
 }
+
+
+/* ===============================
+   MOBILE INTERACTION FIX (GLOBAL)
+   =============================== */
+
+/* Prevent double-tap zoom, keep pinch zoom */
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Stop iOS auto-zoom on inputs */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* Remove ugly tap highlight */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better tap feedback (optional but premium) */
+button:active,
+a:active {
+  transform: scale(0.97);
+}
+
+/* Improve touch responsiveness */
+html {
+  -webkit-text-size-adjust: 100%;
+}

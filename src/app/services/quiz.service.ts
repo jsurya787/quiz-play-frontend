@@ -97,4 +97,8 @@ export class QuizService {
     );
   }
 
+  sendBulkQuestionsToApi(quizId: string, questions: any[]): Observable<any> {
+    return this.http.post(`${this.API}/${quizId}/questions/bulk`,  questions );
+  }
+
 }

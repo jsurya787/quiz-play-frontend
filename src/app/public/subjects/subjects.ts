@@ -25,7 +25,7 @@ export class SubjectsComponent implements OnInit {
   // ===============================
   // 🔹 State (Signals)
   // ===============================
-  loading = signal<boolean>(true);
+  loading = signal<boolean>(false);
 
 
   // ===============================
@@ -39,11 +39,11 @@ export class SubjectsComponent implements OnInit {
   // 🔹 Lifecycle
   // ===============================
   ngOnInit(): void {
-    if(this.subjectService.subjects().length === 0){
-      this.getPrimarySubjects();
-    }else{
-      this.loading.set(false);
-    }
+    // if(this.subjectService.subjects().length === 0){
+    //   this.getPrimarySubjects();
+    // }else{
+    //   this.loading.set(false);
+    // }
 
   }
 

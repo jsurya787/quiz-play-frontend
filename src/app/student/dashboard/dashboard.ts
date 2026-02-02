@@ -2,8 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { Subject, SubjectService } from '../../services/subject.service';
 import { QuizService } from '../../services/quiz.service';
 import { AdminRoutingModule } from "../../admin/admin-routing-module";
-import { debounceTime, Subject as _sb,  } from 'rxjs';
+import { Subject as _sb, debounceTime,  } from 'rxjs';
 import { ToastService } from '../../services/toast-service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -16,29 +17,42 @@ export class DashboardComponent {
   private subjectService = inject(SubjectService);
   private quizService = inject(QuizService);
   private toastService = inject(ToastService);
+  private route = inject(ActivatedRoute);
   // 🔥 Debounce trigger
   private filterChange$ = new _sb<void>();
 
   subjects = signal<Subject[]>([]);
   quizess = signal<any[]>([]);
-  loading = signal(true);
+  loading = signal(true); 
+  subjectId = signal<string | null>(null);
+
 
   // 🔍 FILTER STATE
   search = signal('');
   selectedSubject = signal<string | null>(null);
   difficulty = signal<string | null>(null);
 
-  constructor() {
-    this.loadSubjects();
-    this.loadQuizes();
+constructor() {
+  this.route.paramMap.subscribe(params => {
+    const subjectId = params.get('subjectId');
 
-    // ✅ debounce once, globally
+    if (!subjectId || subjectId === 'all') {
+      this.subjectId.set(null);
+      this.selectedSubject.set(null);
+    } else {
+      this.subjectId.set(subjectId);
+      this.selectedSubject.set(subjectId);
+    }
+    this.loadQuizes();
+        // ✅ debounce once, globally
     this.filterChange$
       .pipe(debounceTime(500))
       .subscribe(() => {
         this.loadQuizes();
       });
-  }
+  });
+  this.loadSubjects();
+ }
 
   loadSubjects(): void {
     this.subjectService.getSubjects().subscribe({

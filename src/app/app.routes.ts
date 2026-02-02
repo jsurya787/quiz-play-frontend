@@ -50,7 +50,7 @@ export const routes: Routes = [
   // 🎓 PROTECTED STUDENT AREA
   // --------------------------------------------------
   {
-    path: 'dashboard',
+    path: 'dashboard/:subjectId',
     loadComponent: () =>
       import('./student/dashboard/dashboard')
         .then(m => m.DashboardComponent),

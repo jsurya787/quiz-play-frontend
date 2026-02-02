@@ -24,13 +24,16 @@ export class CreateQuizPage {
   private quizService = inject(QuizService);
   private subjectService = inject(SubjectService);
   private toast = inject(ToastService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private router = inject(Router);
   private _retryAttemptService = inject(RetryAttemptService);
 
   // 🔢 marks per question
   marks = signal(4);
   editingQuestionId = signal<string | null>(null);
+  showBulkPopup = signal(false);
+  bulkText = '';
+
 
 
   /* ===============================
@@ -317,6 +320,114 @@ saveDraft(): void {
     if (control.errors['min']) return `${label} must be at least ${control.errors['min'].min}`;
     return `Invalid ${label}`;
   }
+
+  openBulkPopup() {
+    console.log(this.authService.isAuthenticated())
+    this.showBulkPopup.set(true);
+  }
+
+  closeBulkPopup() {
+    this.showBulkPopup.set(false);
+    this.bulkText = '';
+  }
+
+  clearBulkText() {
+    this.bulkForm.reset();
+  }
+
+  bulkForm = this.fb.group({
+    bulkText: [''],
+  });
+
+
+parsedQuestions: any[] = [];
+parseBulkQuestions(): {
+  questionText: string;
+  options: { text: string; isCorrect: boolean }[];
+  marks: number;
+}[] | void {
+
+  const rawText = this.bulkForm.controls.bulkText.value;
+
+  if (!rawText.trim()) {
+    this.toast.warning('Paste some questions first');
+    return;
+  }
+
+  const blocks = rawText
+    .split(/\n\s*\n/)
+    .map(b => b.trim())
+    .filter(Boolean);
+
+  const questions = blocks.map((block, index) => {
+    const lines = block
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+
+    const questionLine = lines.find(l => l.startsWith('Q:'));
+    const optionLines = lines.filter(l => /^[A-D]\)/.test(l));
+    const marksLine = lines.find(l => /^Marks:/i.test(l));
+
+    const questionText = questionLine
+      ?.replace(/^Q:/, '')
+      .trim();
+
+    const options = optionLines.map(l => ({
+      text: l
+        .replace(/^[A-D]\)/, '')
+        .replace('*', '')
+        .trim(),
+      isCorrect: l.includes('*'),
+    }));
+
+    const marks = Number(
+      marksLine?.replace(/^Marks:/i, '').trim() || 1
+    );
+
+    return {
+      questionText,
+      options,
+      marks,
+      __index: index + 1, // internal only
+    };
+  });
+
+  // 🔎 VALIDATION
+  const invalidQuestion = questions.find(q =>
+    !q.questionText ||
+    q.options.length !== 4 ||
+    q.options.filter(o => o.isCorrect).length !== 1 ||
+    !Number.isInteger(q.marks) ||
+    q.marks < 1
+  );
+
+  if (invalidQuestion) {
+    this.toast.error(
+      `Invalid format in question #${invalidQuestion.__index}`
+    );
+    return;
+  }
+
+  // ✅ FINAL CLEAN RESULT (this is what you want)
+  const cleanQuestions = questions.map(({ __index, ...q }) => q);
+
+  this.parsedQuestions = cleanQuestions;
+  this.showBulkPopup.set(false);
+  this.quizService.sendBulkQuestionsToApi(this.quizId()!,   this.parsedQuestions).subscribe({
+    next: res => {
+      this.toast.success('Bulk questions added successfully');
+      this.questions.set(res.data.questions);
+      this.totalMarks.set(res.data.totalMarks);
+      this.resetQuestionForm();
+    },
+    error: err =>
+      this.toast.error(err.error?.message || 'Failed to add bulk questions'),
+  });
+  console.log('this.parsedQuestions ----->', this.parsedQuestions);
+}
+
+
 
 
 

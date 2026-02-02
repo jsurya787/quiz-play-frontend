@@ -260,6 +260,16 @@
         + Add Another Question
       </button>
 
+      @if (quizId() && authService.isAdmin() == true) {
+         <button 
+          class="w-full mt-3 bg-indigo-600 text-white py-4 rounded-3xl font-semibold hover:bg-indigo-700 transition active:scale-[0.98]"
+          (click)="openBulkPopup()">
+          📥 Bulk Add Questions
+        </button>
+
+      }
+
+
       <!-- =======================
      ADDED QUESTIONS LIST
      ======================= -->
@@ -331,3 +341,74 @@
     </main>
   </div>
 </div>
+
+<!-- Add a bulk question -->
+
+  @if (showBulkPopup()) {
+    <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+
+      <div
+        class="bg-white w-full max-w-3xl rounded-3xl shadow-[0_40px_80px_rgba(0,0,0,0.25)]
+              animate-fade-in p-6 space-y-4">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-extrabold text-indigo-700">
+            📥 Bulk Add Questions {{authService.isAuthenticated()}}
+          </h2>
+          <button
+            class="text-gray-400 hover:text-gray-600 text-xl"
+            (click)="closeBulkPopup()">
+            ✕
+          </button>
+        </div>
+
+        <!-- INSTRUCTIONS -->
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-gray-700">
+          <p class="font-semibold mb-1">Paste questions in this format:</p>
+          <pre class="text-xs text-gray-600 whitespace-pre-wrap">
+Q: What is 2 + 2?
+A) 3
+B) 4 *
+C) 5
+D) 6
+Marks: 1
+          </pre>
+          <p class="mt-1 text-xs">Use <b>*</b> for correct option</p>
+        </div>
+
+        <form [formGroup]="bulkForm">
+          <textarea
+            rows="10"
+            class="textarea w-full font-mono text-sm"
+            placeholder="Paste all questions here..."
+            formControlName="bulkText">
+          </textarea>
+        </form>
+
+        <!-- ACTIONS -->
+        <div class="flex justify-end gap-3">
+          <button
+            class="btn-secondary"
+            (click)="closeBulkPopup()">
+            Cancel
+          </button>
+
+          <button
+            class="btn-secondary"
+            (click)="clearBulkText()">
+            Clear All
+          </button>
+
+          <button
+            class="btn-primary"
+            (click)="parseBulkQuestions()">
+            Parse & Preview
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+
