@@ -16,7 +16,12 @@ export class HeroComponent {
   loading = signal(false);
 
   constructor() {
-    this.getPrimarySubjects();
+    if(this.subjectService.subjects().length === 0){
+      this.getPrimarySubjects();
+    }else{
+      this.loading.set(true);
+    }
+  
   }
 
 
