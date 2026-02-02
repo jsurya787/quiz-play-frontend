@@ -1,8 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from "@angular/router";
+import { Router } from "@angular/router";
 import { AuthService } from '../../services/auth.service';
 import { SubjectService } from '../../services/subject.service';
-import { Sign } from 'crypto';
 
 @Component({
   selector: 'app-hero',
