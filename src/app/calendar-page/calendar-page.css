@@ -1,0 +1,68 @@
+/* ================= CARD ROOT ================= */
+.calendar-coming-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ================= GLOW BLOBS ================= */
+.calendar-glow {
+  position: absolute;
+  height: 260px;
+  width: 260px;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.35;
+}
+
+.calendar-glow-top {
+  top: -120px;
+  right: -120px;
+  background: rgb(165 180 252); /* indigo-300 */
+}
+
+.calendar-glow-bottom {
+  bottom: -120px;
+  left: -120px;
+  background: rgb(125 211 252); /* sky-300 */
+}
+
+/* ================= ENTRY ANIMATION ================= */
+@keyframes calendarFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.calendar-coming-card .animate-enter {
+  animation: calendarFadeUp 0.8s ease-out both;
+}
+
+/* ================= FLOAT ANIMATION ================= */
+@keyframes calendarFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.calendar-coming-card .animate-float {
+  animation: calendarFloat 4s ease-in-out infinite;
+}
+
+/* ================= MOBILE & ACCESSIBILITY ================= */
+@media (prefers-reduced-motion: reduce) {
+  .calendar-coming-card .animate-enter,
+  .calendar-coming-card .animate-float {
+    animation: none;
+  }
+}

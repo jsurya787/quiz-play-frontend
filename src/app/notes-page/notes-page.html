@@ -1,0 +1,152 @@
+<div
+  class="notes-root relative h-[calc(100vh-64px)]
+         flex bg-gradient-to-br
+         from-indigo-50 via-white to-sky-100
+         pt-4 overflow-hidden">
+
+  <!-- ================= LEFT SIDEBAR ================= -->
+  <aside
+    class="notes-sidebar w-full lg:w-80 shrink-0
+           border-r border-black/5
+           bg-white/70 backdrop-blur-xl
+           flex flex-col
+           transition-all duration-300"
+    [class.hidden]="isMobileEditorOpen() && !isLargeScreen()">
+
+    <!-- Header -->
+    <div class="notes-header p-4 border-b border-black/5 relative">
+      <div class="absolute inset-0 bg-gradient-to-r from-indigo-200/20 to-sky-200/20 blur-xl"></div>
+
+      <h2 class="relative text-lg font-bold text-gray-900">📝 Notes</h2>
+      <p class="relative text-xs text-gray-500 mt-1">
+        Your thoughts, instantly saved
+      </p>
+    </div>
+
+    <!-- Search -->
+    <div class="p-4">
+      <input
+        type="text"
+        placeholder="Search notes…"
+        class="notes-search w-full rounded-xl px-4 py-2
+               bg-white/80 backdrop-blur
+               border border-black/10
+               transition-all duration-300
+               focus:outline-none
+               focus:ring-2 focus:ring-indigo-400/60
+               focus:shadow-[0_0_0_6px_rgba(99,102,241,0.15)]"
+        [(ngModel)]="searchTerm"
+        (input)="filterNotes()" />
+    </div>
+
+    <!-- Notes List -->
+    <div class="flex-1 overflow-y-auto px-2 space-y-2">
+      @for (note of notesService.notes(); track note._id) {
+        <div
+          class="note-card p-3 rounded-xl cursor-pointer
+                 border border-black/5 transition-all"
+          [class.active]="note._id === activeNote()?._id"
+          (click)="selectNote(note)">
+
+          <div class="font-semibold text-sm truncate">
+            {{ note.title || 'Untitled' }}
+          </div>
+
+          <div class="text-xs text-gray-500 truncate mt-1">
+            {{ note.content }}
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Desktop Add Button -->
+    <div class="hidden lg:block p-4 border-t border-black/5">
+      <button
+        class="w-full py-2 rounded-xl
+               bg-indigo-600 text-white font-semibold
+               hover:bg-indigo-700 active:scale-95
+               transition"    (click)="createNote()">
+        ➕ New Note
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= EDITOR ================= -->
+  <main
+    class="notes-editor flex-1 bg-white/60 backdrop-blur-xl
+           absolute lg:static inset-0 z-20
+           transition-all duration-300
+           overflow-y-auto"
+    [class.hidden]="!activeNote() || (!isMobileEditorOpen() && !isLargeScreen())">
+
+    @if (activeNote()) {
+
+      <!-- Mobile Header -->
+      <div
+        class="lg:hidden sticky top-0 z-30
+               flex items-center gap-3
+               p-4 border-b border-black/10
+               bg-white/80 backdrop-blur">
+
+        <button
+          class="text-indigo-600 font-semibold"
+          (click)="isMobileEditorOpen.set(false)">
+          ← Notes
+        </button>
+
+        <span class="text-sm text-gray-500 truncate">
+          {{ activeNote()?.title || 'Untitled' }}
+        </span>
+      </div>
+
+      <!-- Editor Body -->
+      <div class="p-6 lg:p-10">
+
+        <!-- Title -->
+        <input
+          class="w-full text-2xl lg:text-3xl font-bold
+                 bg-transparent outline-none
+                 placeholder:text-gray-400"
+          placeholder="Title"
+          [value]="activeNote()!.title"
+          readonly />
+
+        <!-- Cinematic divider -->
+        <div class="my-6 h-px bg-gradient-to-r
+                    from-transparent via-indigo-300/40 to-transparent">
+        </div>
+
+        <!-- Content -->
+        <textarea
+          class="w-full min-h-[65vh]
+                 bg-transparent resize-none
+                 outline-none text-gray-800
+                 leading-relaxed"
+          placeholder="Start writing…"
+          [value]="activeNote()!.content"
+          (input)="updateNote($event)">
+        </textarea>
+
+      </div>
+    }
+  </main>
+
+  <!-- ================= FLOATING ADD (MOBILE) ================= -->
+  <button
+    class="lg:hidden fixed bottom-6 right-6 z-40
+           h-14 w-14 rounded-full
+           bg-indigo-600 text-white text-2xl
+           shadow-xl active:scale-95
+           animate-fab-pulse"
+    (click)="createNote()">
+    +
+  </button>
+
+</div>
+
+<!-- <button
+  class="text-indigo-600 font-semibold"
+  (click)="backToList()">
+  ← Notes
+</button> -->
+

@@ -98,6 +98,20 @@ export const routes: Routes = [
         .then(m => m.CreateQuizPage),
   //  canActivate: [AuthGuard],
   },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./calendar-page/calendar-page')
+        .then(m => m.CalendarPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'notes',
+    loadComponent: () =>
+      import('./notes-page/notes-page')
+        .then(m => m.NotesPage),
+    canActivate: [AuthGuard],
+  },
 
   // --------------------------------------------------
   // 🛠️ ADMIN (LAZY MODULE)
