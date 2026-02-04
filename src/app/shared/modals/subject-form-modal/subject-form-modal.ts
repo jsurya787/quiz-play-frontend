@@ -18,6 +18,9 @@ export class SubjectFormModalComponent {
   // 🔹 Outputs
   closeModal = output<void>();
   submitForm = output<any>();
+// 🔹 Image State
+  logoFile = signal<File | null>(null);
+  logoPreview = signal<string | null>(null);
 
   keyPoints: string[] = [];
   keyPoint = '';
@@ -49,6 +52,10 @@ export class SubjectFormModalComponent {
           isActive: s.isActive ?? true,
         });
         this.keyPoints = [...(s.keyPoints || [])];
+
+        // 🔹 Existing logo (edit mode)
+        this.logoPreview.set(s.logoUrl ?? null);
+        this.logoFile.set(null);
       } else {
         this.form.reset({
           name: '',
@@ -57,12 +64,32 @@ export class SubjectFormModalComponent {
           isPrimary: false,
           isActive: true,
         });
+
         this.keyPoints = [];
+        this.logoPreview.set(null);
+        this.logoFile.set(null);
       }
 
       this.showErrors.set(false);
     });
+
   }
+
+  onLogoSelect(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || !input.files.length) return;
+
+  const file = input.files[0];
+  this.logoFile.set(file);
+
+  // Preview
+  const reader = new FileReader();
+  reader.onload = () => {
+    this.logoPreview.set(reader.result as string);
+  };
+  reader.readAsDataURL(file);
+}
+
 
   // 🔹 Key points
   addKeyPoint(): void {
@@ -78,22 +105,28 @@ export class SubjectFormModalComponent {
 
   // 🔹 Validation helpers
   get hasMinKeyPoints(): boolean {
-    return this.keyPoints.length >= 4;
+    return this.keyPoints.length >= 3;
   }
 
   // 🔹 Submit
   submit(): void {
     this.showErrors.set(true);
 
-    if (this.form.invalid || !this.hasMinKeyPoints) {
+    if (
+      this.form.invalid ||
+      !this.hasMinKeyPoints ||
+      (!this.logoFile() && !this.isEdit())
+    ) {
       return;
     }
 
     this.submitForm.emit({
       ...this.form.getRawValue(),
       keyPoints: this.keyPoints,
+      logoFile: this.logoFile(), // 🔹 important
     });
   }
+
 
   close(): void {
     this.form.reset({
@@ -103,7 +136,12 @@ export class SubjectFormModalComponent {
       isPrimary: false,
       isActive: true,
     });
+
     this.keyPoints = [];
+    this.logoFile.set(null);
+    this.logoPreview.set(null);
+
     this.closeModal.emit();
   }
+
 }

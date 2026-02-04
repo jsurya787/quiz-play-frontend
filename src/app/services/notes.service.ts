@@ -8,6 +8,7 @@ export interface Note {
   _id: string;
   title: string;
   content: string;
+  isPinned?: boolean;
   createdAt: string;
 }
 
@@ -65,7 +66,9 @@ export class NotesService {
         params: search ? { search } : {},
       })
       .subscribe(res => {
-        if (res.status) this.notes.set(res.data);
+        if (res.status) {
+          this.notes.set(this.sortNotes(res.data));
+        }
       });
   }
 
@@ -85,10 +88,39 @@ export class NotesService {
   }
 
   deleteNote(id: string) {
-    this.http
+    return this.http
       .delete<ApiResponse<null>>(`${this.apiUrl}/${id}`)
-      .subscribe(() => {
-        this.notes.update(n => n.filter(x => x._id !== id));
-      });
+      .pipe(
+        tap(() => {
+          this.notes.update(n => n.filter(x => x._id !== id));
+        }),
+      );
+  }
+
+  togglePin(note: Note) {
+    return this.http
+      .patch<ApiResponse<Note>>(
+        `${this.apiUrl}/${note._id}`,
+        { isPinned: !note.isPinned },
+      )
+      .pipe(
+        tap(res => {
+          if (res.status) {
+            this.notes.update(n =>
+              this.sortNotes(
+                n.map(x =>
+                  x._id === res.data._id ? res.data : x,
+                ),
+              ),
+            );
+          }
+        }),
+      );
+  }
+
+  private sortNotes(notes: Note[]) {
+    return notes.slice().sort(
+      (a, b) => Number(b.isPinned) - Number(a.isPinned),
+    );
   }
 }

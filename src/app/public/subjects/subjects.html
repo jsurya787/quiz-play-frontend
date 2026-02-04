@@ -136,6 +136,47 @@
                      shadow-sm transition-all duration-300
                      hover:shadow-xl hover:-translate-y-1
                      hover:ring-1 hover:ring-indigo-200/60">
+                     <!-- ACTION ICONS -->
+            @if (authService.isAdmin()) {
+              <div
+                class="absolute top-3 right-3 z-10
+                      flex gap-2
+                      opacity-0 scale-95
+                      transition-all duration-200
+                      group-hover:opacity-100 group-hover:scale-100">
+
+                <!-- Edit -->
+                <button
+                  (click)="editSubject(s); $event.stopPropagation()"
+                  class="w-9 h-9 flex items-center justify-center
+                        rounded-full
+                        bg-white/90 backdrop-blur
+                        border border-gray-200
+                        text-indigo-600
+                        shadow-sm
+                        hover:bg-indigo-50 hover:scale-105
+                        transition"
+                  title="Edit">
+                  ✏️
+                </button>
+
+                <!-- Delete -->
+                <button
+                  (click)="deleteSubject(s); $event.stopPropagation()"
+                  class="w-9 h-9 flex items-center justify-center
+                        rounded-full
+                        bg-white/90 backdrop-blur
+                        border border-gray-200
+                        text-red-500
+                        shadow-sm
+                        hover:bg-red-50 hover:scale-105
+                        transition"
+                  title="Delete">
+                  🗑
+                </button>
+
+              </div>
+            }
 
               <div
                 class="h-1.5 rounded-t-2xl"
@@ -147,7 +188,7 @@
                 <div class="flex items-center justify-between mb-4">
                   <div class="flex items-center gap-3">
                     <img
-                      [src]="'assets/' + s.name + '.png'"
+                      [src]="s.logoUrl"
                       class="w-12 h-12"
                       alt="" />
 
@@ -210,8 +251,8 @@
 @if (authService.isAdmin()) {
   <app-subject-form-modal
     [visible]="showModal()"
-    [isEdit]="false"
-    [subject]="null"
+    [isEdit]="isEdit()"
+    [subject]="selectedSubject()"
     (closeModal)="closeModal()"
     (submitForm)="saveSubject($event)">
   </app-subject-form-modal>

@@ -41,7 +41,11 @@ export class CreateQuizPage {
   questionCount = computed(() => this.questions().length);
 
   constructor() {
-    this.loadSubjects();
+    if(this.subjectService.subjects().length === 0){
+      this.loadSubjects();
+    }else{
+      this.subjects.set(this.subjectService.subjects());
+    }
   }
 
   /* ===============================

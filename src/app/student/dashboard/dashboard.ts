@@ -43,7 +43,12 @@ constructor() {
       this.subjectId.set(subjectId);
       this.selectedSubject.set(subjectId);
     }
-    this.loadQuizes();
+    if(this.subjectService.subjects().length === 0){
+      this.loadSubjects();
+    }else{
+      this.subjects.set(this.subjectService.subjects());
+    }
+     this.loadQuizes();
         // ✅ debounce once, globally
     this.filterChange$
       .pipe(debounceTime(500))
@@ -51,7 +56,6 @@ constructor() {
         this.loadQuizes();
       });
   });
-  this.loadSubjects();
  }
 
   loadSubjects(): void {

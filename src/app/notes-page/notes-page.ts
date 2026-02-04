@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NotesService, Note } from '../services/notes.service';
-import { ToastService } from '../services/toast-service'; // adjust path
+import { ToastService } from '../services/toast-service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
@@ -21,12 +21,10 @@ export class NotesPage implements OnInit {
 
   searchTerm = '';
 
-  // ✅ IMPORTANT: start with LIST on mobile
   isMobileEditorOpen = signal(false);
-
   activeNote = signal<Note | null>(null);
-
   saving = signal(false);
+
   private search$ = new Subject<string>();
 
   constructor(
@@ -36,24 +34,22 @@ export class NotesPage implements OnInit {
 
   ngOnInit() {
     this.notesService.loadNotes();
+
     this.search$
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
       )
       .subscribe(term => {
-        // 🔹 if empty → load all
         if (!term) {
           this.notesService.loadNotes();
           return;
         }
 
-        // 🔹 minimum 2 characters
         if (term.length < 2) return;
-
         this.notesService.loadNotes(term);
       });
-    }
+  }
 
   // ================= SCREEN =================
   isLargeScreen = signal(window.innerWidth >= 1024);
@@ -70,11 +66,9 @@ export class NotesPage implements OnInit {
   }
 
   createNote() {
-    this.notesService.createNote((createdNote) => {
-      // ✅ show immediately
+    this.notesService.createNote(createdNote => {
       this.activeNote.set(createdNote);
       this.isMobileEditorOpen.set(true);
-
       this.toaster.success('New note created');
     });
   }
@@ -94,7 +88,6 @@ export class NotesPage implements OnInit {
 
     this.activeNote.set(updated);
 
-    // 🔥 feedback
     this.saving.set(true);
     this.toaster.info('Saving…');
 
@@ -108,7 +101,27 @@ export class NotesPage implements OnInit {
     this.search$.next(this.searchTerm.trim());
   }
 
-  backToList() {
-    this.isMobileEditorOpen.set(false);
+  deleteNote(note: Note, event?: Event) {
+    event?.stopPropagation();
+
+    if (!confirm('Delete this note?')) return;
+
+    this.notesService.deleteNote(note._id).subscribe(() => {
+      if (this.activeNote()?._id === note._id) {
+        this.activeNote.set(null);
+        this.isMobileEditorOpen.set(false);
+      }
+    });
+  }
+
+  togglePin(note: Note) {
+    this.notesService.togglePin(note).subscribe(() => {
+      if (this.activeNote()?._id === note._id) {
+        this.activeNote.set({
+          ...this.activeNote()!,
+          isPinned: !this.activeNote()!.isPinned,
+        });
+      }
+    });
   }
 }

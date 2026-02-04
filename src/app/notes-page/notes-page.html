@@ -30,11 +30,7 @@
         placeholder="Search notes…"
         class="notes-search w-full rounded-xl px-4 py-2
                bg-white/80 backdrop-blur
-               border border-black/10
-               transition-all duration-300
-               focus:outline-none
-               focus:ring-2 focus:ring-indigo-400/60
-               focus:shadow-[0_0_0_6px_rgba(99,102,241,0.15)]"
+               border border-black/10"
         [(ngModel)]="searchTerm"
         (input)="filterNotes()" />
     </div>
@@ -43,17 +39,40 @@
     <div class="flex-1 overflow-y-auto px-2 space-y-2">
       @for (note of notesService.notes(); track note._id) {
         <div
-          class="note-card p-3 rounded-xl cursor-pointer
+          class="note-card group p-3 rounded-xl cursor-pointer
                  border border-black/5 transition-all"
           [class.active]="note._id === activeNote()?._id"
           (click)="selectNote(note)">
 
-          <div class="font-semibold text-sm truncate">
-            {{ note.title || 'Untitled' }}
-          </div>
+          <div class="flex items-start justify-between gap-2">
 
-          <div class="text-xs text-gray-500 truncate mt-1">
-            {{ note.content }}
+            <div class="min-w-0">
+              <div class="font-semibold text-sm truncate flex items-center gap-1">
+                @if (note.isPinned) {
+                  <span>📌</span>
+                }
+                {{ note.title || 'Untitled' }}
+              </div>
+
+              <div class="text-xs text-gray-500 truncate mt-1">
+                {{ note.content }}
+              </div>
+            </div>
+
+            <!-- Desktop-only actions -->
+            <div class="hidden lg:flex items-center gap-2 shrink-0">
+              <button
+                class="opacity-0 group-hover:opacity-100 transition"
+                (click)="togglePin(note); $event.stopPropagation()">
+                {{ note.isPinned ? '📌' : '📍' }}
+              </button>
+
+              <button
+                class="opacity-0 group-hover:opacity-100 transition text-red-500"
+                (click)="deleteNote(note, $event)">
+                🗑
+              </button>
+            </div>
           </div>
         </div>
       }
@@ -63,9 +82,8 @@
     <div class="hidden lg:block p-4 border-t border-black/5">
       <button
         class="w-full py-2 rounded-xl
-               bg-indigo-600 text-white font-semibold
-               hover:bg-indigo-700 active:scale-95
-               transition"    (click)="createNote()">
+               bg-indigo-600 text-white font-semibold"
+        (click)="createNote()">
         ➕ New Note
       </button>
     </div>
@@ -81,10 +99,10 @@
 
     @if (activeNote()) {
 
-      <!-- Mobile Header -->
+      <!-- ================= MOBILE HEADER ================= -->
       <div
         class="lg:hidden sticky top-0 z-30
-               flex items-center gap-3
+               flex items-center justify-between
                p-4 border-b border-black/10
                bg-white/80 backdrop-blur">
 
@@ -94,12 +112,26 @@
           ← Notes
         </button>
 
-        <span class="text-sm text-gray-500 truncate">
-          {{ activeNote()?.title || 'Untitled' }}
-        </span>
+        <div class="flex items-center gap-4">
+
+          <!-- Pin -->
+          <button
+            class="text-xl"
+            (click)="togglePin(activeNote()!)">
+            {{ activeNote()!.isPinned ? '📌' : '📍' }}
+          </button>
+
+          <!-- Delete -->
+          <button
+            class="text-xl text-red-500"
+            (click)="deleteNote(activeNote()!)">
+            🗑
+          </button>
+
+        </div>
       </div>
 
-      <!-- Editor Body -->
+      <!-- ================= EDITOR BODY ================= -->
       <div class="p-6 lg:p-10">
 
         <!-- Title -->
@@ -143,10 +175,3 @@
   </button>
 
 </div>
-
-<!-- <button
-  class="text-indigo-600 font-semibold"
-  (click)="backToList()">
-  ← Notes
-</button> -->
-
