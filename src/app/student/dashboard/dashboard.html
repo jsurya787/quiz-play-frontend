@@ -1,117 +1,68 @@
 @if (loading()) {
-  <section
-  class="relative min-h-screen pt-28 px-6
-         overflow-hidden
+<section
+  class="relative min-h-screen pt-28 px-6 overflow-hidden
          bg-gradient-to-br from-indigo-100/60 via-white to-sky-100/60">
 
   <!-- Decorative Blobs -->
-  <div
-    class="absolute -top-24 -left-24 h-96 w-96
-           rounded-full bg-indigo-300/20 blur-3xl">
-  </div>
+  <div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl"></div>
+  <div class="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-sky-300/20 blur-3xl"></div>
 
-  <div
-    class="absolute top-1/3 -right-32 h-96 w-96
-           rounded-full bg-sky-300/20 blur-3xl">
-  </div>
-
-  <!-- CONTENT WRAPPER -->
   <div class="relative max-w-7xl mx-auto">
 
-    <!-- PAGE HEADER SKELETON -->
+    <!-- Header Skeleton -->
     <div class="mb-12 text-center">
-
       <div class="h-7 w-48 mx-auto rounded-full skeleton-shimmer mb-4"></div>
       <div class="h-10 w-72 mx-auto rounded skeleton-shimmer mb-3"></div>
       <div class="h-5 w-full max-w-xl mx-auto rounded skeleton-shimmer"></div>
-
     </div>
 
-    <!-- FILTER BAR SKELETON -->
-    <div
-      class="mb-10 flex flex-col md:flex-row gap-4 justify-between
-             bg-white/70 backdrop-blur-lg
-             rounded-2xl shadow-md p-4">
-
+    <!-- Filter Skeleton -->
+    <div class="mb-10 flex flex-col md:flex-row gap-4
+                bg-white/70 backdrop-blur-lg
+                rounded-2xl shadow-md p-4">
       <div class="h-11 w-full md:w-1/3 rounded-xl skeleton-shimmer"></div>
       <div class="h-11 w-full md:w-48 rounded-xl skeleton-shimmer"></div>
       <div class="h-11 w-full md:w-48 rounded-xl skeleton-shimmer"></div>
       <div class="h-11 w-full md:w-32 rounded-xl skeleton-shimmer"></div>
-
     </div>
 
-    <!-- QUIZ GRID SKELETON -->
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-
+    <!-- Grid Skeleton -->
+    <div class="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       @for (i of [1,2,3,4,5,6]; track i) {
-
-        <div
-          class="bg-white/80 backdrop-blur-lg
-                 rounded-3xl shadow-lg p-6">
-
-          <!-- Difficulty Badge -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg p-6">
           <div class="h-6 w-20 rounded-full skeleton-shimmer mb-3"></div>
-
-          <!-- Title -->
           <div class="h-6 w-3/4 rounded skeleton-shimmer mb-3"></div>
-
-          <!-- Description -->
           <div class="h-4 w-full rounded skeleton-shimmer mb-2"></div>
           <div class="h-4 w-5/6 rounded skeleton-shimmer"></div>
-
-          <!-- Meta -->
           <div class="mt-4 flex justify-between">
             <div class="h-4 w-24 rounded skeleton-shimmer"></div>
             <div class="h-4 w-20 rounded skeleton-shimmer"></div>
           </div>
-
-          <!-- CTA -->
           <div class="h-11 w-full rounded-xl skeleton-shimmer mt-6"></div>
-
         </div>
-
       }
-
     </div>
 
   </div>
 </section>
-} 
-<!-- @if (!loading() && quizess().length === 0) {
-  <div class="text-center py-12">
-    <h2 class="text-2xl font-bold text-gray-900">No quizzes available</h2>
-    <p class="mt-2 text-gray-600">There are no quizzes matching your current filters.</p>
-  </div>
-} -->
+}
+
 @if (!loading()) {
 <section
-  class="relative min-h-screen pt-28 px-6
-         overflow-hidden
+  class="relative min-h-screen pt-28 px-6 overflow-hidden
          bg-gradient-to-br from-indigo-100/60 via-white to-sky-100/60">
 
-  <!-- Decorative Blobs (background only) -->
-  <div
-    class="absolute -top-24 -left-24 h-96 w-96
-           rounded-full bg-indigo-300/20 blur-3xl
-           animate-float-slow">
-  </div>
+  <!-- Floating Blobs -->
+  <div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl animate-float-slow"></div>
+  <div class="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-sky-300/20 blur-3xl animate-float-slower"></div>
 
-  <div
-    class="absolute top-1/3 -right-32 h-96 w-96
-           rounded-full bg-sky-300/20 blur-3xl
-           animate-float-slower">
-  </div>
-
-  <!-- CONTENT WRAPPER -->
   <div class="relative max-w-7xl mx-auto">
 
-    <!-- PAGE HEADER -->
+    <!-- Page Header -->
     <div class="mb-12 text-center animate-quiz-card">
-      <span
-        class="inline-block mb-4 px-5 py-1.5 rounded-full
-               bg-indigo-100/80 backdrop-blur
-               text-indigo-700 text-sm font-semibold
-               animate-slide-down">
+      <span class="inline-block mb-4 px-5 py-1.5 rounded-full
+                   bg-indigo-100/80 backdrop-blur
+                   text-indigo-700 text-sm font-semibold">
         🧠 Choose Your Challenge
       </span>
 
@@ -124,14 +75,11 @@
       </p>
     </div>
 
-    <!-- FILTER BAR -->
-    <div
-      class="mb-10 flex flex-col md:flex-row gap-4 justify-between
-            bg-white/70 backdrop-blur-lg
-            rounded-2xl shadow-md p-4
-            animate-quiz-card">
+    <!-- Filter Bar -->
+    <div class="mb-10 flex flex-col md:flex-row gap-4 justify-between
+                bg-white/70 backdrop-blur-lg
+                rounded-2xl shadow-md p-4 animate-quiz-card">
 
-      <!-- 🔍 SEARCH -->
       <input
         type="text"
         placeholder="Search quizzes..."
@@ -139,193 +87,147 @@
         [value]="search()"
         (input)="search.set($any($event.target).value); applyFilters()" />
 
-      <!-- 📚 SUBJECT -->
-      <select
-        class="input md:w-48"
-        (change)="selectedSubject.set($any($event.target).value || null); applyFilters()">
-
+      <select class="input md:w-48"
+              (change)="selectedSubject.set($any($event.target).value || null); applyFilters()">
         <option value="">All Subjects</option>
         @for (item of subjects(); track item._id) {
-          <option [value]="item._id">
-            {{ item.name }}
-          </option>
+          <option [value]="item._id">{{ item.name }}</option>
         }
       </select>
 
-      <!-- 🎯 DIFFICULTY -->
-      <select
-        class="input md:w-48"
-        (change)="difficulty.set($any($event.target).value || null); applyFilters()">
-
+      <select class="input md:w-48"
+              (change)="difficulty.set($any($event.target).value || null); applyFilters()">
         <option value="">All Levels</option>
         <option value="easy">Easy</option>
         <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
 
-      <!-- 🔄 RESET -->
-      <button
-        class="btn-secondary md:w-32"
-        (click)="resetFilters()">
+        <!-- 👤 CREATED BY YOU -->
+         @if(authService.isAuthenticated() == true){
+  <label
+    class="flex items-center gap-2
+           px-4 py-2 rounded-xl
+           bg-white/80 backdrop-blur
+           border border-black/5
+           text-sm font-medium text-gray-700
+           cursor-pointer select-none">
+    <input
+      type="checkbox"
+      class="accent-indigo-600"
+      [checked]="createdByMe()"
+      (change)="createdByMe.set($any($event.target).checked); applyFilters()" />
+    Created by me
+  </label>
+}
+
+      <button class="btn-secondary md:w-32" (click)="resetFilters()">
         Reset
       </button>
-
     </div>
 
-
-    <!-- QUIZ GRID -->
-     @if (quizess().length > 0) {
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3" >
-
-      <!-- QUIZ CARD -->
-      <!-- <div
-        class="quiz-glow animate-quiz-card
-               bg-white/80 backdrop-blur-lg
-               rounded-3xl shadow-lg p-6
-               transition-all duration-300
-               hover:-translate-y-1 hover:shadow-xl">
-
-        <span
-          class="inline-block mb-3 px-3 py-1 rounded-full
-                 bg-indigo-100 text-indigo-700
-                 text-xs font-semibold">
-          Easy
-        </span>
-
-        <h3 class="text-xl font-bold text-gray-900">
-          Physics Basics
-        </h3>
-
-        <p class="mt-2 text-gray-600 text-sm">
-          Test your understanding of fundamental physics concepts.
-        </p>
-
-        <div class="mt-4 flex justify-between text-sm text-gray-500">
-          <span>📝 10 Questions</span>
-          <span>⏱️ 10 min</span>
-        </div>
-
-        <button class="btn-primary btn-pulse w-full mt-6">
-          Start Quiz
-        </button>
-      </div> -->
-
-      <!-- QUIZ CARD -->
-      <!-- <div
-        class="quiz-glow animate-quiz-card
-               bg-white/80 backdrop-blur-lg
-               rounded-3xl shadow-lg p-6
-               transition-all duration-300
-               hover:-translate-y-1 hover:shadow-xl">
-
-        <span
-          class="inline-block mb-3 px-3 py-1 rounded-full
-                 bg-purple-100 text-purple-700
-                 text-xs font-semibold">
-          Medium
-        </span>
-
-        <h3 class="text-xl font-bold text-gray-900">
-          Chemistry Essentials
-        </h3>
-
-        <p class="mt-2 text-gray-600 text-sm">
-          Strengthen your chemistry knowledge with quick challenges.
-        </p>
-
-        <div class="mt-4 flex justify-between text-sm text-gray-500">
-          <span>📝 15 Questions</span>
-          <span>⏱️ 15 min</span>
-        </div>
-
-        <button class="btn-primary btn-pulse w-full mt-6">
-          Start Quiz
-        </button>
-      </div> -->
-
-      <!-- QUIZ CARD -->
-      <!-- <div
-        class="quiz-glow animate-quiz-card
-               bg-white/80 backdrop-blur-lg
-               rounded-3xl shadow-lg p-6
-               transition-all duration-300
-               hover:-translate-y-1 hover:shadow-xl">
-
-        <span
-          class="inline-block mb-3 px-3 py-1 rounded-full
-                 bg-pink-100 text-pink-700
-                 text-xs font-semibold"
-                  >
-          Hard
-        </span>
-
-        <h3 class="text-xl font-bold text-gray-900">
-          Advanced Mathematics
-        </h3>
-
-        <p class="mt-2 text-gray-600 text-sm">
-          Push your limits with advanced problem-solving questions.
-        </p>
-
-        <div class="mt-4 flex justify-between text-sm text-gray-500">
-          <span>📝 20 Questions</span>
-          <span>⏱️ 25 min</span>
-        </div>
-
-        <button class="btn-primary btn-pulse w-full mt-6">
-          Start Quiz
-        </button>
-      </div> -->
+    <!-- Quiz Grid -->
+    @if (quizess().length > 0) {
+    <div class="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
       @for (item of quizess(); track $index) {
-              <div
-        class="quiz-glow animate-quiz-card
-               bg-white/80 backdrop-blur-lg
-               rounded-3xl shadow-lg p-6
-               transition-all duration-300
-               hover:-translate-y-1 hover:shadow-xl" [routerLink]="['/quiz-player-page', item._id]">
+      <div
+        class="group quiz-glow animate-quiz-card
+               bg-white/85 backdrop-blur-xl
+               rounded-3xl shadow-[0_10px_35px_rgba(0,0,0,0.08)]
+               p-5 sm:p-6
+               transition-all duration-500
+               hover:-translate-y-1.5
+               hover:shadow-[0_22px_60px_rgba(79,70,229,0.22)]
+               active:scale-[0.98]"
+        [routerLink]="['/quiz-player-page', item._id]">
 
-        <span
-          class="inline-block mb-3 px-3 py-1 rounded-full
-                 text-indigo-700
-                 text-xs font-semibold"
-                 [class.bg-purple-100]="item.difficulty === 'medium'"
-                 [class.text-purple-700]="item.difficulty === 'medium'"
-                 [class.bg-pink-100]="item.difficulty === 'hard'"
-                 [class.text-pink-700]="item.difficulty === 'hard'"
-                 [class.bg-indigo-100]="item.difficulty === 'easy'"
-                 >
-          {{item.difficulty}}
-        </span>
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
 
-        <h3 class="text-xl font-bold text-gray-900">
-           {{item.title}}
-        </h3>
+          <span
+            class="inline-flex items-center gap-1 px-3 py-1 rounded-full
+                   text-xs font-semibold tracking-wide"
+            [class.bg-purple-100]="item.difficulty === 'medium'"
+            [class.text-purple-700]="item.difficulty === 'medium'"
+            [class.bg-pink-100]="item.difficulty === 'hard'"
+            [class.text-pink-700]="item.difficulty === 'hard'"
+            [class.bg-indigo-100]="item.difficulty === 'easy'"
+            [class.text-indigo-700]="item.difficulty === 'easy'">
+            ⚡ {{ item.difficulty }}
+          </span>
 
-        <p class="mt-2 text-gray-600 text-sm">
-          {{item.description}}
-        </p>
+          <div class="relative group">
+            <span
+              class="px-2.5 py-1 rounded-full
+                     text-[11px] font-semibold
+                     text-indigo-700
+                     bg-indigo-100/80 backdrop-blur
+                     shadow-sm transition-all
+                     ">
+              ⭐ {{ item.totalMarks }} Marks
+            </span>
 
-        <div class="mt-4 flex justify-between text-sm text-gray-500">
-          <span>📝 {{item.questionsCount}} Questions</span>
-          <span>⏱️ {{item.timeLimit}} min</span>
+            @if(authService.isAdmin() == true){
+            <button
+              class="absolute -top-2 -right-2
+                     h-7 w-7 rounded-full
+                     bg-white/90 backdrop-blur
+                     text-red-500
+                     flex items-center justify-center
+                     opacity-0 scale-75
+                     group-hover:opacity-100 group-hover:scale-100
+                     hover:bg-red-50 hover:scale-110
+                     transition-all"
+              (click)="onDeleteQuiz(item._id); $event.stopPropagation()">
+              🗑️
+            </button>
+          }
+          </div>
+
         </div>
 
-        <button class="btn-primary btn-pulse w-full mt-6" [routerLink]="['/quiz-player-page', item._id]">
+        <h3 class="text-[1.05rem] sm:text-xl font-extrabold tracking-tight
+                   text-gray-900 leading-snug
+                   group-hover:text-indigo-700 transition-colors">
+          {{ item.title }}
+        </h3>
+
+        <p class="mt-2 text-sm sm:text-[0.95rem]
+                  font-medium text-gray-700 leading-relaxed line-clamp-3">
+          {{ item.description }}
+        </p>
+
+        <div class="mt-4 flex items-center justify-between
+                    px-4 py-2 rounded-2xl
+                    bg-gray-50/80 text-sm font-medium text-gray-600">
+          <span>📝 {{ item.questionsCount }} Questions</span>
+          <span>⏱️ {{ item.timeLimit }} min</span>
+        </div>
+
+        <button
+          class="btn-primary btn-pulse w-full mt-6
+                 hover:scale-[1.03]
+                 active:scale-95 transition-all"
+          (click)="$event.stopPropagation()">
           Start Quiz
         </button>
-      </div>
 
+      </div>
       }
 
     </div>
-     }
-     @if (quizess().length === 0) {
-  <div class="text-center py-12">
-    <h2 class="text-2xl font-bold text-gray-900">No quizzes available</h2>
-    <p class="mt-2 text-gray-600">There are no quizzes matching your current filters.</p>
-  </div>
-}
+    }
+
+    @if (quizess().length === 0) {
+    <div class="text-center py-16">
+      <h2 class="text-2xl font-bold text-gray-900">No quizzes available</h2>
+      <p class="mt-2 text-gray-600">
+        There are no quizzes matching your current filters.
+      </p>
+    </div>
+    }
+
   </div>
 </section>
 }

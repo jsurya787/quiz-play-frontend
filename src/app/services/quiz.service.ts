@@ -74,12 +74,14 @@ export class QuizService {
   search?: string;
   subjectId?: string | null;
   difficulty?: string | null;
+  createdByMe?: boolean;
 }) {
   const params: any = {};
 
   if (filters?.search) params.search = filters.search;
   if (filters?.subjectId) params.subjectId = filters.subjectId;
   if (filters?.difficulty) params.difficulty = filters.difficulty;
+  if (filters?.createdByMe) params.createdByMe = this._auth.userData.id || this._auth.userData._id ;
 
   return this.http.get<any>(
     `${this.API}`,
@@ -99,6 +101,10 @@ export class QuizService {
 
   sendBulkQuestionsToApi(quizId: string, questions: any[]): Observable<any> {
     return this.http.post(`${this.API}/${quizId}/questions/bulk`,  questions );
+  }
+
+  deleteQuiz(quizId: string): Observable<any> {
+    return this.http.delete(`${this.API}/${quizId}`);
   }
 
 }

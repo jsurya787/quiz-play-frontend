@@ -5,12 +5,14 @@ import { AdminRoutingModule } from "../../admin/admin-routing-module";
 import { Subject as _sb, debounceTime,  } from 'rxjs';
 import { ToastService } from '../../services/toast-service';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
   templateUrl:'./dashboard.html',
   styleUrls: ['./dashboard.css'],
-  imports: [AdminRoutingModule],
+  imports: [AdminRoutingModule, CommonModule],
 })
 export class DashboardComponent {
 
@@ -18,6 +20,7 @@ export class DashboardComponent {
   private quizService = inject(QuizService);
   private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
+  public authService = inject(AuthService);
   // 🔥 Debounce trigger
   private filterChange$ = new _sb<void>();
 
@@ -31,6 +34,7 @@ export class DashboardComponent {
   search = signal('');
   selectedSubject = signal<string | null>(null);
   difficulty = signal<string | null>(null);
+  createdByMe = signal(false);
 
 constructor() {
   this.route.paramMap.subscribe(params => {
@@ -75,6 +79,7 @@ constructor() {
       search: this.search(),
       subjectId: this.selectedSubject(),
       difficulty: this.difficulty(),
+      createdByMe: this.createdByMe(),
     }).subscribe({
       next: res => {
         if (res.success) {
@@ -99,6 +104,23 @@ constructor() {
     this.search.set('');
     this.selectedSubject.set(null);
     this.difficulty.set(null);
+    this.createdByMe.set(false);
     this.loadQuizes();
+  }
+
+  onDeleteQuiz(quizId: string): void {
+    alert('Are you sure you want to delete this quiz? This action cannot be undone.');
+    this.quizService.deleteQuiz(quizId).subscribe({
+      next: res => {
+        if (res.success) {
+          this.toastService.success('Quiz deleted successfully.');
+          this.loadQuizes();
+        }
+      },
+      error: err => {
+        this.toastService.error('Failed to delete quiz. Please try again later.');
+        console.error(err.error?.message || 'Failed to delete quiz');
+      }
+    });
   }
 }
