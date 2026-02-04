@@ -88,7 +88,7 @@
 } @else {
 
   <div class="flex flex-wrap justify-center gap-4">
-    @for (item of subjectService.subjects(); track item._id; let i = $index) {
+    @for (item of subjectService.primarySubjects(); track item._id; let i = $index) {
       <div
         class="group relative cursor-pointer
               px-6 py-3 rounded-full
