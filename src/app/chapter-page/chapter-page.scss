@@ -1,0 +1,117 @@
+@reference "tailwindcss";
+
+/* ================= PREMIUM TOKENS ================= */
+.bg-decor {
+    @apply absolute rounded-full blur-[120px] pointer-events-none opacity-20 mix-blend-multiply;
+}
+
+.bg-decor-1 {
+    @apply top-[-10%] left-[-5%] w-[600px] h-[600px] bg-indigo-200;
+    animation: floatCinematic 20s ease-in-out infinite alternate;
+}
+
+.bg-decor-2 {
+    @apply bottom-[-5%] right-[-5%] w-[500px] h-[500px] bg-purple-200;
+    animation: floatCinematic 25s ease-in-out infinite alternate-reverse;
+}
+
+/* ================= SIDEBAR GLASS ================= */
+.sidebar-glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    /* Professional soft shadow */
+    border-radius: 24px;
+}
+
+/* ================= SECTION CARDS ================= */
+.premium-card {
+    position: relative;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    border-radius: 20px;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(168, 85, 247, 0.04));
+        transition: opacity 0.5s ease;
+    }
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
+        border-color: rgba(99, 102, 241, 0.2);
+        background: rgba(255, 255, 255, 0.9);
+
+        &::before {
+            opacity: 100;
+        }
+    }
+}
+
+/* ================= SKELETONS ================= */
+.skeleton-box {
+    background: rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shimmer 2s infinite;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ================= MODAL POLISH ================= */
+.modal-glass {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+    border-radius: 32px;
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes floatCinematic {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(20px, -40px) scale(1.1);
+    }
+
+    100% {
+        transform: translate(-10px, 20px) scale(0.95);
+    }
+}
+
+.animate-fade-in-up {
+    @apply translate-y-4 opacity-0;
+    animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

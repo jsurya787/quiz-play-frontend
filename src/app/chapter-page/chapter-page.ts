@@ -1,6 +1,6 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SubjectService } from '../services/subject.service';
 import { AuthService } from '../services/auth.service';
@@ -10,7 +10,7 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chapter-page.html',
-  styleUrl: './chapter-page.css',
+  styleUrl: './chapter-page.scss',
 })
 export class ChapterPage {
 
@@ -20,6 +20,7 @@ export class ChapterPage {
   private route = inject(ActivatedRoute);
   private chapterService = inject(SubjectService);
   private authService = inject(AuthService);
+  private platformId = inject(PLATFORM_ID);
 
   /* ===============================
      STATE
@@ -27,10 +28,16 @@ export class ChapterPage {
   chapterId = signal<string | null>(null);
   chapter = signal<any>(null);
   sections = signal<any[]>([]);
+  activeSectionId = signal<string | null>(null);
   loading = signal(true);
 
   /* 🔐 TEMP ADMIN FLAG */
   isAdmin = signal(false);
+
+  /* ===============================
+     OBSERVER
+  ================================ */
+  private observer: IntersectionObserver | null = null;
 
   /* ===============================
      POPUP STATE
@@ -52,6 +59,13 @@ export class ChapterPage {
       this.chapterId.set(id);
       this.loadChapter(id);
     });
+
+    // Clean up observer on destroy
+    effect((onCleanup) => {
+      onCleanup(() => {
+        this.observer?.disconnect();
+      });
+    });
   }
 
   /* ===============================
@@ -65,8 +79,34 @@ export class ChapterPage {
         this.chapter.set(res.data);
         this.sections.set(res.data.sections || []);
         this.loading.set(false);
+        
+        // Initialize observer after sections are loaded
+        setTimeout(() => this.initScrollObserver(), 100);
       },
       error: () => this.loading.set(false),
+    });
+  }
+
+  private initScrollObserver() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    this.observer?.disconnect();
+
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace('section-', '');
+          this.activeSectionId.set(id);
+        }
+      });
+    }, {
+      rootMargin: '-20% 0px -70% 0px', // Trigger when section is near the top
+      threshold: 0
+    });
+
+    this.sections().forEach(sec => {
+      const el = document.getElementById(`section-${sec._id}`);
+      if (el) this.observer?.observe(el);
     });
   }
 

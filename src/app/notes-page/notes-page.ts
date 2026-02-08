@@ -9,10 +9,12 @@ import { NotesService, Note } from '../services/notes.service';
 import { ToastService } from '../services/toast-service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-notes-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   providers: [NotesService],
   templateUrl: './notes-page.html',
   styleUrl: './notes-page.scss',

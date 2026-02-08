@@ -1,0 +1,127 @@
+@reference "tailwindcss";
+
+/* ================= ROOT & TOKENS ================= */
+.subject-page-root {
+    --accent: #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.15);
+}
+
+/* ================= CINEMATIC BACKGROUND ================= */
+.bg-decor {
+    @apply absolute rounded-full blur-[120px] pointer-events-none opacity-40 mix-blend-multiply;
+}
+
+.bg-decor-1 {
+    @apply top-[-10%] left-[-5%] w-[600px] h-[600px] bg-indigo-200;
+    animation: floatCinematic 20s ease-in-out infinite alternate;
+}
+
+.bg-decor-2 {
+    @apply bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-200;
+    animation: floatCinematic 25s ease-in-out infinite alternate-reverse;
+}
+
+.bg-decor-3 {
+    @apply top-[40%] right-[10%] w-[300px] h-[300px] bg-amber-100;
+    animation: floatCinematic 15s ease-in-out infinite alternate;
+}
+
+/* ================= HERO SECTION ================= */
+.hero-glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.05);
+    /* Reduced shadow */
+    border-radius: 32px;
+    /* Slightly smaller radius */
+}
+
+/* ================= CARD ARCHITECTURE ================= */
+.premium-card {
+    position: relative;
+    padding: 1.25rem;
+    /* Reduced padding from 1.5rem */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    border-radius: 24px;
+    /* Slightly smaller radius */
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(168, 85, 247, 0.04));
+        transition: opacity 0.5s ease;
+    }
+
+    &:hover {
+        transform: translateY(-4px);
+        /* Reduced elevation */
+        box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);
+        border-color: rgba(99, 102, 241, 0.2);
+        background: rgba(255, 255, 255, 0.9);
+
+        &::before {
+            opacity: 100;
+        }
+    }
+}
+
+/* ================= SKELETONS ================= */
+.skeleton-box {
+    background: rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shimmer 2s infinite;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ================= MODAL POLISH ================= */
+.modal-glass {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+    border-radius: 36px;
+}
+
+/* ================= UTILITIES ================= */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.animate-delay-100 {
+    animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+    animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+    animation-delay: 300ms;
+}

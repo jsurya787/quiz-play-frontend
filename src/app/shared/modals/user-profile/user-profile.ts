@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Output,
   signal,
+  computed,
   inject,
   DestroyRef,
 } from '@angular/core';
@@ -19,11 +20,11 @@ import { QuizService } from '../../../services/quiz.service';
   templateUrl: './user-profile.html',
 })
 export class UserProfileModalComponent {
-
+  
   /* ================= OUTPUT ================= */
   @Output() close = new EventEmitter<void>();
 
-  /* ================= DI (Angular 20 style) ================= */
+  /* ================= DI ================= */
   private authService = inject(AuthService);
   private quizService = inject(QuizService);
   private router = inject(Router);
@@ -33,8 +34,15 @@ export class UserProfileModalComponent {
   userTitle = signal('🎓 Student');
   totalQuizes = signal(0);
   attemptedQuizes = signal(0);
-
   user = signal<any>(null);
+
+  rank = computed(() => {
+    const attempts = this.attemptedQuizes();
+    if (attempts > 50) return 'Grandmaster';
+    if (attempts > 20) return 'Expert';
+    if (attempts > 5) return 'Scholar';
+    return 'Novice';
+  });
 
   constructor() {
     /* 🔥 React to auth user changes */

@@ -21,7 +21,7 @@ export class UserMenuComponent {
   showUserProfile = signal(false);
 
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     private router: Router
   ) {}
 

@@ -109,17 +109,18 @@ constructor() {
   }
 
   onDeleteQuiz(quizId: string): void {
-    alert('Are you sure you want to delete this quiz? This action cannot be undone.');
+    if(!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) return;
+    
     this.quizService.deleteQuiz(quizId).subscribe({
-      next: res => {
+      next: (res) => {
         if (res.success) {
           this.toastService.success('Quiz deleted successfully.');
           this.loadQuizes();
         }
       },
-      error: err => {
+      error: (err) => {
         this.toastService.error('Failed to delete quiz. Please try again later.');
-        console.error(err.error?.message || 'Failed to delete quiz');
+        console.error(err);
       }
     });
   }

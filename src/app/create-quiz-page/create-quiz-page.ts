@@ -10,9 +10,9 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-quiz-page',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-quiz-page.html',
-  styleUrl: './create-quiz-page.scss',
 })
 export class CreateQuizPage {
   private fb = inject(NonNullableFormBuilder);
@@ -235,7 +235,7 @@ export class CreateQuizPage {
     this.options.controls.forEach((ctrl, i) => ctrl.get('isCorrect')?.setValue(i === index));
   }
 
-  private resetQuestionForm(): void {
+  public resetQuestionForm(): void {
     this.questionForm.reset({
       questionText: '',
       marks: 4,
