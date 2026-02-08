@@ -37,8 +37,8 @@ export class UserProfileModalComponent {
   user = signal<any>(null);
 
   rank = computed(() => {
-    const attempts = this.attemptedQuizes();
-    if (attempts > 50) return 'Grandmaster';
+    const attempts = this.attemptedQuizes(); 
+    if (attempts > 50) return 'Grandmaster'; 
     if (attempts > 20) return 'Expert';
     if (attempts > 5) return 'Scholar';
     return 'Novice';
