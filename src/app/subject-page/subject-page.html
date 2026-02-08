@@ -1,374 +1,302 @@
-<div class="relative overflow-hidden">
+<div class="subject-page-root relative min-h-screen w-full bg-[#fcfcfd] pt-20 pb-12 overflow-x-clip">
+  
+  <!-- PREMIUM BACKGROUND DECOR -->
+  <div class="bg-decor bg-decor-1 opacity-20"></div>
+  <div class="bg-decor bg-decor-2 opacity-20"></div>
+  <div class="bg-decor bg-decor-3 opacity-10"></div>
 
-  <!-- BACKGROUND -->
-  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-indigo-100"></div>
-
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
     <!-- ================= SUBJECT HERO ================= -->
-
-    @if (loading()) {
-      <div class="mb-10 p-6 sm:p-8 rounded-2xl
-                  bg-white/60 backdrop-blur-md
-                  border border-black/5
-                  shadow-sm animate-pulse">
-
+    <header class="hero-glass p-6 sm:p-10 mb-10 animate-fade-in-up">
+      @if (loading()) {
         <div class="space-y-4">
-          <div class="h-9 w-72 rounded skeleton-shimmer"></div>
-          <div class="h-4 w-full max-w-xl rounded skeleton-shimmer"></div>
-          <div class="h-4 w-96 rounded skeleton-shimmer"></div>
+          <div class="skeleton-box h-10 w-2/3 rounded-xl"></div>
+          <div class="skeleton-box h-4 w-full max-w-xl rounded-lg"></div>
+          <div class="flex gap-3 pt-2">
+            <div class="skeleton-box h-12 w-40 rounded-xl"></div>
+            <div class="skeleton-box h-12 w-32 rounded-xl"></div>
+          </div>
         </div>
-
-        <div class="mt-6 flex gap-4">
-          <div class="h-12 w-52 rounded-xl skeleton-shimmer"></div>
-          <div class="h-12 w-40 rounded-xl skeleton-shimmer"></div>
-        </div>
-      </div>
-    }
-
-    @if (!loading()) {
-      <div class="mb-10 p-6 sm:p-8 rounded-2xl
-                  bg-white/70 backdrop-blur-md
-                  border border-black/5
-                  shadow-sm animate-fade-in">
-
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900">
+      } @else {
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div class="max-w-2xl">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-indigo-50 text-[10px] font-black uppercase tracking-widest text-indigo-600 rounded-md">Subject Hub</span>
+              <div class="h-0.5 w-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
               {{ subject()?.name }}
             </h1>
-            <p class="mt-2 text-gray-600 max-w-2xl">
-              {{ subject()?.description }}
+            
+            <p class="text-sm font-medium text-gray-500 leading-relaxed mb-6">
+              {{ subject()?.description || 'Deep dive into ' + subject()?.name + '. Master the core concepts and excel in your exams with our curated resources.' }}
             </p>
+
+            <div class="flex flex-wrap gap-3">
+              <button 
+                class="btn-primary px-6 py-2.5 text-sm italic shadow-xl shadow-indigo-100/50 group"
+                [disabled]="!quizzes().length"
+                [routerLink]="quizzes().length ? ['/quiz-player-page', quizzes()[0]._id] : null">
+                <span class="flex items-center gap-2">▶ Start Mock Test</span>
+              </button>
+              
+              <button 
+                class="btn-secondary px-6 py-2.5 text-sm italic border-indigo-100 text-indigo-600 hover:bg-indigo-50"
+                [routerLink]="['/create-quiz-page']">
+                + Custom Quiz
+              </button>
+            </div>
           </div>
 
           @if (isAdmin()) {
-            <button
-              class="px-3 py-1.5 rounded-lg
-                     border border-black/10
-                     text-gray-600 text-sm
-                     hover:bg-gray-100 transition"
-              (click)="openEditSubject()">
-              ✏️ Edit
-            </button>
+            <div class="flex-shrink-0">
+              <button 
+                class="w-12 h-12 rounded-2xl bg-white border border-black/[0.03] shadow-sm flex items-center justify-center text-xl hover:bg-gray-50 hover:shadow-md hover:-rotate-6 transition-all duration-300 active:scale-95"
+                (click)="openEditSubject()"
+                title="Edit Subject">
+                ✏️
+              </button>
+            </div>
           }
         </div>
+      }
+    </header>
 
-        <div class="mt-6 flex flex-col sm:flex-row gap-4">
-          <button
-            class="px-7 py-3 rounded-xl
-                   bg-indigo-600 text-white font-semibold
-                   shadow-md hover:shadow-lg
-                   hover:bg-indigo-700
-                   transition transform hover:-translate-y-0.5"
-            [disabled]="!quizzes().length"
-            [routerLink]="quizzes().length ? ['/quiz-player-page', quizzes()[0]._id] : null">
-            ▶ Start Full Mock Test
-          </button>
-
-          <button
-            class="px-7 py-3 rounded-xl
-                   border border-indigo-600
-                   text-indigo-600 font-semibold
-                   hover:bg-indigo-50 transition"
-            [routerLink]="['/create-quiz-page']">
-            + Create Custom Quiz
-          </button>
+    <!-- ================= QUIZZES SECTION ================= -->
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6 px-1">
+        <div>
+          <h2 class="text-xl font-black text-gray-900 tracking-tight italic uppercase">📘 Mock Tests</h2>
+          <p class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.25em] mt-0.5">Exam simulation cluster</p>
         </div>
       </div>
-    }
 
-    <!-- ================= QUIZZES ================= -->
-
-    @if (loading()) {
-      <section class="py-14">
-        <div class="h-6 w-48 mb-6 rounded skeleton-shimmer"></div>
-
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @if (loading()) {
           @for (i of [1,2,3]; track i) {
-            <div class="p-6 rounded-2xl
-                        bg-white/70
-                        border border-black/5
-                        animate-pulse space-y-3">
-              <div class="h-5 w-3/4 rounded skeleton-shimmer"></div>
-              <div class="h-4 w-2/3 rounded skeleton-shimmer"></div>
-              <div class="flex justify-between mt-4">
-                <div class="h-3 w-20 rounded skeleton-shimmer"></div>
-                <div class="h-4 w-16 rounded skeleton-shimmer"></div>
-              </div>
-            </div>
+            <div class="skeleton-box h-52 rounded-[24px]"></div>
           }
-        </div>
-      </section>
-    }
-
-    @if (!loading() && quizzes().length) {
-      <section class="py-14">
-        <h2 class="text-xl font-bold mb-6">📘 Available Quizzes</h2>
-
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          @for (quiz of quizzes(); track quiz._id) {
-            <div class="relative p-6 rounded-2xl
-                        bg-white/80 backdrop-blur
-                        border border-black/5
-                        shadow-sm hover:shadow-lg transition">
-
+        } @else {
+          @for (quiz of quizzes(); track quiz._id; let i = $index) {
+            <div class="premium-card animate-fade-in-up" [style.animation-delay]="(i * 80) + 'ms'">
               @if (isAdmin()) {
-                <div class="absolute top-3 right-3">
-                  <button class="text-red-600"
-                    (click)="$event.stopPropagation();confirmDelete('quiz', quiz._id)">🗑</button>
-                </div>
+                <button 
+                  class="absolute top-4 right-4 w-7 h-7 rounded-full bg-red-50 text-red-500 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  (click)="$event.stopPropagation();confirmDelete('quiz', quiz._id)">
+                  🗑
+                </button>
               }
 
-              <h3 class="text-lg font-semibold text-gray-900">{{ quiz.title }}</h3>
-
-              <p class="text-sm text-gray-600 mt-1">
-                {{ quiz.questions?.length || 0 }} Questions • {{ quiz.timeLimit }} Minutes
-              </p>
-
-              <div class="mt-4 flex justify-between items-center">
-                <span class="text-xs text-gray-500">
-                  Difficulty: {{ quiz.difficulty | titlecase }}
-                </span>
-                <a class="text-indigo-600 font-semibold hover:underline"
-                   [routerLink]="['/quiz-player-page', quiz._id]">
-                  Start →
-                </a>
+              <div class="relative z-10">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-4 shadow-sm">🎯</div>
+                <h3 class="text-lg font-black text-gray-900 tracking-tight mb-1 truncate">{{ quiz.title }}</h3>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{{ quiz.questions?.length || 0 }} Questions • {{ quiz.timeLimit }} Min</p>
+                
+                <div class="mt-6 pt-4 border-t border-black/[0.02] flex items-center justify-between">
+                  <span class="text-[9px] font-black uppercase text-indigo-400 bg-indigo-50/50 px-2 py-0.5 rounded-md">
+                    {{ quiz.difficulty | titlecase }}
+                  </span>
+                  <a class="text-[11px] font-black italic uppercase tracking-tighter text-indigo-600 hover:text-indigo-800 transition-colors"
+                     [routerLink]="['/quiz-player-page', quiz._id]">
+                    Start →
+                  </a>
+                </div>
               </div>
             </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center opacity-30">
+              <p class="text-4xl mb-3">📭</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">No quizzes mapped</p>
+            </div>
           }
-        </div>
-      </section>
-    }
+        }
+      </div>
+    </section>
 
     <!-- ================= HOT TOPICS ================= -->
-
-    @if (loading()) {
-      <section class="mb-14">
-        <div class="h-6 w-40 mb-5 rounded skeleton-shimmer"></div>
-
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          @for (i of [1,2,3]; track i) {
-            <div class="p-5 rounded-2xl
-                        bg-white/70
-                        border border-black/5
-                        animate-pulse space-y-3">
-              <div class="h-4 w-2/3 rounded skeleton-shimmer"></div>
-              <div class="h-3 w-full rounded skeleton-shimmer"></div>
-            </div>
-          }
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6 px-1">
+        <div>
+          <h2 class="text-xl font-black text-gray-900 tracking-tight italic uppercase">🔥 Hot Topics</h2>
+          <p class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.25em] mt-0.5">High priority concepts</p>
         </div>
-      </section>
-    }
+        
+        @if (isAdmin() && !loading()) {
+          <button class="w-10 h-10 rounded-xl bg-white border border-black/[0.03] shadow-sm flex items-center justify-center text-lg hover:bg-gray-50 hover:shadow-md transition-all active:scale-95" (click)="openHotTopic()">+</button>
+        }
+      </div>
 
-    @if (!loading()) {
-      <section class="mb-14">
-        <h2 class="text-xl font-bold mb-5 flex items-center justify-between">
-          🔥 Hot Topics
-
-          @if (isAdmin()) {
-            <button
-              class="px-4 py-2 rounded-lg
-                    bg-indigo-600 text-white text-sm
-                    hover:bg-indigo-700 transition text-white"
-              (click)="openHotTopic()">
-               + Add
-            </button>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        @if (loading()) {
+          @for (i of [1,2,3]; track i) {
+            <div class="skeleton-box h-32 rounded-[20px]"></div>
           }
-        </h2>
-
-        @if (subjectInfo()?.hotTopics?.length) {
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          @for (topic of subjectInfo().hotTopics; track topic._id) {
-            <div class="relative p-5 rounded-2xl
-                        bg-white/80 backdrop-blur
-                        border border-black/5
-                        hover:border-indigo-300/40
-                        hover:bg-indigo-50 transition">
-                          @if (isAdmin()) {
-                <div class="absolute top-3 right-3 flex gap-2 text-xs">
-                  <button
-                    (click)="$event.stopPropagation(); openHotTopic(topic)">
-                    ✏️
-                  </button>
-
-                  <button
-                    class="text-red-600"
-                    (click)="$event.stopPropagation(); confirmDelete('hotTopic', topic._id)">
-                    🗑
-                  </button>
+        } @else {
+          @for (topic of subjectInfo()?.hotTopics; track topic._id; let i = $index) {
+            <div class="premium-card animate-fade-in-up" [style.animation-delay]="(i * 80) + 'ms'">
+              @if (isAdmin()) {
+                <div class="absolute top-4 right-4 flex gap-1.5">
+                  <button class="w-6 h-6 rounded-md bg-white/80 border border-black/[0.02] text-[9px] flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-colors" (click)="$event.stopPropagation(); openHotTopic(topic)">✏️</button>
+                  <button class="w-6 h-6 rounded-md bg-red-50/80 border border-red-100/50 text-red-500 text-[9px] flex items-center justify-center hover:bg-red-100 transition-colors" (click)="$event.stopPropagation(); confirmDelete('hotTopic', topic._id)">🗑</button>
                 </div>
               }
-              <h3 class="font-semibold text-gray-900">{{ topic.title }}</h3>
-              <p class="text-sm text-gray-600 mt-1">{{ topic.description }}</p>
+              <div class="relative z-10">
+                <h3 class="font-black text-base text-gray-800 tracking-tight mb-1.5">{{ topic.title }}</h3>
+                <p class="text-xs font-medium text-gray-500 leading-relaxed line-clamp-2">{{ topic.description }}</p>
+              </div>
+            </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center opacity-20 border border-dashed border-gray-200 rounded-[32px]">
+              <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Curating resources...</p>
             </div>
           }
-        </div>
-      }
-      </section>
-    }
-
-    <!-- ================= CHAPTERS ================= -->
-
-    @if (loading()) {
-      <section>
-        <div class="h-6 w-52 mb-5 rounded skeleton-shimmer"></div>
-
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          @for (i of [1,2,3,4]; track i) {
-            <div class="p-5 rounded-2xl
-                        bg-white/70
-                        border border-black/5
-                        animate-pulse space-y-3">
-              <div class="h-4 w-3/4 rounded skeleton-shimmer"></div>
-              <div class="h-3 w-full rounded skeleton-shimmer"></div>
-            </div>
-          }
-        </div>
-      </section>
-    }
-
-    @if (!loading()) {
-      <section>
-      <h2 class="text-xl font-bold mb-5 flex items-center justify-between">
-        🧠 Practice by Chapter
-
-        @if (isAdmin()) {
-          <button
-            class="px-4 py-2 rounded-lg
-                  bg-indigo-600 text-white text-sm
-                  hover:bg-indigo-700 transition"
-            (click)="openChapter()">
-            + Add Chapter
-          </button>
         }
-      </h2>
+      </div>
+    </section>
 
-      @if (chapters().length) {
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          @for (chapter of chapters(); track chapter._id) {
-            <div
-              class="p-5 rounded-2xl
-                     bg-white/70 backdrop-blur
-                     border border-black/5
-                     hover:border-indigo-300/40
-                     hover:bg-indigo-50 transition"
-              [routerLink]="['/chapter-page/' + chapter._id]">
-                @if (isAdmin()) {
-                  <div class="absolute top-3 right-3 flex gap-2 text-xs">
-                    <button
-                      (click)="$event.stopPropagation(); openChapter(chapter)">
-                      ✏️
-                    </button>
+    <!-- ================= CHAPTERS SECTION ================= -->
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6 px-1">
+        <div>
+          <h2 class="text-xl font-black text-gray-900 tracking-tight italic uppercase">🧠 Brain Training</h2>
+          <p class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.25em] mt-0.5">Foundation Mastery</p>
+        </div>
+        
+        @if (isAdmin() && !loading()) {
+          <button class="btn-primary px-5 py-2 text-xs italic shadow-lg shadow-indigo-100/50" (click)="openChapter()">+ Add Chapter</button>
+        }
+      </div>
 
-                    <button
-                      class="text-red-600"
-                      (click)="$event.stopPropagation(); confirmDelete('chapter', chapter._id)">
-                      🗑
-                    </button>
-                  </div>
-                }
-              <h3 class="font-semibold text-gray-900">{{ chapter.name }}</h3>
-              <p class="text-sm text-gray-600 mt-1">{{ chapter.description }}</p>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        @if (loading()) {
+          @for (i of [1,2,3,4]; track i) {
+            <div class="skeleton-box h-40 rounded-[20px]"></div>
+          }
+        } @else {
+          @for (chapter of chapters(); track chapter._id; let i = $index) {
+            <div class="premium-card cursor-pointer animate-fade-in-up" 
+                 [style.animation-delay]="(i * 80) + 'ms'"
+                 [routerLink]="['/chapter-page/' + chapter._id]">
+              @if (isAdmin()) {
+                <div class="absolute top-4 right-4 flex gap-1.5 z-20">
+                  <button class="w-6 h-6 rounded-md bg-white/80 border border-black/[0.02] text-[9px] flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-colors" (click)="$event.stopPropagation(); openChapter(chapter)">✏️</button>
+                  <button class="w-6 h-6 rounded-md bg-red-50/80 border border-red-100/50 text-red-500 text-[9px] flex items-center justify-center hover:bg-red-100 transition-colors" (click)="$event.stopPropagation(); confirmDelete('chapter', chapter._id)">🗑</button>
+                </div>
+              }
+              <div class="relative z-10">
+                <span class="text-[9px] font-black italic text-indigo-400 mb-1.5 block">CH-{{ i + 1 }}</span>
+                <h3 class="font-black text-base text-gray-800 tracking-tight mb-1.5 line-clamp-1">{{ chapter.name }}</h3>
+                <p class="text-[10px] font-medium text-gray-400 leading-relaxed line-clamp-2">{{ chapter.description }}</p>
+              </div>
+            </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center opacity-20 border border-dashed border-gray-200 rounded-[32px]">
+              <p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Chapters incoming...</p>
             </div>
           }
-        </div>
-      }
-      </section>
-    }
+        }
+      </div>
+    </section>
 
   </div>
 </div>
 
+<!-- ================= MANAGEMENT MODALS ================= -->
 @if (showPopup()) {
-  <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-
-    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl animate-fade-in">
-
-      <h3 class="text-lg font-bold mb-4">
-        {{ popupTitle() }}
-      </h3>
-
-      <!-- SUBJECT -->
-      @if (popupType() === 'subject') {
-        <input class="input w-full mb-3"
-               placeholder="Subject Name"
-               [(ngModel)]="formModel().name">
-
-        <textarea class="input w-full"
-                  placeholder="Description"
-                  [(ngModel)]="formModel().description"></textarea>
-      }
-
-      <!-- HOT TOPIC -->
-      @if (popupType() === 'hotTopic') {
-        <input class="input w-full mb-3"
-               placeholder="Title"
-               [(ngModel)]="formModel().title">
-
-        <textarea class="input w-full mb-3"
-                  placeholder="Description"
-                  [(ngModel)]="formModel().description"></textarea>
-
-        <label class="block text-sm font-medium mb-1">Priority</label>
-        <select class="input w-full" [(ngModel)]="formModel().priority">
-          @for (p of [1,2,3,4,5]; track p) {
-            <option [ngValue]="p">Priority {{ p }}</option>
-          }
-        </select>
-      }
-
-      <!-- CHAPTER -->
-      @if (popupType() === 'chapter') {
-        <input class="input w-full mb-3"
-               placeholder="Chapter Name"
-               [(ngModel)]="formModel().name">
-
-        <textarea class="input w-full mb-3"
-                  placeholder="Description"
-                  [(ngModel)]="formModel().description"></textarea>
-
-        <label class="block text-sm font-medium mb-1">Order</label>
-        <select class="input w-full mb-3" [(ngModel)]="formModel().order">
-          @for (o of [1,2,3,4,5,6,7,8,9,10]; track o) {
-            <option [ngValue]="o">Order {{ o }}</option>
-          }
-        </select>
-
-        <label class="flex items-center gap-2 text-sm">
-          <input type="checkbox" [(ngModel)]="formModel().isActive">
-          Active
-        </label>
-      }
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/30 backdrop-blur-[2px] animate-fade-in" (click)="closePopup()"></div>
+    
+    <div class="modal-glass w-full max-w-md relative z-10 animate-profile-pop p-8 lg:p-10">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-black text-gray-900 tracking-tight italic uppercase underline decoration-indigo-200 decoration-4 underline-offset-[-1px]">
+          {{ popupTitle() }}
+        </h2>
+        <button class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors" (click)="closePopup()">✕</button>
+      </div>
 
       <!-- DELETE CONFIRM -->
       @if (popupType() === 'confirmDelete') {
-        <p class="text-gray-600">
-          Are you sure you want to delete this item?
-        </p>
+        <div class="text-center py-4">
+          <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">⚠️</div>
+          <p class="text-base font-bold text-gray-700 leading-relaxed">Shall we proceed with this deletion?</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">This action cannot be undone</p>
+        </div>
       }
 
-      <!-- ACTIONS -->
-      <div class="mt-6 flex justify-end gap-3">
-        <button class="px-4 py-2 border rounded-lg"
-                (click)="closePopup()">
-          Cancel
-        </button>
+      <!-- FORM FIELDS -->
+      <div class="space-y-4">
+        @if (popupType() === 'subject') {
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Subject Title</label>
+            <input class="input-premium py-2.5 text-sm" placeholder="Ex: Neurobiology" [(ngModel)]="formModel().name">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Curriculum Details</label>
+            <textarea rows="3" class="textarea-premium p-3 text-sm" placeholder="Learning objectives..." [(ngModel)]="formModel().description"></textarea>
+          </div>
+        }
 
-        @if (popupType() === 'confirmDelete') {
-          <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                  (click)="performDelete()">
-            Delete
-          </button>
-        } @else {
-          <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg"
-                  (click)="saveForm()">
-            Save
-          </button>
+        @if (popupType() === 'hotTopic') {
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Topic Title</label>
+            <input class="input-premium py-2.5 text-sm" placeholder="Ex: Neural Plasticity" [(ngModel)]="formModel().title">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">High-Level Summary</label>
+            <textarea rows="2" class="textarea-premium p-3 text-sm" placeholder="Core priority..." [(ngModel)]="formModel().description"></textarea>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Priority Weight</label>
+            <select class="input-premium py-2.5 text-sm" [(ngModel)]="formModel().priority">
+              @for (p of [1,2,3,4,5]; track p) {
+                <option [ngValue]="p">Rank {{ p }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (popupType() === 'chapter') {
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Chapter Identity</label>
+            <input class="input-premium py-2.5 text-sm" placeholder="Ex: Synapses" [(ngModel)]="formModel().name">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Focus Points</label>
+            <textarea rows="2" class="textarea-premium p-3 text-sm" placeholder="Key takeaways..." [(ngModel)]="formModel().description"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Sequence</label>
+              <select class="input-premium py-2.5 text-sm" [(ngModel)]="formModel().order">
+                @for (o of [1,2,3,4,5,6,7,8,9,10]; track o) {
+                  <option [ngValue]="o">CH-{{ o }}</option>
+                }
+              </select>
+            </div>
+            <div class="flex flex-col justify-end pb-2">
+              <label class="flex items-center gap-2 text-[10px] font-black text-gray-800 uppercase italic cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-black/[0.1] text-indigo-600" [(ngModel)]="formModel().isActive">
+                Live Status
+              </label>
+            </div>
+          </div>
         }
       </div>
 
+      <!-- MODAL ACTIONS -->
+      <div class="mt-10 flex flex-col sm:flex-row gap-3">
+        <button class="flex-1 py-3 text-xs font-black uppercase tracking-tight text-gray-400 hover:text-gray-600 transition-colors" (click)="closePopup()">Abort</button>
+        
+        @if (popupType() === 'confirmDelete') {
+          <button class="btn-primary flex-1 py-3 text-xs italic bg-red-600 from-red-600 to-red-700 shadow-lg shadow-red-100/50" (click)="performDelete()">Confirm Purge</button>
+        } @else {
+          <button class="btn-primary flex-1 py-3 text-xs italic shadow-xl shadow-indigo-100/50" (click)="saveForm()">
+            {{ formModel()._id ? 'Update' : 'Initialize' }} Record
+          </button>
+        }
+      </div>
     </div>
   </div>
 }
-

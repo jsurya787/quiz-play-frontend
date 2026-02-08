@@ -10,6 +10,7 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './subject-page.html',
+  styleUrl: './subject-page.scss',
 })
 export class SubjectPage {
   private route = inject(ActivatedRoute);

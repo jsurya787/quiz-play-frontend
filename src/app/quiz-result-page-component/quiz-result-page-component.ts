@@ -2,7 +2,7 @@ import { Component, signal, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { QuizPlayerService } from '../services/quiz-player.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast-service';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 
 /* ================= TYPES ================= */
 type QuestionStatus = 'correct' | 'wrong' | 'skipped';
@@ -25,6 +25,8 @@ interface QuizResultResponse {
 
 @Component({
   selector: 'app-quiz-result',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './quiz-result-page-component.html',
   styleUrl: './quiz-result-page-component.css',
 })
@@ -76,11 +78,16 @@ export class QuizResultPageComponent implements OnInit {
     });
   }
 
+
+  /* ================= COMPUTED ================= */
+  percentage = signal(0); // will be updated in applyResult
+
   /* ================= APPLY RESULT ================= */
   private applyResult(res: QuizResultResponse): void {
-    this.quizTitle.set(this.quizService.quizData.title);
+    this.quizTitle.set(this.quizService.quizData?.title || 'Quiz Result');
     this.totalMarks.set(res.totalMarks);
     this.score.set(res.score);
+    this.percentage.set(Math.round((res.score / res.totalMarks) * 100) || 0);
 
     this.correct.set(res.correct);
     this.wrong.set(res.wrong);
@@ -92,8 +99,20 @@ export class QuizResultPageComponent implements OnInit {
     this.loading.set(false);
   }
 
+  getScoreColor(percent: number): string {
+    if (percent >= 90) return '#10B981'; // Emerald
+    if (percent >= 70) return '#34D399'; // Green-400
+    if (percent >= 50) return '#6366F1'; // Indigo
+    return '#475569'; // Slate-600 (Dark Gray) for Keep Learning
+  }
+
+  openReview() {
+    // Scroll to the map or open first question
+    document.querySelector('.question-dot')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   goToDashboard() {
-  this.router.navigate(['/dashboard']);
+  this.router.navigate(['/student/dashboard/all']);
 }
 
 goToHome() {

@@ -11,21 +11,24 @@ export class SuccessStoriesComponent {
   stories = [
     {
       name: 'Aman Verma',
-      class: 'Class 10',
-      score: 'Maths: 92%',
-      image: '/assets/student1.png'
+      role: 'Class 10 Topper',
+      quote: "QuizPlay helped me clear my concepts in Maths. The instant feedback was a game changer for my board prep.",
+      score: '98% in Maths',
+      image: 'https://ui-avatars.com/api/?name=Aman+Verma&background=6366f1&color=fff'
     },
     {
       name: 'Riya Sharma',
-      class: 'Class 12',
-      score: 'Physics: 95%',
-      image: '/assets/student2.png'
+      role: 'NEET Aspirant',
+      quote: "The physics quizzes are tough but exactly what I needed. I improved my speed by 30% in just two months.",
+      score: '680/720 in Neet Mock',
+      image: 'https://ui-avatars.com/api/?name=Riya+Sharma&background=a855f7&color=fff'
     },
     {
       name: 'Kunal Singh',
-      class: 'Class 12',
-      score: 'Chemistry: 90%',
-      image: '/assets/student3.png'
+      role: 'JEE Main Qualified',
+      quote: "Chemistry reactions were a nightmare until I started practicing here. The visual explanations are amazing.",
+      score: '99.5 Percentile',
+      image: 'https://ui-avatars.com/api/?name=Kunal+Singh&background=10b981&color=fff'
     }
   ];
 }

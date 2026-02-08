@@ -1,0 +1,51 @@
+/* ===============================
+   LANDING PAGE PREMIUM STYLES
+================================ */
+
+/* Premium section spacing */
+:host {
+    display: block;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Premium inter-section transitions */
+section {
+    position: relative;
+}
+
+/* ===============================
+   SECTION REVEAL ANIMATION
+================================ */
+@keyframes revealSection {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reveal-section {
+    animation: revealSection 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ===============================
+   PREMIUM DIVIDER
+================================ */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(99, 102, 241, 0.15) 20%,
+            rgba(99, 102, 241, 0.15) 80%,
+            transparent 100%);
+    margin: 0 auto;
+    max-width: 600px;
+}

@@ -23,6 +23,7 @@ export class QuizPlayerPageComponent implements OnInit {
   quiz = signal<any>(null);
   currentIndex = signal(0);
   loading = signal(true);
+  Object = Object;
 
   answerForm!: FormGroup;
 

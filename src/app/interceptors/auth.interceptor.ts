@@ -25,8 +25,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // 🚨 Never attach token to auth endpoints
   if (
-    originReq.url.includes('/auth/google') ||
-    originReq.url.includes('/auth/refresh')
+    originReq.url.includes('/auth/google') || 
+    originReq.url.includes('/auth/refresh') ||
+    originReq.url.includes('/auth/login') ||
+    originReq.url.includes('/auth/signup') ||
+    originReq.url.includes('/auth/logout') ||
+    originReq.url.includes('/auth/google/callback')
   ) {
     return next(originReq.clone({ withCredentials: true }));
   }

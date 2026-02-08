@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment';
 import { endpoints } from '../../endpoints';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, firstValueFrom, tap } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, tap } from 'rxjs';
 
 
 const ACCESS_TOKEN_KEY: StateKey<string | null> =
@@ -137,6 +137,53 @@ bootstrapAuth(): Promise<void> {
 
   isAdmin(): boolean {
     return this.userData?.role === 'ADMIN';
+  }
+
+  // ============================
+  // 📝 SIGNUP & OTP
+  // ============================
+  signup(body: any) {
+    return this.http.post(
+      environment.apiUrl + endpoints.auth.signup,
+      body,
+      { withCredentials: true }
+    ).pipe(
+      catchError(err => {
+        console.error('Signup API error:', err);
+        throw err;
+      })
+    );
+  }
+
+
+
+  verifyOtp(email: string, otp: string) {
+    return this.http.post<{ accessToken: string; user: any }>(
+      environment.apiUrl + endpoints.auth.verifyOtp,
+      { email, otp },
+      { withCredentials: true }
+    ).pipe(
+      tap(res => {
+        this.setAccessToken(res.accessToken);
+        this.userData = res.user;
+      })
+    );
+  }
+
+  resendOtp(email: string) {
+    return this.http.post<{ message: string }>(
+      environment.apiUrl + endpoints.auth.resendOtp,
+      { email },
+      { withCredentials: true }
+    );
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post(
+      environment.apiUrl + endpoints.auth.forgotPassword,
+      { email },
+      { withCredentials: true }
+    );
   }
 
 }

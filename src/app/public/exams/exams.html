@@ -1,27 +1,30 @@
-<section class="py-32 bg-gray-950 text-white px-6">
-  <div class="max-w-6xl mx-auto text-center">
-
-    <h2 class="text-4xl font-extrabold mb-6">
-      Built for Your Board Exams
-    </h2>
-
-    <p class="text-gray-300 mb-16">
-      Strictly designed as per CBSE & ICSE syllabus
+<section class="py-20 md:py-32 bg-white border-t border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    
+    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-8">
+      Prepare for excellence in
     </p>
 
-    <div class="grid md:grid-cols-2 gap-10">
-      <div class="bg-white/10 p-10 rounded-3xl backdrop-blur
-                  hover:bg-white/20 transition">
-        <h3 class="text-2xl font-bold mb-4">CBSE</h3>
-        <p>NCERT aligned quizzes, mock tests & revisions.</p>
-      </div>
+    <div class="flex flex-wrap justify-center gap-6">
+      @for (exam of exams; track $index) {
+        <div class="group px-8 py-6 rounded-2xl bg-white border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default flex flex-col items-center min-w-[160px]"
+             [ngClass]="exam.border">
+          
+          <h3 class="text-xl font-bold mb-1" [ngClass]="exam.color">
+            {{ exam.name }}
+          </h3>
+          
+          <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+            {{ exam.desc }}
+          </p>
 
-      <div class="bg-white/10 p-10 rounded-3xl backdrop-blur
-                  hover:bg-white/20 transition">
-        <h3 class="text-2xl font-bold mb-4">ICSE</h3>
-        <p>Concept-driven quizzes with exam-focused patterns.</p>
-      </div>
+        </div>
+      }
     </div>
+
+    <p class="mt-12 text-gray-400 text-sm">
+      & many more coming soon...
+    </p>
 
   </div>
 </section>

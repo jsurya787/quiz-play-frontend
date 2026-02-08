@@ -5,7 +5,10 @@ export const  endpoints = {
         signup: '/auth/signup',
         refresh: '/auth/refresh',
         logout:'/auth/logout',
-        setPassword: '/auth/set-password'
+        setPassword: '/auth/set-password',
+        verifyOtp: '/auth/otp/verify',
+        resendOtp: '/auth/otp/resend',
+        forgotPassword: '/auth/forgot-password'
     },
     student: {
         dashboard: '/student/dashboard'

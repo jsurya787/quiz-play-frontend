@@ -1,9 +1,77 @@
 /* ===============================
-   INPUT ERROR STATE
+   iOS-STYLE INPUT
 ================================ */
-.input-error {
-  border-color: rgb(248 113 113); /* red-400 */
+.input-ios {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 1rem;
+  color: #1f2937;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.input-ios::placeholder {
+  color: #9ca3af;
+}
+
+.input-ios:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.input-ios.border-red-500 {
+  border-color: rgb(239 68 68);
   animation: shake 0.25s ease-in-out;
+}
+
+/* ===============================
+   FADE SCALE IN ANIMATION
+================================ */
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-scale-in {
+  animation: fadeScaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ===============================
+   SHAKE ANIMATION
+================================ */
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 /* ===============================
@@ -11,17 +79,14 @@
 ================================ */
 .error-text {
   font-size: 0.75rem;
-  color: rgb(220 38 38); /* red-600 */
+  color: rgb(220 38 38);
   margin-top: 2px;
 }
 
 /* ===============================
-   SHAKE ANIMATION
+   INPUT ERROR STATE
 ================================ */
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
-  100% { transform: translateX(0); }
+.input-error {
+  border-color: rgb(248 113 113);
+  animation: shake 0.25s ease-in-out;
 }
