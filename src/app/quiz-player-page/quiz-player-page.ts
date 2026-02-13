@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuizPlayerService } from '../services/quiz-player.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { RetryAttemptService } from '../services/retry-attempt-service';
 import { ToastService } from '../services/toast-service';
@@ -18,6 +18,7 @@ export class QuizPlayerPageComponent implements OnInit {
   answeredMap = signal<Record<number, number>>({});
   private _retryAttemptService = inject(RetryAttemptService);
   private _toastService = inject(ToastService);
+  private _platformId = inject(PLATFORM_ID);
 
 
   quiz = signal<any>(null);
@@ -58,10 +59,10 @@ export class QuizPlayerPageComponent implements OnInit {
   );
 
   remainingTime = computed(() => {
-    const remaining = this.remainingSeconds();
-    const min = Math.floor(remaining / 60).toString().padStart(2, '0');
-    const sec = (remaining % 60).toString().padStart(2, '0');
-    return `${min}:${sec}`;
+    const totalSec = Math.max(this.totalTime() - this.elapsedTime(), 0);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   });
 
   private timerRef: any;
@@ -71,7 +72,7 @@ export class QuizPlayerPageComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private quizService: QuizPlayerService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   /* =======================
@@ -83,14 +84,17 @@ export class QuizPlayerPageComponent implements OnInit {
     this.initForm();
     
     // ✅ APP_INITIALIZER already called bootstrapAuth() - no need to call again
-    // Now load quiz after we know auth state
-    this.loadQuiz();
+    
+    // 🚫 Check Platform - ONLY RUN ON BROWSER
+    if (isPlatformBrowser(this._platformId)) {
+      this.loadQuiz();
 
-    if(!this.authService.isAuthenticated() && !this._retryAttemptService.canAttempt()) {
-      this._toastService.info('You’ve reached the maximum attempts. Log in with Google to continue, or try again after 24 hours.', 4000);
-      setTimeout(() => {
-        this.router.navigate(['/dashboard/all']);
-      }, 4500);
+      if(!this.authService.isAuthenticated() && !this._retryAttemptService.canAttempt()) {
+        this._toastService.info('You\'ve reached the maximum attempts. Log in with Google to continue, or try again after 24 hours.', 4000);
+        setTimeout(() => {
+          this.router.navigate(['/dashboard/all']);
+        }, 4500);
+      }
     }
     this._retryAttemptService.resetAll();
   }

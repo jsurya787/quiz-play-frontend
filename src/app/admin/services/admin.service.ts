@@ -27,4 +27,8 @@ export class AdminService {
   clearCache(): Observable<any> {
     return this.http.post(`${this.API}/clear-cache`, {});
   }
+
+  assignRole(userId: string, role: 'STUDENT' | 'TEACHER'): Observable<any> {
+    return this.http.post(`${this.API}/assign-role`, { userId, role });
+  }
 }

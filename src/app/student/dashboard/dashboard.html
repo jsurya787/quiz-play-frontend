@@ -168,26 +168,28 @@
           </label>
 
           <!-- Teacher Quizzes -->
-          <label class="group relative flex items-center justify-center p-3 rounded-xl cursor-pointer hover:bg-gray-50/80 transition-all select-none border border-transparent"
-                 [class.bg-purple-50]="teacherQuizzesOnly()"
-                 [class.border-purple-100]="teacherQuizzesOnly()"
-                 [class.text-purple-600]="teacherQuizzesOnly()">
-            <input type="checkbox" class="sr-only"
-                   [checked]="teacherQuizzesOnly()"
-                   (change)="teacherQuizzesOnly.set($any($event.target).checked); createdByMe.set(false); applyFilters()" />
-            <div class="flex items-center gap-2">
-              <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
-                   [class.border-purple-500]="teacherQuizzesOnly()"
-                   [class.bg-purple-500]="teacherQuizzesOnly()"
-                   [class.border-gray-300]="!teacherQuizzesOnly()">
-                @if(teacherQuizzesOnly()) {
-                  <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                }
+           @if (!authService.isTeacher() && !authService.isAdmin()) {
+            <label class="group relative flex items-center justify-center p-3 rounded-xl cursor-pointer hover:bg-gray-50/80 transition-all select-none border border-transparent"
+                  [class.bg-purple-50]="teacherQuizzesOnly()"
+                  [class.border-purple-100]="teacherQuizzesOnly()"
+                  [class.text-purple-600]="teacherQuizzesOnly()">
+              <input type="checkbox" class="sr-only"
+                    [checked]="teacherQuizzesOnly()"
+                    (change)="teacherQuizzesOnly.set($any($event.target).checked); createdByMe.set(false); applyFilters()" />
+              <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
+                    [class.border-purple-500]="teacherQuizzesOnly()"
+                    [class.bg-purple-500]="teacherQuizzesOnly()"
+                    [class.border-gray-300]="!teacherQuizzesOnly()">
+                  @if(teacherQuizzesOnly()) {
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                  }
+                </div>
+                <span class="text-sm font-bold transition-colors duration-200"
+                      [class.text-gray-600]="!teacherQuizzesOnly()">Teacher Quizzes</span>
               </div>
-              <span class="text-sm font-bold transition-colors duration-200"
-                    [class.text-gray-600]="!teacherQuizzesOnly()">Teacher Quizzes</span>
-            </div>
-          </label>
+            </label>
+          }
         </div>
       }
 

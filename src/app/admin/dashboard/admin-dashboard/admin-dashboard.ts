@@ -3,11 +3,12 @@ import { RouterModule } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { inject, signal, OnInit, Component, PLATFORM_ID, Inject } from '@angular/core';
 import { ToastService } from '../../../services/toast-service';
+import { ConfirmationModalComponent, ConfirmationType } from '../../../shared/modals/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ConfirmationModalComponent],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -27,6 +28,19 @@ export class AdminDashboard implements OnInit {
   teachers = signal<any[]>([]);
   students = signal<any[]>([]);
   loading = signal(false);
+
+  confirmModal = signal<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: ConfirmationType;
+    action?: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -73,6 +87,51 @@ export class AdminDashboard implements OnInit {
         error: () => this.loading.set(false)
       });
     }
+  }
+
+  getUserName(user: any): string {
+    return user.displayName || user.name || (user.firstName ? `${user.firstName} ${user.lastName}` : 'User');
+  }
+
+  assignRole(user: any, role: 'STUDENT' | 'TEACHER') {
+    const name = this.getUserName(user);
+    const action = role === 'TEACHER' ? 'promote' : 'demote';
+    const type: ConfirmationType = role === 'TEACHER' ? 'info' : 'danger';
+    
+    this.confirmModal.set({
+      isOpen: true,
+      title: `${action === 'promote' ? 'Promote' : 'Demote'} User`,
+      message: `Are you sure you want to ${action} ${name} to ${role}?`,
+      type,
+      action: () => this.executeAssignRole(user, role)
+    });
+  }
+
+  executeAssignRole(user: any, role: 'STUDENT' | 'TEACHER') {
+    this.loading.set(true);
+    this.adminService.assignRole(user._id, role).subscribe({
+      next: (res: any) => {
+        this.toaster.success(`User role updated to ${role}`);
+        // Refresh lists
+        this.loadTeachers();
+        this.loadStudents();
+        this.loadStats();
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+         this.toaster.error(err.error?.message || 'Failed to update role');
+         this.loading.set(false);
+      }
+    });
+  }
+
+  onConfirmAction() {
+    this.confirmModal().action?.();
+    this.closeConfirm();
+  }
+
+  closeConfirm() {
+    this.confirmModal.update(s => ({ ...s, isOpen: false }));
   }
 
   subjects: any[] = [
