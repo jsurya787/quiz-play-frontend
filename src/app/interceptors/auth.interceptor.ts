@@ -53,6 +53,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
+      // ✅ Only refresh if we don't already have a token
+      // If we have a token and got 401, it means the token is invalid
+      // In that case, just logout instead of refreshing again
+      const currentToken = auth.getAccessToken();
+      
+      if (currentToken) {
+        // Token exists but is invalid → logout
+        auth.logout();
+        return throwError(() => err);
+      }
+
+      // No token → try to refresh (shared promise prevents duplicates)
       return from(auth.bootstrapAuth()).pipe(
         switchMap(() => {
           const newToken = auth.getAccessToken();

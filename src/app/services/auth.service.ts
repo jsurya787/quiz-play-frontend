@@ -1,10 +1,10 @@
-import { Inject, Injectable, PLATFORM_ID, TransferState, StateKey, makeStateKey  } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID, TransferState, StateKey, makeStateKey, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment';
 import { endpoints } from '../../endpoints';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, catchError, firstValueFrom, tap } from 'rxjs';
+import { catchError, firstValueFrom, tap, EMPTY } from 'rxjs';
 
 
 const ACCESS_TOKEN_KEY: StateKey<string | null> =
@@ -13,9 +13,16 @@ const ACCESS_TOKEN_KEY: StateKey<string | null> =
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private accessToken$ = new BehaviorSubject<string | null>(null);
+  // 🚦 STATE SIGNALS
+  accessToken = signal<string | null>(null);
+  currentUser = signal<any>(null);
+  
+  // 🧠 COMPUTED SIGNALS
+  isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
+  isTeacher = computed(() => this.currentUser()?.role === 'TEACHER');
+
   private refreshPromise: Promise<void> | null = null;
-  public userData: any;
+  private isLoggingOut = false; // 🚫 Flag to block zombie refreshes
 
 
   constructor(
@@ -29,6 +36,7 @@ export class AuthService {
   // 🔑 GOOGLE LOGIN (REDIRECT)
   // ============================
   loginWithGoogle(): void {
+    this.isLoggingOut = false; // ✅ Reset flag
     const params = new URLSearchParams({
       client_id: environment.googleClientId,
       redirect_uri: `${window.location.origin}/auth/google/callback`,
@@ -47,72 +55,96 @@ export class AuthService {
   // 🔐 TOKEN MANAGEMENT
   // ============================
   setAccessToken(token: string) {
-    this.accessToken$.next(token);
+    this.accessToken.set(token);
   }
 
   getAccessToken(): string | null {
-    return this.accessToken$.value;
+    return this.accessToken();
   }
 
   isAuthenticated(): boolean {
-    return !!this.accessToken$.value;
+    return !!this.accessToken();
   }
 
 
   refreshToken() {
+    if (this.isLoggingOut) {
+      return EMPTY; // ✅ Consistent Observable type
+    }
     return this.http.post<{ accessToken: string , user: any}>(
       environment.apiUrl + endpoints.auth.refresh,
       {},
       { withCredentials: true },
     ).pipe(
-      tap(res => {this.setAccessToken(res.accessToken); this.userData = res.user;}),
+      tap(res => {
+        if (this.isLoggingOut) return; // 🛑 Don't restore session if we just logged out
+        this.setAccessToken(res.accessToken); 
+        this.currentUser.set(res.user);
+      }),
     );
   }
 
   // ============================
   // 🚀 BOOTSTRAP (APP_INITIALIZER)
   // ============================
-bootstrapAuth(): Promise<void> {
-  // ❌ NEVER refresh on server
-  if (!isPlatformBrowser(this.platformId)) {
-    return Promise.resolve();
+  // 🔒 Shared Refresh Promise (Singleton Pattern)
+  // This ensures multiple guards/interceptors wait for the SAME request
+  // private refreshPromise: Promise<void> | null = null; // Defined above
+
+  bootstrapAuth(): Promise<void> {
+    // ❌ NEVER refresh on server
+    if (!isPlatformBrowser(this.platformId)) {
+      return Promise.resolve();
+    }
+    // 🛑 Block if logging out
+    if (this.isLoggingOut) {
+      return Promise.resolve();
+    }
+
+    // 🚀 FAST PATH: token from SSR
+    const tokenFromSSR =
+      this.transferState.get(ACCESS_TOKEN_KEY, null);
+
+    if (tokenFromSSR) {
+      this.setAccessToken(tokenFromSSR);
+      this.transferState.remove(ACCESS_TOKEN_KEY);
+      return Promise.resolve();
+    }
+
+    // 🔒 Prevent double refresh (Concurrrent calls wait for the same promise)
+    if (!this.refreshPromise) {
+      this.refreshPromise = firstValueFrom(this.refreshToken())
+        .then(() => undefined) // ✅ Success: Token is set by tap() in refreshToken()
+        .catch(() => undefined) // ⚠️ Error: Just resolve, guards will check isAuthenticated()
+        .finally(() => {
+           this.refreshPromise = null; // 🧹 Cleanup after completion
+        });
+    }
+
+    return this.refreshPromise;
   }
-
-  // 🚀 FAST PATH: token from SSR
-  const tokenFromSSR =
-    this.transferState.get(ACCESS_TOKEN_KEY, null);
-
-  if (tokenFromSSR) {
-    this.setAccessToken(tokenFromSSR);
-    this.transferState.remove(ACCESS_TOKEN_KEY);
-    return Promise.resolve();
-  }
-
-  // 🔒 Prevent double refresh
-  if (!this.refreshPromise) {
-    this.refreshPromise = firstValueFrom(
-      this.refreshToken()
-    )
-      .then(() => undefined)   // ✅ FORCE Promise<void>
-      .catch(() => {})         // unauth user
-      .finally(() => {
-        this.refreshPromise = null;
-      });
-  }
-
-  return this.refreshPromise;
-}
 
 
   logout(): void {
+    this.isLoggingOut = true; // 🚫 Enable block
+    // 🧹 Clear local state immediately (Optimistic)
+    this.accessToken.set(null);
+    this.currentUser.set(null);
+    this.refreshPromise = null; // Clear any pending promise
+    this.router.navigate(['/login']);
+
+    // 📞 Call API to invalidate session/cookie (Side effect)
     this.http
       .post(environment.apiUrl + endpoints.auth.logout, {}, {
         withCredentials: true,
       })
       .subscribe({
         complete: () => {
-          this.accessToken$.next(null);
-          this.router.navigate(['/login']);
+          this.isLoggingOut = false; // ✅ Reset flag on success
+        },
+        error: (err) => {
+          console.error('Logout API failed:', err);
+          this.isLoggingOut = false; // ✅ Reset flag even on error
         },
       });
   }
@@ -126,18 +158,15 @@ bootstrapAuth(): Promise<void> {
   }
 
   loginWithPassword(email: string, password: string) {
+  this.isLoggingOut = false; // ✅ Reset flag
   return this.http.post<any>(
     environment.apiUrl + '/auth/login',
     { email, password },
     { withCredentials: true }
   ).pipe(
-    tap(res => {this.setAccessToken(res.accessToken); this.userData = res.user;}),
+    tap(res => {this.setAccessToken(res.accessToken); this.currentUser.set(res.user);}),
   );
 }
-
-  isAdmin(): boolean {
-    return this.userData?.role === 'ADMIN';
-  }
 
   // ============================
   // 📝 SIGNUP & OTP
@@ -156,7 +185,6 @@ bootstrapAuth(): Promise<void> {
   }
 
 
-
   verifyOtp(email: string, otp: string) {
     return this.http.post<{ accessToken: string; user: any }>(
       environment.apiUrl + endpoints.auth.verifyOtp,
@@ -165,7 +193,7 @@ bootstrapAuth(): Promise<void> {
     ).pipe(
       tap(res => {
         this.setAccessToken(res.accessToken);
-        this.userData = res.user;
+        this.currentUser.set(res.user);
       })
     );
   }

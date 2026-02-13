@@ -1,7 +1,7 @@
 <footer class="bg-slate-900 text-gray-300 pt-20 pb-10 border-t border-slate-800">
   <div class="max-w-7xl mx-auto px-6">
     
-    <div class="grid lg:grid-cols-4 gap-12 mb-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-16">
 
       <!-- Brand & Newsletter -->
       <div class="lg:col-span-2 space-y-6">
@@ -17,9 +17,9 @@
         <!-- Newsletter -->
         <div class="mt-8">
           <h4 class="text-white font-semibold mb-2">Stay Updated</h4>
-          <div class="flex gap-2 max-w-md">
+          <div class="flex flex-col sm:flex-row gap-2 max-w-md">
             <input type="email" placeholder="Enter your email" class="flex-1 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors">
-            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-colors">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-colors whitespace-nowrap">
               Subscribe
             </button>
           </div>
@@ -51,10 +51,10 @@
     </div>
 
     <!-- Bottom Bar -->
-    <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-      <p>© {{ year }} QuizPlay Inc. All rights reserved.</p>
+    <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-500">
+      <p class="text-center md:text-left">© {{ year }} QuizPlay Inc. All rights reserved.</p>
       
-      <div class="flex gap-6">
+      <div class="flex flex-wrap gap-4 md:gap-6 justify-center">
         <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
         <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
         <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>

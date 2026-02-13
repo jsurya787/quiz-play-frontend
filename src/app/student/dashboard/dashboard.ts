@@ -4,7 +4,7 @@ import { QuizService } from '../../services/quiz.service';
 import { AdminRoutingModule } from "../../admin/admin-routing-module";
 import { Subject as _sb, debounceTime,  } from 'rxjs';
 import { ToastService } from '../../services/toast-service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
@@ -20,6 +20,7 @@ export class DashboardComponent {
   private quizService = inject(QuizService);
   private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   public authService = inject(AuthService);
   // 🔥 Debounce trigger
   private filterChange$ = new _sb<void>();
@@ -35,6 +36,7 @@ export class DashboardComponent {
   selectedSubject = signal<string | null>(null);
   difficulty = signal<string | null>(null);
   createdByMe = signal(false);
+  teacherQuizzesOnly = signal(false);
 
 constructor() {
   this.route.paramMap.subscribe(params => {
@@ -80,6 +82,7 @@ constructor() {
       subjectId: this.selectedSubject(),
       difficulty: this.difficulty(),
       createdByMe: this.createdByMe(),
+      teacherQuizzesOnly: this.teacherQuizzesOnly(),
     }).subscribe({
       next: res => {
         if (res.success) {
@@ -105,6 +108,7 @@ constructor() {
     this.selectedSubject.set(null);
     this.difficulty.set(null);
     this.createdByMe.set(false);
+    this.teacherQuizzesOnly.set(false);
     this.loadQuizes();
   }
 
@@ -124,4 +128,8 @@ constructor() {
       }
     });
   }
+
+  onEditQuiz(quizId: string) {
+     this.router.navigate(['/create-quiz-page'], { queryParams: { id: quizId } });
+  } 
 }

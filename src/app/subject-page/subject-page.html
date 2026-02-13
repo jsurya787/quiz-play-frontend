@@ -11,11 +11,11 @@
     <header class="hero-glass p-6 sm:p-10 mb-10 animate-fade-in-up">
       @if (loading()) {
         <div class="space-y-4">
-          <div class="skeleton-box h-10 w-2/3 rounded-xl"></div>
-          <div class="skeleton-box h-4 w-full max-w-xl rounded-lg"></div>
+          <div class="skeleton-premium h-10 w-2/3 rounded-xl"></div>
+          <div class="skeleton-premium h-4 w-full max-w-xl rounded-lg"></div>
           <div class="flex gap-3 pt-2">
-            <div class="skeleton-box h-12 w-40 rounded-xl"></div>
-            <div class="skeleton-box h-12 w-32 rounded-xl"></div>
+            <div class="skeleton-premium h-12 w-40 rounded-xl"></div>
+            <div class="skeleton-premium h-12 w-32 rounded-xl"></div>
           </div>
         </div>
       } @else {
@@ -76,7 +76,7 @@
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @if (loading()) {
           @for (i of [1,2,3]; track i) {
-            <div class="skeleton-box h-52 rounded-[24px]"></div>
+            <div class="skeleton-premium skeleton-card h-52"></div>
           }
         } @else {
           @for (quiz of quizzes(); track quiz._id; let i = $index) {
@@ -131,7 +131,7 @@
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         @if (loading()) {
           @for (i of [1,2,3]; track i) {
-            <div class="skeleton-box h-32 rounded-[20px]"></div>
+            <div class="skeleton-premium skeleton-card h-32"></div>
           }
         } @else {
           @for (topic of subjectInfo()?.hotTopics; track topic._id; let i = $index) {
@@ -172,7 +172,7 @@
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         @if (loading()) {
           @for (i of [1,2,3,4]; track i) {
-            <div class="skeleton-box h-40 rounded-[20px]"></div>
+            <div class="skeleton-premium skeleton-card h-40"></div>
           }
         } @else {
           @for (chapter of chapters(); track chapter._id; let i = $index) {

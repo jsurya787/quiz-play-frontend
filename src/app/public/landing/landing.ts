@@ -11,7 +11,6 @@ import { StatsComponent } from '../stats/stats';
 import { SyllabusTimelineComponent } from '../syllabus-timeline/syllabus-timeline';
 import { SuccessStoriesComponent } from '../success-stories/success-stories';
 import { ExamsComponent } from '../exams/exams';
-import { ScrollProgressComponent } from '../scroll-progress/scroll-progress';
 import { QuizDemoComponent } from '../quiz-demo/quiz-demo';
 import { AuthFunnelComponent } from '../../shared-auth/auth-funnel/auth-funnel';
 import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
@@ -34,7 +33,6 @@ import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
     SyllabusTimelineComponent,
     SuccessStoriesComponent,
     ExamsComponent,
-    ScrollProgressComponent,
     QuizDemoComponent,
    // AuthFunnelComponent,
    // MobileCtaComponent

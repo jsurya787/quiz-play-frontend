@@ -78,14 +78,18 @@ export class QuizPlayerPageComponent implements OnInit {
      LIFECYCLE
      ======================= */
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.quizId = this.route.snapshot.paramMap.get('quizId')!;
     this.initForm();
+    
+    // ✅ APP_INITIALIZER already called bootstrapAuth() - no need to call again
+    // Now load quiz after we know auth state
     this.loadQuiz();
+
     if(!this.authService.isAuthenticated() && !this._retryAttemptService.canAttempt()) {
       this._toastService.info('You’ve reached the maximum attempts. Log in with Google to continue, or try again after 24 hours.', 4000);
       setTimeout(() => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard/all']);
       }, 4500);
     }
     this._retryAttemptService.resetAll();
@@ -102,7 +106,11 @@ export class QuizPlayerPageComponent implements OnInit {
   }
 
   loadQuiz() {
-    this.quizService.getQuiz(this.quizId).subscribe(res => {
+    const quizObservable = this.authService.isAuthenticated()
+      ? this.quizService.getQuiz(this.quizId)
+      : this.quizService.getQuizPublic(this.quizId);
+
+    quizObservable.subscribe(res => {
       this.loading.set(false);
       this.quiz.set(res.data);
 
@@ -111,22 +119,47 @@ export class QuizPlayerPageComponent implements OnInit {
       this.startTimer();
 
       this.startAttempt();
-    }, err=>{
+    }, err => {
       this.loading.set(true);
-      this._toastService.error('Failed to load quiz. Please try again later.');
+      if (err.status === 403) {
+        this._toastService.error('Access Denied: This quiz is restricted to specific batches.');
+      } else {
+        this._toastService.error('Failed to load quiz. Please try again later.');
+      }
       setTimeout(() => {
-        this.router.navigate(['/dashboard']);
-      }, 2000);
+        this.router.navigate(['/dashboard/all']);
+      }, 3000);
     });
   }
 // 695f7eceebf73de912504bc3 for static user
 
   startAttempt() {
-    this.quizService
-      .startAttempt(this.quizId, this.authService?.userData?.id || '695f7eceebf73de912504bc3')
-      .subscribe(res => {
-        this.attemptId.set(res.attemptId);
-      });
+    // ✅ Use guest endpoint if not authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.quizService
+        .startAttemptPublic(this.quizId)
+        .subscribe({
+          next: (res) => {
+            this.attemptId.set(res.attemptId);
+          },
+          error: (err) => {
+            if (err.status === 403) {
+              this._toastService.info(
+                "You've reached the guest limit of 10 quizzes. If you want to continue or play more quizzes, please login – it's completely free of cost!",
+                10000
+              );
+              this.router.navigate(['/dashboard/all']);
+            }
+          }
+        });
+    } else {
+      // 🔐 Use authenticated endpoint
+      this.quizService
+        .startAttempt(this.quizId, this.authService.currentUser()?.id!)
+        .subscribe(res => {
+          this.attemptId.set(res.attemptId);
+        });
+    }
   }
 
   /* =======================
@@ -160,11 +193,18 @@ selectOption(index: number) {
     [this.currentIndex()]: index,
   }));
 
-  this.quizService.saveAnswer({
+  const payload = {
     attemptId: this.attemptId()!,
     questionId: this.currentQuestion()._id,
     selectedOptionIndex: index,
-  }).subscribe();
+  };
+
+  // ✅ Use guest endpoint if not authenticated
+  if (!this.authService.isAuthenticated()) {
+    this.quizService.saveAnswerPublic(payload).subscribe();
+  } else {
+    this.quizService.saveAnswer(payload).subscribe();
+  }
 }
 
 
@@ -201,10 +241,11 @@ selectOption(index: number) {
 
   submitQuiz() {
     localStorage.setItem('lastAttemptId', this.attemptId()!);
-     this.quizService.quizData = this.quiz();
-      this.router.navigate(['/quiz-result']);
-    if(!this.authService.isAuthenticated()){
-        this._retryAttemptService.increaseAttempt();
+    this.quizService.quizData = this.quiz();
+    this.router.navigate(['/quiz-result']);
+    
+    if (!this.authService.isAuthenticated()) {
+      this._retryAttemptService.increaseAttempt();
     }
   }
 

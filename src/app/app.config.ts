@@ -12,8 +12,10 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AuthService } from './services/auth.service';
+import { authInterceptor } from './interceptors/auth.interceptor';
 
 /**
  * 🔐 Restore auth state (NON-BLOCKING, SSR-SAFE)
@@ -40,10 +42,14 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({
         anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'enabled',
       }),
     ),
 
     // 💧 Client hydration
     provideClientHydration(withEventReplay()),
+
+    // 🌐 HTTP Client (Fetch for SSR)
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
   ],
 };

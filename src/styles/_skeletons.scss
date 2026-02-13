@@ -1,0 +1,74 @@
+/* =========================================
+   PREMIUM CINEMATIC SKELETONS
+   ========================================= */
+
+/* 
+   The "Cinematic" effect comes from a high-contrast, 
+   angled shimmer that moves smoothly across the element.
+*/
+
+@layer components {
+
+    .skeleton-premium {
+        @apply relative overflow-hidden bg-gray-100/50 rounded-xl border border-white/40;
+        /* Glass-like base */
+        backdrop-filter: blur(4px);
+        transform: translateZ(0);
+        /* Hardware acceleration */
+    }
+
+    .skeleton-premium::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(110deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0.6) 40%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0.6) 60%,
+                transparent 80%);
+        animation: shimmerCinematic 2.5s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    /* Dark mode support if needed, or darker variants */
+    .skeleton-premium-dark {
+        @apply bg-gray-800/50 border-gray-700/30;
+    }
+
+    .skeleton-premium-dark::after {
+        background: linear-gradient(110deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0.05) 40%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 60%,
+                transparent 80%);
+    }
+
+    /* Variations for different shapes */
+    .skeleton-card {
+        @apply rounded-3xl border border-white/60 shadow-sm;
+    }
+
+    .skeleton-text {
+        @apply h-4 w-3/4 rounded-lg;
+    }
+
+    .skeleton-avatar {
+        @apply h-12 w-12 rounded-full;
+    }
+
+    .skeleton-btn {
+        @apply h-10 w-32 rounded-full;
+    }
+}
+
+@keyframes shimmerCinematic {
+    0% {
+        transform: translateX(-100%) skewX(-10deg);
+    }
+
+    100% {
+        transform: translateX(200%) skewX(-10deg);
+    }
+}

@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
+import { AdminService } from './admin/services/admin.service';
+import { TeacherService } from './teacher/services/teacher.service';
 import { AuthGuard } from './guards/auth.guard';
 import { PublicGuard } from './guards/public.guard';
+import { roleGuard } from './guards/role.guard';
 
 // ==============================
 // ROUTES (SSR OPTIMIZED + SECURE)
@@ -50,11 +53,20 @@ export const routes: Routes = [
   // 🎓 PROTECTED STUDENT AREA
   // --------------------------------------------------
   {
+    path: 'teacher/dashboard',
+    loadComponent: () =>
+      import('./teacher/teacher-dashboard/teacher-dashboard').then(
+        (m) => m.TeacherDashboardComponent
+      ),
+    canActivate: [AuthGuard, roleGuard(['ADMIN', 'TEACHER'])],
+    providers: [TeacherService],
+  },
+  {
     path: 'dashboard/:subjectId',
     loadComponent: () =>
       import('./student/dashboard/dashboard')
         .then(m => m.DashboardComponent),
-   // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
   path: 'login-success',
@@ -68,35 +80,35 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./subject-page/subject-page')
         .then(m => m.SubjectPage),
-   // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
     {
     path: 'chapter-page/:chapterId',
     loadComponent: () =>
       import('./chapter-page/chapter-page')
         .then(m => m.ChapterPage),
-   // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'quiz-player-page/:quizId',
     loadComponent: () =>
       import('./quiz-player-page/quiz-player-page')
         .then(m => m.QuizPlayerPageComponent),
-   // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'quiz-result',
     loadComponent: () =>
       import('./quiz-result-page-component/quiz-result-page-component')
         .then(m => m.QuizResultPageComponent),
-   // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'create-quiz-page',
     loadComponent: () =>
       import('./create-quiz-page/create-quiz-page')
         .then(m => m.CreateQuizPage),
-  //  canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'calendar',
@@ -121,7 +133,8 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./admin/admin-module')
         .then(m => m.AdminModule),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, roleGuard(['ADMIN'])],
+    providers: [AdminService],
   },
 
   // --------------------------------------------------

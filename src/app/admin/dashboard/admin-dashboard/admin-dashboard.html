@@ -1,132 +1,231 @@
-<div class="relative min-h-screen overflow-hidden">
+<div class="relative min-h-screen overflow-hidden bg-[#f8fafc]">
+  <!-- Background Decorations -->
+  <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-indigo-100/50 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-100/50 rounded-full blur-3xl"></div>
 
-  <!-- Background -->
-  <div
-    class="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-indigo-100">
-  </div>
-
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-
+  <div class="mx-auto max-w-7xl px-6 pt-24 pb-12 relative z-10">
     <!-- Header -->
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">
-        QuizPlay Admin
-      </h1>
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+      <div>
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Admin Dashboard</h1>
+        <p class="text-slate-500 font-medium">Manage your system, users, and performance.</p>
+      </div>
+      
+      <!-- Quick Stats Card -->
+      <div class="flex gap-4">
+        <div class="bg-white/80 backdrop-blur-xl p-4 rounded-2xl border border-white shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-slate-900">{{stats().totalUsers}}</div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Users</div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-      <button
-        class="px-6 py-2.5 rounded-xl
-               bg-indigo-600 text-white font-semibold
-               shadow-md hover:shadow-lg
-               hover:bg-indigo-700
-               transition-all">
-        + New Subject
+    <!-- Navigation Tabs -->
+    <div class="flex gap-8 mb-8 border-b border-slate-200">
+      <button 
+        (click)="activeTab.set('subjects')"
+        class="pb-4 text-sm font-bold tracking-wide transition-all relative uppercase"
+        [class.text-indigo-600]="activeTab() === 'subjects'"
+        [class.text-slate-400]="activeTab() !== 'subjects'"
+      >
+        SUBJECTS & CONTENT
+        @if (activeTab() === 'subjects') {
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+        }
+      </button>
+      <button 
+        (click)="activeTab.set('users')"
+        class="pb-4 text-sm font-bold tracking-wide transition-all relative uppercase"
+        [class.text-indigo-600]="activeTab() === 'users'"
+        [class.text-slate-400]="activeTab() !== 'users'"
+      >
+        USER MANAGEMENT
+        @if (activeTab() === 'users') {
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+        }
+      </button>
+      <button 
+        (click)="activeTab.set('redis')"
+        class="pb-4 text-sm font-bold tracking-wide transition-all relative uppercase"
+        [class.text-indigo-600]="activeTab() === 'redis'"
+        [class.text-slate-400]="activeTab() !== 'redis'"
+      >
+        SYSTEM & REDIS
+        @if (activeTab() === 'redis') {
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+        }
       </button>
     </div>
 
-    <!-- Search -->
-    <div class="mb-8">
-      <input
-        type="text"
-        placeholder="Search subjects…"
-        class="w-full rounded-xl border border-gray-200
-               bg-white/70 backdrop-blur
-               px-4 py-3 text-sm
-               focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-    </div>
-
-    <!-- SUBJECTS -->
-    <div class="space-y-6">
-
-      <!-- SUBJECT CARD -->
-      <div
-        *ngFor="let subject of subjects"
-        class="rounded-2xl bg-white/70 backdrop-blur
-               border border-gray-100
-               shadow-sm
-               animate-fade-in">
-
-        <!-- Subject Header -->
-        <div class="flex items-start justify-between p-6">
-          <div>
-            <h2 class="text-lg font-bold text-gray-900">
-              {{ subject.name }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-600">
-              {{ subject.chapterCount }} chapters · {{ subject.sectionCount }} sections
-            </p>
+    <!-- Tab Content -->
+    <div class="animate-fade-in">
+      
+      <!-- SUBJECTS TAB -->
+      @if (activeTab() === 'subjects') {
+        <div class="space-y-6">
+          <div class="flex justify-between items-center bg-white/50 p-6 rounded-2xl border border-slate-100">
+            <input type="text" placeholder="Search subjects..." class="bg-white px-4 py-2 rounded-xl border border-slate-200 w-96 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <button class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors">+ New Subject</button>
           </div>
 
-          <div class="flex gap-2">
-            <button class="admin-btn">Edit</button>
-            <button class="admin-btn text-red-600">Delete</button>
-          </div>
-        </div>
-
-        <!-- Subject Actions -->
-        <div class="px-6 pb-4">
-          <button
-            class="text-sm font-semibold text-indigo-600 hover:underline">
-            + Add Chapter
-          </button>
-        </div>
-
-        <!-- CHAPTERS -->
-        <div class="grid gap-4 px-6 pb-6 sm:grid-cols-2 lg:grid-cols-3">
-
-          <!-- Chapter Card -->
-          <div
-            *ngFor="let chapter of subject.chapters"
-            class="rounded-xl p-4
-                   bg-white/80 backdrop-blur
-                   border border-gray-100
-                   hover:border-indigo-300
-                   hover:shadow-md
-                   transition-all hover:-translate-y-0.5">
-
-            <div class="flex justify-between">
-              <div>
-                <h3 class="font-semibold text-gray-900">
-                  {{ chapter.title }}
-                </h3>
-                <p class="mt-1 text-xs text-gray-600">
-                  {{ chapter.sections.length }} sections
-                </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (subject of subjects; track subject.id) {
+              <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-white shadow-sm hover:shadow-md transition-all p-6">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 class="text-xl font-bold text-slate-900">{{subject.name}}</h3>
+                    <p class="text-sm text-slate-500">{{subject.chapterCount}} Chapters · {{subject.sectionCount}} Sections</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button class="p-2 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  @for (chapter of subject.chapters.slice(0, 2); track chapter.id) {
+                    <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+                      <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
+                      {{chapter.title}}
+                    </div>
+                  }
+                  @if (subject.chapters.length > 2) {
+                    <div class="text-xs font-bold text-indigo-500">+ {{subject.chapters.length - 2}} more chapters</div>
+                  }
+                </div>
               </div>
+            }
+          </div>
+        </div>
+      }
 
-              <div class="flex gap-1">
-                <button class="admin-icon">✏️</button>
-                <button class="admin-icon text-red-500">🗑️</button>
+      <!-- USERS TAB -->
+      @if (activeTab() === 'users') {
+        <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-white shadow-sm overflow-hidden">
+          <div class="flex border-b border-slate-100 p-2">
+            <button 
+              (click)="userTab.set('teachers')"
+              class="px-6 py-2 rounded-xl text-sm font-bold transition-all"
+              [class.bg-indigo-50]="userTab() === 'teachers'"
+              [class.text-indigo-600]="userTab() === 'teachers'"
+              [class.text-slate-400]="userTab() !== 'teachers'"
+            >
+              Teachers ({{stats().totalTeachers}})
+            </button>
+            <button 
+              (click)="userTab.set('students')"
+              class="px-6 py-2 rounded-xl text-sm font-bold transition-all"
+              [class.bg-indigo-50]="userTab() === 'students'"
+              [class.text-indigo-600]="userTab() === 'students'"
+              [class.text-slate-400]="userTab() !== 'students'"
+            >
+              Students ({{stats().totalStudents}})
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/50">
+                  <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Name</th>
+                  <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Email</th>
+                  <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Joined</th>
+                  <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Associations</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                @if (userTab() === 'teachers') {
+                  @for (t of teachers(); track t._id) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="p-6">
+                        <div class="font-bold text-slate-900">{{t.firstName}} {{t.lastName}}</div>
+                      </td>
+                      <td class="p-6 text-slate-600 font-medium">{{t.email}}</td>
+                      <td class="p-6 text-slate-500 text-sm">{{t.createdAt | date:'mediumDate'}}</td>
+                      <td class="p-6">
+                        <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold">
+                          {{t.students?.length || 0}} Students
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                } @else {
+                  @for (s of students(); track s._id) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="p-6">
+                        <div class="font-bold text-slate-900">{{s.firstName}} {{s.lastName}}</div>
+                      </td>
+                      <td class="p-6 text-slate-600 font-medium">{{s.email}}</td>
+                      <td class="p-6 text-slate-500 text-sm">{{s.createdAt | date:'mediumDate'}}</td>
+                      <td class="p-6">
+                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
+                          {{s.teachers?.length || 0}} Teachers
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- REDIS TAB -->
+      @if (activeTab() === 'redis') {
+        <div class="max-w-2xl">
+          <div class="bg-white/80 backdrop-blur-xl rounded-3xl border border-white shadow-sm p-8 space-y-8">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Redis Cache Management</h3>
+                <p class="text-slate-500 text-sm font-medium pr-12">
+                  Manage the distributed cache used for quiz access control and performance optimization. These actions are immediate and affecting all users.
+                </p>
               </div>
             </div>
 
-            <!-- Sections -->
-            <ul class="mt-3 space-y-1">
-              <li
-                *ngFor="let section of chapter.sections"
-                class="flex items-center justify-between
-                       rounded-md px-2 py-1.5
-                       hover:bg-indigo-50 transition">
-                <span class="text-sm text-gray-700">
-                  {{ section.title }}
-                </span>
-                <button class="text-xs text-red-500 hover:underline">
-                  delete
+            <div class="grid grid-cols-1 gap-4 pt-4">
+              <!-- Rebuild -->
+              <div class="p-6 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-center justify-between group">
+                <div>
+                  <div class="font-bold text-slate-900">Rebuild Global Cache</div>
+                  <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Safe Action</div>
+                </div>
+                <button 
+                  (click)="syncCache()"
+                  [disabled]="loading()"
+                  class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-sm hover:shadow-md hover:bg-indigo-700 transition-all disabled:opacity-50"
+                >
+                  @if (loading()) { <span class="animate-pulse">Processing...</span> } @else { Rebuild Now }
                 </button>
-              </li>
-            </ul>
+              </div>
 
-            <button
-              class="mt-3 text-xs font-semibold text-indigo-600 hover:underline">
-              + Add Section
-            </button>
-
+              <!-- Clear -->
+              <div class="p-6 rounded-2xl border border-red-100 bg-red-50/30 flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-red-900">Clear All Cache (Flush)</div>
+                  <div class="text-xs font-bold text-red-400 uppercase tracking-widest mt-1">Danger Zone</div>
+                </div>
+                <button 
+                  (click)="clearCache()"
+                  [disabled]="loading()"
+                  class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold shadow-sm hover:shadow-md hover:bg-red-700 transition-all disabled:opacity-50"
+                >
+                  Flush Cache
+                </button>
+              </div>
+            </div>
           </div>
-
         </div>
-
-      </div>
+      }
 
     </div>
-
   </div>
 </div>
+

@@ -44,10 +44,19 @@ export class UserProfileModalComponent {
     return 'Novice';
   });
 
+  roleLabel = computed(() => {
+    const role = this.user()?.role;
+    switch (role) {
+      case 'ADMIN': return 'Admin Elite';
+      case 'TEACHER': return 'Teacher Elite';
+      default: return 'Student Elite';
+    }
+  });
+
   constructor() {
     /* 🔥 React to auth user changes */
     effect(() => {
-      this.user.set(this.authService.userData); // <-- signal read
+      this.user.set(this.authService.currentUser()); // <-- signal read
     });
 
     /* 🔥 Load stats once component is alive */

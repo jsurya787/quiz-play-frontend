@@ -40,22 +40,21 @@
     @if (loading()) {
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @for (i of [1,2,3,4,5,6]; track $index) {
-          <div class="rounded-3xl bg-white border border-gray-100 p-6 shadow-sm h-[280px] flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent skeleton-shimmer"></div>
+          <div class="skeleton-premium skeleton-card h-[280px] p-6 flex flex-col justify-between">
             <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl bg-gray-100"></div>
+              <div class="skeleton-premium h-14 w-14 rounded-2xl"></div>
               <div class="space-y-2">
-                <div class="h-4 w-32 bg-gray-100 rounded"></div>
-                <div class="h-3 w-20 bg-gray-100 rounded"></div>
+                <div class="skeleton-premium h-4 w-32 rounded"></div>
+                <div class="skeleton-premium h-3 w-20 rounded"></div>
               </div>
             </div>
             <div class="space-y-3 mt-6">
-              <div class="h-3 w-full bg-gray-100 rounded"></div>
-              <div class="h-3 w-3/4 bg-gray-100 rounded"></div>
+              <div class="skeleton-premium h-3 w-full rounded"></div>
+              <div class="skeleton-premium h-3 w-3/4 rounded"></div>
             </div>
             <div class="mt-auto pt-6 flex gap-2">
-              <div class="h-8 w-16 rounded-lg bg-gray-100"></div>
-              <div class="h-8 w-20 rounded-lg bg-gray-100"></div>
+              <div class="skeleton-premium h-8 w-16 rounded-lg"></div>
+              <div class="skeleton-premium h-8 w-20 rounded-lg"></div>
             </div>
           </div>
         }

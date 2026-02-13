@@ -3,6 +3,7 @@ import { QuizPlayerService } from '../services/quiz-player.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast-service';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 /* ================= TYPES ================= */
 type QuestionStatus = 'correct' | 'wrong' | 'skipped';
@@ -36,6 +37,7 @@ export class QuizResultPageComponent implements OnInit {
   private quizService = inject(QuizPlayerService);
   private toastService = inject(ToastService);
   private platformId = inject(PLATFORM_ID);
+  private authService = inject(AuthService);
   /* ================= UI STATE (Signals) ================= */
   quizTitle = signal('Maths Mock Test – 1');
 
@@ -51,21 +53,28 @@ export class QuizResultPageComponent implements OnInit {
   loading = signal(true);
 
   /* ================= INIT ================= */
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
+
+    // ✅ APP_INITIALIZER already called bootstrapAuth() - no need to call again
 
     const attemptId = localStorage.getItem('lastAttemptId');
     console.log("attemptId -->", attemptId);
 
     // ✅ Hard guard
     if (!attemptId) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/dashboard/all']);
       return;
     }
 
-    this.quizService.submitQuiz(attemptId).subscribe({
+    // ✅ Use guest endpoint if not authenticated
+    const submitObservable = this.authService.isAuthenticated()
+      ? this.quizService.submitQuiz(attemptId)
+      : this.quizService.submitQuizPublic(attemptId);
+
+    submitObservable.subscribe({
       next: (res) => {
         this.applyResult(res);
       },
@@ -73,7 +82,7 @@ export class QuizResultPageComponent implements OnInit {
         this.toastService.error(
           'Failed to load quiz result. Please try again later.'
         );
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard/all']);
       }
     });
   }
@@ -83,11 +92,16 @@ export class QuizResultPageComponent implements OnInit {
   percentage = signal(0); // will be updated in applyResult
 
   /* ================= APPLY RESULT ================= */
-  private applyResult(res: QuizResultResponse): void {
-    this.quizTitle.set(this.quizService.quizData?.title || 'Quiz Result');
-    this.totalMarks.set(res.totalMarks);
-    this.score.set(res.score);
-    this.percentage.set(Math.round((res.score / res.totalMarks) * 100) || 0);
+  private applyResult(res: any): void {
+    const title = res.quizTitle || res.data?.quizTitle || this.quizService.quizData?.title || 'Quiz Result';
+    this.quizTitle.set(title);
+    
+    // Handle flattened or nested response from API
+    const data = res.data || res;
+
+    this.totalMarks.set(data.totalMarks);
+    this.score.set(data.score);
+    this.percentage.set(Math.round((data.score / data.totalMarks) * 100) || 0);
 
     this.correct.set(res.correct);
     this.wrong.set(res.wrong);

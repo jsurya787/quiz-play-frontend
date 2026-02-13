@@ -29,10 +29,14 @@ export class QuizService {
 
   createQuiz(payload: CreateQuizPayload): Observable<any> {
     let api = this.API
-    if(!this._auth.userData){
+    if(!this._auth.currentUser()){
       api = this.API + '/public'
     }
     return this.http.post(api, payload);
+  }
+
+  getQuizById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.API}/${id}`);
   }
 
   updarteQuiz(
@@ -71,17 +75,22 @@ export class QuizService {
   }
 
   getQuizes(filters?: {
-  search?: string;
-  subjectId?: string | null;
-  difficulty?: string | null;
-  createdByMe?: boolean;
-}) {
+    search?: string;
+    subjectId?: string | null;
+    difficulty?: string | null;
+    createdByMe?: boolean;
+    teacherQuizzesOnly?: boolean;
+  }) {
   const params: any = {};
 
   if (filters?.search) params.search = filters.search;
   if (filters?.subjectId) params.subjectId = filters.subjectId;
   if (filters?.difficulty) params.difficulty = filters.difficulty;
-  if (filters?.createdByMe) params.createdByMe = this._auth.userData.id || this._auth.userData._id ;
+  if (filters?.teacherQuizzesOnly) params.teacherQuizzesOnly = 'true';
+  if (filters?.createdByMe) {
+    const user = this._auth.currentUser();
+    params.createdByMe = user?.id || user?._id;
+  }
 
   return this.http.get<any>(
     `${this.API}`,
@@ -106,5 +115,4 @@ export class QuizService {
   deleteQuiz(quizId: string): Observable<any> {
     return this.http.delete(`${this.API}/${quizId}`);
   }
-
 }

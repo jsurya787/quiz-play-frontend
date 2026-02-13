@@ -6,13 +6,27 @@
   <!-- Loading Skeletons -->
   <div class="relative max-w-7xl mx-auto">
     <div class="mb-12 text-center space-y-4">
-      <div class="h-8 w-48 mx-auto rounded-full bg-gray-200/50 animate-pulse"></div>
-      <div class="h-12 w-96 mx-auto rounded-xl bg-gray-200/50 animate-pulse"></div>
+      <div class="skeleton-premium h-8 w-48 mx-auto rounded-full"></div>
+      <div class="skeleton-premium h-12 w-96 mx-auto rounded-xl"></div>
     </div>
 
     <div class="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       @for (i of [1,2,3,4,5,6]; track i) {
-        <div class="h-[320px] rounded-3xl bg-white/60 border border-white/40 shadow-sm animate-pulse"></div>
+        <div class="skeleton-premium skeleton-card h-[320px]">
+          <div class="p-8 flex flex-col h-full">
+             <div class="flex justify-between mb-8">
+               <div class="skeleton-premium h-6 w-20 rounded-full"></div>
+               <div class="skeleton-premium h-8 w-8 rounded-full"></div>
+             </div>
+             <div class="skeleton-premium h-8 w-3/4 rounded mb-4"></div>
+             <div class="skeleton-premium h-4 w-full rounded mb-2"></div>
+             <div class="skeleton-premium h-4 w-2/3 rounded"></div>
+             <div class="mt-auto pt-6 flex justify-between border-t border-white/10">
+               <div class="skeleton-premium h-4 w-24 rounded"></div>
+               <div class="skeleton-premium h-10 w-10 rounded-full"></div>
+             </div>
+          </div>
+        </div>
       }
     </div>
   </div>
@@ -130,14 +144,15 @@
 
       <!-- Created By Me Toggle -->
       @if(authService.isAuthenticated()){
-        <div class="flex items-center">
+        <div class="flex items-center gap-2">
+          <!-- My Quizzes -->
           <label class="group relative flex items-center justify-center p-3 rounded-xl cursor-pointer hover:bg-gray-50/80 transition-all select-none border border-transparent"
                  [class.bg-indigo-50]="createdByMe()"
                  [class.border-indigo-100]="createdByMe()"
                  [class.text-indigo-600]="createdByMe()">
             <input type="checkbox" class="sr-only"
                    [checked]="createdByMe()"
-                   (change)="createdByMe.set($any($event.target).checked); applyFilters()" />
+                   (change)="createdByMe.set($any($event.target).checked); teacherQuizzesOnly.set(false); applyFilters()" />
             <div class="flex items-center gap-2">
               <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
                    [class.border-indigo-500]="createdByMe()"
@@ -149,6 +164,28 @@
               </div>
               <span class="text-sm font-bold transition-colors duration-200"
                     [class.text-gray-600]="!createdByMe()">My Quizzes</span>
+            </div>
+          </label>
+
+          <!-- Teacher Quizzes -->
+          <label class="group relative flex items-center justify-center p-3 rounded-xl cursor-pointer hover:bg-gray-50/80 transition-all select-none border border-transparent"
+                 [class.bg-purple-50]="teacherQuizzesOnly()"
+                 [class.border-purple-100]="teacherQuizzesOnly()"
+                 [class.text-purple-600]="teacherQuizzesOnly()">
+            <input type="checkbox" class="sr-only"
+                   [checked]="teacherQuizzesOnly()"
+                   (change)="teacherQuizzesOnly.set($any($event.target).checked); createdByMe.set(false); applyFilters()" />
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
+                   [class.border-purple-500]="teacherQuizzesOnly()"
+                   [class.bg-purple-500]="teacherQuizzesOnly()"
+                   [class.border-gray-300]="!teacherQuizzesOnly()">
+                @if(teacherQuizzesOnly()) {
+                  <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                }
+              </div>
+              <span class="text-sm font-bold transition-colors duration-200"
+                    [class.text-gray-600]="!teacherQuizzesOnly()">Teacher Quizzes</span>
             </div>
           </label>
         </div>
@@ -210,6 +247,11 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
+                                <button
+              class="p-2 -mr-2 -mt-2 rounded-full text-gray-300 hover:text-blue-500 hover:bg-blue-50 transition-all opacity-0 group-hover:opacity-100"
+              (click)="onEditQuiz(item._id); $event.stopPropagation()">
+              edit
+            </button>
                 }
               </div>
 

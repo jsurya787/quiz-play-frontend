@@ -1,20 +1,26 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-scroll-progress',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './scroll-progress.html',
 })
 export class ScrollProgressComponent {
   progress = 0;
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   @HostListener('window:scroll')
   onScroll() {
-    const scrollTop = window.scrollY;
-    const docHeight =
-      document.documentElement.scrollHeight -
-      document.documentElement.clientHeight;
+    if (isPlatformBrowser(this.platformId)) {
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
 
-    this.progress = (scrollTop / docHeight) * 100;
+      this.progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    }
   }
 }

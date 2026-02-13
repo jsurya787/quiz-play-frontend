@@ -3,13 +3,15 @@ import {
   signal,
   OnInit,
   HostListener,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotesService, Note } from '../services/notes.service';
 import { ToastService } from '../services/toast-service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-
-import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-notes-page',
@@ -32,10 +34,18 @@ export class NotesPage implements OnInit {
   constructor(
     public notesService: NotesService,
     private toaster: ToastService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
   ) {}
 
-  ngOnInit() {
-    this.notesService.loadNotes();
+  async ngOnInit() {
+    // 🚫 Skip on Server (SSR) to prevent 401s
+    if (isPlatformBrowser(this.platformId)) {
+      // ✅ APP_INITIALIZER already called bootstrapAuth() - no need to call again
+      this.notesService.loadNotes();
+      
+      this.isLargeScreen.set(window.innerWidth >= 1024);
+    }
 
     this.search$
       .pipe(
@@ -54,11 +64,13 @@ export class NotesPage implements OnInit {
   }
 
   // ================= SCREEN =================
-  isLargeScreen = signal(window.innerWidth >= 1024);
+  isLargeScreen = signal(false);
 
   @HostListener('window:resize')
   onResize() {
-    this.isLargeScreen.set(window.innerWidth >= 1024);
+    if (isPlatformBrowser(this.platformId)) {
+      this.isLargeScreen.set(window.innerWidth >= 1024);
+    }
   }
 
   // ================= NOTES =================

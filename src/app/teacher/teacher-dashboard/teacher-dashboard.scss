@@ -1,0 +1,145 @@
+@reference "tailwindcss";
+
+.teacher-dashboard {
+    --accent: #6366f1;
+    --accent-soft: #eef2ff;
+
+    .bg-decor {
+        @apply absolute rounded-full blur-[120px] pointer-events-none opacity-40;
+    }
+
+    .bg-decor-1 {
+        @apply top-[-10%] left-[-5%] w-[600px] h-[600px] bg-indigo-200/50;
+        animation: floatCinematic 18s ease-in-out infinite alternate;
+    }
+
+    .bg-decor-2 {
+        @apply bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-200/50;
+        animation: floatCinematic 22s ease-in-out infinite alternate-reverse;
+    }
+
+    .glass-card {
+        @apply bg-white/70 backdrop-blur-2xl border border-white/80 rounded-[2rem] shadow-xl shadow-slate-200/50 overflow-hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .quiz-card {
+        &:hover {
+            @apply -translate-y-1 shadow-2xl shadow-indigo-200/40;
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .action-btn {
+            @apply p-2 rounded-xl border border-slate-100 bg-white text-slate-400 transition-all duration-300;
+
+            &:hover {
+                @apply scale-110 shadow-sm border-slate-200;
+            }
+        }
+    }
+
+    /* Submissions Table */
+    table {
+        @apply w-full;
+
+        th {
+            @apply font-bold text-slate-400 uppercase tracking-widest text-[10px];
+        }
+    }
+
+    .badge {
+        @apply px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+
+        &-published {
+            @apply bg-emerald-50 text-emerald-600;
+        }
+
+        &-draft {
+            @apply bg-amber-50 text-amber-600;
+        }
+    }
+
+    .action-btn {
+        @apply p-2 rounded-xl text-slate-400 transition-all active:scale-90;
+    }
+
+    .animate-scale-x {
+        animation: scaleX 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    }
+
+    @keyframes scaleX {
+        from {
+            transform: scaleX(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+    }
+}
+
+@keyframes floatCinematic {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(20px, -40px) scale(1.05);
+    }
+
+    100% {
+        transform: translate(-10px, 20px) scale(0.95);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out both;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.delay-100 {
+    animation-delay: 100ms;
+}

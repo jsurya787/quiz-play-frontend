@@ -12,10 +12,10 @@
         <div class="sidebar-glass p-5 sticky top-28 transition-all duration-500 animate-fade-in-up">
           @if (loading()) {
             <div class="space-y-4">
-              <div class="skeleton-box h-5 w-40 rounded-lg"></div>
+              <div class="skeleton-premium h-5 w-40 rounded-lg"></div>
               <div class="space-y-2">
                 @for (i of [1,2,3,4,5]; track i) {
-                  <div class="skeleton-box h-4 w-full rounded-md"></div>
+                  <div class="skeleton-premium h-10 w-full rounded-xl"></div>
                 }
               </div>
             </div>
@@ -58,9 +58,9 @@
         <header class="hero-glass p-6 sm:p-8 mb-8 animate-fade-in-up">
           @if (loading()) {
             <div class="space-y-4">
-              <div class="skeleton-box h-8 w-64 rounded-xl"></div>
-              <div class="skeleton-box h-4 w-full max-w-xl rounded-lg"></div>
-              <div class="skeleton-box h-4 w-96 rounded-lg"></div>
+              <div class="skeleton-premium h-8 w-64 rounded-xl"></div>
+              <div class="skeleton-premium h-4 w-full max-w-xl rounded-lg"></div>
+              <div class="skeleton-premium h-4 w-96 rounded-lg"></div>
             </div>
           } @else {
             <div class="flex flex-col sm:flex-row justify-between items-start gap-6">
@@ -94,7 +94,7 @@
         <div class="space-y-8">
           @if (loading()) {
             @for (i of [1,2,3]; track i) {
-              <div class="skeleton-box h-48 rounded-[24px]"></div>
+              <div class="skeleton-premium skeleton-card h-48"></div>
             }
           } @else {
             @for (section of sections(); track section._id; let i = $index) {

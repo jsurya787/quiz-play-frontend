@@ -18,7 +18,7 @@ export class LoginSuccessComponent {
 
       // navigate after exit animation
       setTimeout(() => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard/all']);
       }, 300);
     }, 1000);
   }

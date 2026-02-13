@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ToastService } from '../services/toast-service';
 import { RetryAttemptService } from '../services/retry-attempt-service';
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-quiz-page',
@@ -22,12 +22,14 @@ export class CreateQuizPage {
   public authService = inject(AuthService);
   private router = inject(Router);
   private _retryAttemptService = inject(RetryAttemptService);
+  private route = inject(ActivatedRoute);
 
   // 🔢 marks per question
   marks = signal(4);
   editingQuestionId = signal<string | null>(null);
   showBulkPopup = signal(false);
   bulkText = '';
+  loading = signal(false); // ⏳ Loading state
 
   /* ===============================
      STATE (SIGNALS)
@@ -46,6 +48,40 @@ export class CreateQuizPage {
     }else{
       this.subjects.set(this.subjectService.subjects());
     }
+
+    // 🔥 Check for edit mode
+    const editId = this.route.snapshot.queryParamMap.get('id');
+    if (editId) {
+      this.quizId.set(editId);
+      this.loadQuiz(editId);
+    }
+  }
+
+  loadQuiz(id: string) {
+    this.loading.set(true);
+    this.quizService.getQuizById(id).subscribe({
+      next: (res) => {
+        // Support both { data: quiz } and direct quiz object
+        const quiz = res.data || res;
+        
+        if (quiz) {
+          this.quizForm.patchValue({
+            title: quiz.title,
+            description: quiz.description,
+            subjectId: quiz.subjectId,
+            difficulty: quiz.difficulty,
+            timeLimit: quiz.timeLimit,
+          });
+          this.questions.set(quiz.questions || []);
+          this.totalMarks.set(quiz.totalMarks || 0);
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.toast.error('Failed to load quiz data');
+        this.loading.set(false);
+      }
+    });
   }
 
   /* ===============================
@@ -82,14 +118,19 @@ export class CreateQuizPage {
   ================================ */
 
   loadSubjects(): void {
+    this.loading.set(true);
     this._retryAttemptService.resetAll();
     this.subjectService.getSubjects().subscribe({
       next: (res) => {
         if (res.success) {
           this.subjects.set(res.data);
         }
+        this.loading.set(false);
       },
-      error: (err) => console.error(err.error?.message || 'Failed to load subjects'),
+      error: (err) => {
+        console.error(err.error?.message || 'Failed to load subjects');
+        this.loading.set(false);
+      },
     });
   }
 
@@ -104,7 +145,7 @@ export class CreateQuizPage {
         4000,
       );
       setTimeout(() => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard/all']);
       }, 4500);
       return;
     }
@@ -266,7 +307,9 @@ export class CreateQuizPage {
       );
     });
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   increaseMarks() {

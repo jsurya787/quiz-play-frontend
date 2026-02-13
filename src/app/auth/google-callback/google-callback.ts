@@ -41,7 +41,7 @@ export class GoogleCallbackComponent implements OnInit {
     )
     .subscribe({
       next: (res) => {
-        this.auth.userData = res.user;
+        this.auth.currentUser.set(res.user);
         this.auth.setAccessToken(res.accessToken);
        // this.router.navigate(['/dashboard']);
        this.router.navigate(['/login-success']);
