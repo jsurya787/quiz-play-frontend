@@ -48,6 +48,24 @@ export const routes: Routes = [
       import('./public/landing/landing')
         .then(m => m.LandingComponent),
   },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./public/about/about')
+        .then(m => m.AboutComponent),
+  },
+  {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./public/privacy/privacy')
+        .then(m => m.PrivacyComponent),
+  },
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('./public/terms/terms')
+        .then(m => m.TermsComponent),
+  },
 
   // --------------------------------------------------
   // 🎓 PROTECTED STUDENT AREA

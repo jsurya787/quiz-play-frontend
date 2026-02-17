@@ -256,8 +256,18 @@
 
     <!-- FOOTER -->
     <div class="border-t border-gray-200/60 px-6 py-4 text-sm text-gray-500 space-y-2">
-      <div>Terms & Conditions · Privacy Policy</div>
-      <div>About · Careers · Blog</div>
+      <div class="flex gap-2">
+        <a routerLink="/terms" (click)="close.emit()" class="hover:text-indigo-600 transition-colors">Terms & Conditions</a> 
+        <span>·</span>
+        <a routerLink="/privacy-policy" (click)="close.emit()" class="hover:text-indigo-600 transition-colors">Privacy Policy</a>
+      </div>
+      <div class="flex gap-2">
+        <a routerLink="/about" (click)="close.emit()" class="hover:text-indigo-600 transition-colors">About</a> 
+        <span>·</span>
+        <span>Careers</span> 
+        <span>·</span>
+        <span>Blog</span>
+      </div>
 
     <!-- SOCIAL ICONS -->
     <div class="flex gap-4 pt-2">
