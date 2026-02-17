@@ -18,5 +18,5 @@ export class PrivacyComponent {
     this.meta.updateTag({ name: 'description', content: 'QuizPlay Privacy Policy. Read how we protect your data and ensure your privacy while using our platform.' });
   }
 
-  lastUpdated = 'February 20, 2026';
+  lastUpdated = 'January 20, 2026';
 }

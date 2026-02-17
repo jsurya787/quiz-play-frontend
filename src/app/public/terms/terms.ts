@@ -18,5 +18,5 @@ export class TermsComponent {
     this.meta.updateTag({ name: 'description', content: 'Terms and Conditions for using the QuizPlay platform. Rules, responsibilities, and legal agreements.' });
   }
 
-  lastUpdated = 'February 20, 2026';
+  lastUpdated = 'January 20, 2026';
 }
