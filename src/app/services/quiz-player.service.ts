@@ -87,4 +87,10 @@ export class QuizPlayerService {
       withCredentials: true // 🔑 Validates session ownership
     });
   }
+
+  getAttemptedQuizzes() {
+    return this.http.get<any>(`${this.baseUrl}/attempted`, {
+      withCredentials: true
+    });
+  }
 }

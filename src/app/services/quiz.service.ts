@@ -74,6 +74,10 @@ export class QuizService {
     return this.http.post(`${this.API}/${quizId}/publish`, {});
   }
 
+  notifyAssociatedStudentsForQuiz(quizId: string): Observable<any> {
+    return this.http.post(`${this.API}/${quizId}/notify-students`, {});
+  }
+
   getQuizes(filters?: {
     search?: string;
     subjectId?: string | null;
@@ -100,6 +104,10 @@ export class QuizService {
 
   getCountofQuizes(): Observable<any>  {
     return this.http.get<any>(`${this.API}/createdByUser`);
+  }
+
+  getCreatedQuizzesList(): Observable<any> {
+    return this.http.get<any>(`${this.API}/createdByUser/list`);
   }
 
   getAttemptedQuizzesCount(): Observable<{ success: boolean; count: number }> {

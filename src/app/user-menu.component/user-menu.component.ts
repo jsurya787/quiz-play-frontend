@@ -2,8 +2,8 @@ import { Component, EventEmitter, inject, Input, Output, signal } from '@angular
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { SetPasswordComponent } from "../shared/modals/set-password/set-password";
-import { UserProfileModalComponent } from "../shared/modals/user-profile/user-profile";
 import { ToastService } from '../services/toast-service';
+import { UserProfileModalComponent } from '../shared/modals/user-profile/user-profile';
 
 @Component({
   selector: 'app-user-menu',
@@ -39,6 +39,20 @@ export class UserMenuComponent {
     this.showSetPassword.set(false);
   }
 
+  openUserProfile() {
+    this.close.emit();
+    this.showUserProfile.set(true);
+  }
+
+  closeUserProfile() {
+    this.showUserProfile.set(false);
+  }
+
+  openSetPasswordFromProfile() {
+    this.showUserProfile.set(false);
+    this.showSetPassword.set(true);
+  }
+
 
 
   handleSetPassword() {
@@ -46,31 +60,25 @@ export class UserMenuComponent {
     this.showSetPassword.set(true);  // open modal
   }
 
-  openUserProfile() {
-    this.showUserProfile.set(true);
-  }
-
-  closeUserProfile() {
-    this.close.emit(); 
-    this.showUserProfile.set(false);
-}
-
   referFriend() {
-    const shareText =
-      `Hey 👋\nI’ve been using QuizPlay to practice quizzes & notes — it’s super useful 📚✨\n\nTry it here 👉 https://quizplay.co.in`;
-
     const shareUrl = 'https://quizplay.co.in';
+    const logoUrl = 'https://quizplay.co.in/qp-logo.svg';
+    const shareText =
+      `🚀 Level up your prep with QuizPlay!\n\n` +
+      `🎯 Daily quizzes\n📚 Smart notes\n🏆 Better scores\n\n` +
+      `✨ Join now: ${shareUrl}\n` +
+      `🧩 Logo: ${logoUrl}`;
 
     // 1️⃣ Native share (best experience)
     if (navigator.share) {
       navigator
         .share({
-          title: 'QuizPlay',
+          title: 'QuizPlay 🚀',
           text: shareText,
           url: shareUrl,
         })
         .then(() => {
-          this.toaster.success('Invite sent 🎉');
+          this.toaster.success('Invite sent 🚀🎉');
         })
         .catch(() => {
           // user cancelled — do nothing
@@ -85,13 +93,13 @@ export class UserMenuComponent {
     const opened = window.open(whatsappUrl, '_blank');
 
     if (opened) {
-      this.toaster.success('Opening WhatsApp…');
+      this.toaster.success('Opening WhatsApp 💬✨');
       return;
     }
 
     // 3️⃣ Final fallback: copy link
     navigator.clipboard.writeText(shareUrl).then(() => {
-      this.toaster.success('Link copied ✔ Share it with your friends!');
+      this.toaster.success('Link copied 🔗✨ Share the QuizPlay vibe!');
     });
     this.close.emit();
   }

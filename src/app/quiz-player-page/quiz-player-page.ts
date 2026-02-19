@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuizPlayerService } from '../services/quiz-player.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { RetryAttemptService } from '../services/retry-attempt-service';
 import { ToastService } from '../services/toast-service';
 
 @Component({
@@ -17,7 +16,6 @@ export class QuizPlayerPageComponent implements OnInit {
   quizId!: string;
   attemptId = signal<string | null>(null);
   answeredMap = signal<Record<number, number>>({});
-  private _retryAttemptService = inject(RetryAttemptService);
   private _toastService = inject(ToastService);
   private _platformId = inject(PLATFORM_ID);
 
@@ -99,15 +97,7 @@ export class QuizPlayerPageComponent implements OnInit {
     // 🚫 Check Platform - ONLY RUN ON BROWSER
     if (isPlatformBrowser(this._platformId)) {
       this.loadQuiz();
-
-      if(!this.authService.isAuthenticated() && !this._retryAttemptService.canAttempt()) {
-        this._toastService.info('You\'ve reached the maximum attempts. Log in with Google to continue, or try again after 24 hours.', 4000);
-        setTimeout(() => {
-          this.router.navigate(['/dashboard/all']);
-        }, 4500);
-      }
     }
-    this._retryAttemptService.resetAll();
   }
 
   /* =======================
@@ -258,10 +248,6 @@ selectOption(index: number) {
     localStorage.setItem('lastAttemptId', this.attemptId()!);
     this.quizService.quizData = this.quiz();
     this.router.navigate(['/quiz-result']);
-    
-    if (!this.authService.isAuthenticated()) {
-      this._retryAttemptService.increaseAttempt();
-    }
   }
 
   /* =======================

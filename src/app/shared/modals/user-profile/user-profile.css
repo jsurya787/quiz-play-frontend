@@ -1,49 +1,66 @@
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
+.profile-shell .premium-edit-btn {
+  color: #fff8e7;
+  border: 1px solid rgba(255, 214, 102, 0.35);
+  background: linear-gradient(130deg, #8f6a1d, #b78a2a 45%, #d2a43a 100%);
+  box-shadow: 0 12px 30px rgba(183, 138, 42, 0.32);
+}
 
-    to {
-        transform: rotate(360deg);
-    }
+.profile-shell .premium-edit-btn:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 16px 38px rgba(183, 138, 42, 0.38);
+}
+
+.profile-shell .premium-access-btn {
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, #0f172a, #1e293b 55%, #334155 100%);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);
+}
+
+.profile-shell .premium-access-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.35);
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
+  animation: spin-slow 8s linear infinite;
 }
 
 @keyframes profile-pop {
-    0% {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .animate-profile-pop {
-    animation: profile-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: profile-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
 
-    0%,
-    100% {
-        transform: translateY(0) scale(1);
-    }
-
-    50% {
-        transform: translateY(-20px) scale(1.1);
-    }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+  }
 }
 
 .animate-float-slow {
-    animation: float-slow 10s ease-in-out infinite;
+  animation: float-slow 10s ease-in-out infinite;
 }
 
 .animate-float-slow-reverse {
-    animation: float-slow 12s ease-in-out infinite reverse;
+  animation: float-slow 12s ease-in-out infinite reverse;
 }

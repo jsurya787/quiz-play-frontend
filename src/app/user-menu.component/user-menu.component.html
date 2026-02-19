@@ -346,6 +346,25 @@
   </div>
 }
 
+<!-- ================= USER PROFILE MODAL ================= -->
+@if (showUserProfile()) {
+  <div
+    class="fixed inset-0 z-[9999]
+           flex items-center justify-center
+           bg-black/30 backdrop-blur-md
+           animate-fade-scale-in"
+    (click)="closeUserProfile()">
+    <div
+      class="relative"
+      (click)="$event.stopPropagation()">
+      <app-user-profile
+        (close)="closeUserProfile()"
+        (changeAccess)="openSetPasswordFromProfile()">
+      </app-user-profile>
+    </div>
+  </div>
+}
+
 <!-- ================= SET PASSWORD MODAL ================= -->
 @if (showSetPassword()) {
   <div
@@ -367,26 +386,3 @@
     </div>
   </div>
 }
-
-<!-- ================= USER PROFILE MODAL ================= -->
-@if (showUserProfile()) {
-  <div
-    class="fixed inset-0 z-[9999]
-           flex items-center justify-center
-           bg-black/30 backdrop-blur-md
-           animate-fade-scale-in"
-    (click)="closeUserProfile()">
-
-    <!-- STOP CLICK -->
-    <div
-      class="relative"
-      (click)="$event.stopPropagation()">
-
-      <app-user-profile
-        (close)="closeUserProfile()">
-      </app-user-profile>
-
-    </div>
-  </div>
-}
-

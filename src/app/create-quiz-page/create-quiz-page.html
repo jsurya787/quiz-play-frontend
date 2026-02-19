@@ -74,15 +74,15 @@
         </p>
       }
 
-      <div class="grid grid-cols-2 gap-3">
-        <!-- SUBJECT -->
-        <div class="col-span-1">
-          <select class="input w-full" formControlName="subjectId">
-            <option value="">Select Subject</option>
-            @for (subject of subjects(); track subject._id) {
-              <option [value]="subject._id">{{ subject.name }}</option>
-            }
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <!-- SUBJECT -->
+          <div class="col-span-1">
+            <select class="input w-full focus:ring-2 focus:ring-indigo-300" formControlName="subjectId">
+              <option value="">Select Subject</option>
+              @for (subject of subjects(); track subject._id) {
+                <option [value]="subject._id">{{ subject.name }}</option>
+              }
+            </select>
 
           @if (isInvalid(quizForm, 'subjectId')) {
             <p class="text-xs text-red-500 mt-1">Subject is required</p>
@@ -91,7 +91,7 @@
 
         <!-- DIFFICULTY -->
         <div class="col-span-1">
-          <select class="input w-full" formControlName="difficulty">
+          <select class="input w-full focus:ring-2 focus:ring-indigo-300" formControlName="difficulty">
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
@@ -157,7 +157,7 @@
           </p>
         }
 
-        <select class="input" formControlName="subjectId">
+        <select class="input focus:ring-2 focus:ring-indigo-300" formControlName="subjectId">
           <option value="">Select Subject</option>
           @for (item of subjects(); track $index) {
             <option [value]="item._id">{{ item.name }}</option>
@@ -168,7 +168,7 @@
           <p class="text-xs text-red-500">Subject is required</p>
         }
 
-        <select class="input" formControlName="difficulty">
+        <select class="input focus:ring-2 focus:ring-indigo-300" formControlName="difficulty">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
           <option value="hard">Hard</option>
@@ -214,7 +214,7 @@
           <p class="text-gray-500 text-sm">Create engaging questions with ease</p>
         </div>
 
-        <button class="btn-success w-full sm:w-auto active:scale-[0.97]" (click)="publishQuiz()">
+        <button type="button" class="btn-success w-full sm:w-auto active:scale-[0.97]" (click)="requestPublishQuiz()">
           Publish Quiz 🚀
         </button>
       </div>
@@ -271,9 +271,19 @@
         <!-- OPTIONS -->
         <div class="grid sm:grid-cols-2 gap-4" formArrayName="options">
           <div class="option" *ngFor="let _ of options.controls; let i = index" [formGroupName]="i">
-            <input type="radio" name="correct" (change)="selectCorrectOption(i)" />
+            <input
+              type="radio"
+              name="correct"
+              (change)="selectCorrectOption(i)"
+              class="h-4 w-4 accent-indigo-600 cursor-pointer"
+              [checked]="options.at(i).get('isCorrect')?.value"
+            />
 
-            <input placeholder="Option {{ i + 1 }}" formControlName="text" />
+            <input
+              placeholder="Option {{ i + 1 }}"
+              formControlName="text"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-all"
+            />
 
             @if (
               options.at(i).get('text')?.invalid &&
@@ -283,6 +293,12 @@
             }
           </div>
         </div>
+        @if (questionSubmitAttempted() && hasAnyInvalidOptionText()) {
+          <p class="text-xs text-red-500 -mt-2">All option fields are required.</p>
+        }
+        @if (questionSubmitAttempted() && !hasSelectedCorrectOption()) {
+          <p class="text-xs text-red-500 -mt-2">Please select one correct option.</p>
+        }
 
         <!-- ACTIONS -->
         <div class="flex justify-between items-center">
@@ -453,4 +469,24 @@ Marks: 1
   }
 
 
+<app-confirmation-modal
+  [isOpen]="publishConfirm().isOpen"
+  [title]="publishConfirm().title"
+  [message]="publishConfirm().message"
+  [type]="publishConfirm().type"
+  [confirmText]="'Publish Quiz'"
+  [cancelText]="'Cancel'"
+  (confirm)="confirmPublishQuiz()"
+  (cancel)="closePublishConfirm()"
+></app-confirmation-modal>
 
+<app-confirmation-modal
+  [isOpen]="notifyStudentsConfirm().isOpen"
+  [title]="notifyStudentsConfirm().title"
+  [message]="notifyStudentsConfirm().message"
+  [type]="notifyStudentsConfirm().type"
+  [confirmText]="'Yes, Notify'"
+  [cancelText]="'No, Skip'"
+  (confirm)="confirmNotifyStudentsAfterPublish()"
+  (cancel)="skipNotifyStudentsAfterPublish()"
+></app-confirmation-modal>

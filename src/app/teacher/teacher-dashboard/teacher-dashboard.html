@@ -1,4 +1,4 @@
-<div class="teacher-dashboard min-h-screen relative overflow-hidden bg-[#f8fafc]">
+<div class="teacher-dashboard dashboard-shell min-h-screen relative overflow-hidden">
   <!-- Cinematic Background -->
   <div class="bg-decor bg-decor-1"></div>
   <div class="bg-decor bg-decor-2"></div>
@@ -8,12 +8,12 @@
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
       <div class="animate-slide-down">
         <h1 class="text-2xl md:text-4xl font-black text-slate-900 tracking-tight mb-2">
-          Teacher <span class="text-indigo-600">Dashboard</span>
+          Teacher <span class="text-brand">Dashboard</span>
         </h1>
         <p class="text-slate-500 font-medium text-sm md:text-base">Manage your educational content and review student contributions.</p>
       </div>
 
-      <button (click)="createNewQuiz()" class="btn-primary group animate-slide-up text-sm px-4 py-2 md:text-base md:px-6 md:py-3">
+      <button (click)="createNewQuiz()" class="dashboard-btn dashboard-btn-primary group animate-slide-up text-sm px-4 py-2 md:text-base md:px-6 md:py-3">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
@@ -23,9 +23,9 @@
 
     <!-- Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-      <div class="glass-card p-4 md:p-6 animate-fade-in delay-100 border-l-4 border-indigo-500">
+      <div class="glass-card stat-card stat-brand p-4 md:p-6 animate-fade-in delay-100">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+          <div class="stat-icon stat-icon-brand w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
@@ -37,9 +37,9 @@
         </div>
       </div>
 
-      <div class="glass-card p-4 md:p-6 animate-fade-in delay-200 border-l-4 border-emerald-500">
+      <div class="glass-card stat-card stat-success p-4 md:p-6 animate-fade-in delay-200">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+          <div class="stat-icon stat-icon-success w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
@@ -51,9 +51,9 @@
         </div>
       </div>
 
-      <div class="glass-card p-4 md:p-6 animate-fade-in delay-300 border-l-4 border-amber-500">
+      <div class="glass-card stat-card stat-warning p-4 md:p-6 animate-fade-in delay-300">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
+          <div class="stat-icon stat-icon-warning w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -70,35 +70,32 @@
     <div class="flex items-center gap-4 md:gap-8 mb-8 border-b border-slate-200 overflow-x-auto pb-2 snap-x no-scrollbar">
       <button 
         (click)="setActiveTab('quizzes')"
-        class="pb-4 text-sm font-bold tracking-wide transition-all relative"
-        [class.text-indigo-600]="activeTab() === 'quizzes'"
-        [class.text-slate-400]="activeTab() !== 'quizzes'"
+        class="tab-btn pb-4 text-sm font-bold tracking-wide transition-all relative"
+        [class.tab-btn-active]="activeTab() === 'quizzes'"
       >
         MY QUIZZES
         @if (activeTab() === 'quizzes') {
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+          <div class="absolute bottom-0 left-0 w-full h-1 tab-indicator rounded-full animate-scale-x"></div>
         }
       </button>
       <button 
         (click)="setActiveTab('submissions')"
-        class="pb-4 text-sm font-bold tracking-wide transition-all relative"
-        [class.text-indigo-600]="activeTab() === 'submissions'"
-        [class.text-slate-400]="activeTab() !== 'submissions'"
+        class="tab-btn pb-4 text-sm font-bold tracking-wide transition-all relative"
+        [class.tab-btn-active]="activeTab() === 'submissions'"
       >
         STUDENT SUBMISSIONS
         @if (activeTab() === 'submissions') {
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+          <div class="absolute bottom-0 left-0 w-full h-1 tab-indicator rounded-full animate-scale-x"></div>
         }
       </button>
       <button 
         (click)="setActiveTab('students')"
-        class="pb-4 text-sm font-bold tracking-wide transition-all relative uppercase"
-        [class.text-indigo-600]="activeTab() === 'students'"
-        [class.text-slate-400]="activeTab() !== 'students'"
+        class="tab-btn pb-4 text-sm font-bold tracking-wide transition-all relative uppercase"
+        [class.tab-btn-active]="activeTab() === 'students'"
       >
         MY STUDENTS
         @if (activeTab() === 'students') {
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-full animate-scale-x"></div>
+          <div class="absolute bottom-0 left-0 w-full h-1 tab-indicator rounded-full animate-scale-x"></div>
         }
       </button>
     </div>
@@ -154,7 +151,7 @@
                       </div>
                     </div>
 
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 truncate group-hover:text-indigo-600 transition-colors">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 truncate group-hover:text-brand transition-colors">
                       {{ quiz.title }}
                     </h3>
                     <p class="text-slate-500 text-sm line-clamp-2 mb-6 h-10">
@@ -183,7 +180,7 @@
                   </div>
                   <h3 class="text-xl font-bold text-slate-800 mb-2">No quizzes found</h3>
                   <p class="text-slate-500 mb-8 max-w-sm mx-auto">You haven't created any quizzes yet. Start building your curriculum today!</p>
-                  <button (click)="createNewQuiz()" class="btn-secondary">
+                  <button (click)="createNewQuiz()" class="dashboard-btn dashboard-btn-outline">
                     Create Your First Quiz
                   </button>
                 </div>
@@ -257,13 +254,15 @@
               <div class="glass-card p-8 bg-white/50 border border-indigo-100">
                 <div class="max-w-2xl">
                   <h3 class="text-xl font-bold text-slate-800 mb-2">Add New Student</h3>
-                  <p class="text-slate-500 mb-6">Enter the email address of the student you want to add to your list. They must have an account in our system.</p>
+                  <p class="text-slate-500 mb-2">Enter the email address of the student you want to add to your list. They must have an account in our system.</p>
+                  <p class="text-xs text-indigo-600 font-medium mb-6">{{ studentEmailTemplate.helperText }}</p>
                   
                   <div class="flex gap-4">
                     <div class="flex-1 relative">
                       <input 
                         type="email" 
-                        [(ngModel)]="newStudentEmail"
+                        [ngModel]="newStudentEmail()"
+                        (ngModelChange)="newStudentEmail.set($event)"
                         placeholder="student@example.com"
                         class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-white"
                         (keyup.enter)="addStudent(newStudentEmail())"
@@ -272,10 +271,13 @@
                     <button 
                       (click)="addStudent(newStudentEmail())" 
                       [disabled]="addingStudent()"
-                      class="btn-primary"
+                      class="dashboard-btn dashboard-btn-primary px-6 py-3"
                     >
-                      <span *ngIf="!addingStudent()">Add Student</span>
-                      <span *ngIf="addingStudent()">Adding...</span>
+                      @if (!addingStudent()) {
+                        <span>Add Student</span>
+                      } @else {
+                        <span>Adding...</span>
+                      }
                     </button>
                   </div>
                 </div>
@@ -283,9 +285,18 @@
 
               <!-- Student List -->
               <div class="glass-card overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between md:items-center gap-4 bg-white/50">
                   <h3 class="text-lg font-bold text-slate-800">My Student List</h3>
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ students().length }} Students Total</span>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
+                    <input
+                      type="text"
+                      [value]="studentSearchTerm()"
+                      (input)="onStudentSearch($any($event.target).value)"
+                      placeholder="Search my students..."
+                      class="dashboard-search-input w-full sm:w-72"
+                    />
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{{ students().length }} Students Total</span>
+                  </div>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -318,7 +329,11 @@
                             <span class="text-xs font-medium text-slate-400">{{ (student.createdAt | date) || 'N/A' }}</span>
                           </td>
                           <td class="p-4 border-b border-slate-50 text-right">
-                            <button class="text-slate-400 hover:text-red-500 transition-colors">
+                            <button
+                              type="button"
+                              (click)="removeStudent(student)"
+                              class="text-slate-400 hover:text-red-500 transition-colors"
+                              title="Remove student from my list">
                               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
@@ -349,3 +364,14 @@
     </div>
   </div>
 </div>
+
+<app-confirmation-modal
+  [isOpen]="confirmModal().isOpen"
+  [title]="confirmModal().title"
+  [message]="confirmModal().message"
+  [type]="confirmModal().type"
+  [confirmText]="confirmModal().confirmText"
+  [cancelText]="confirmModal().cancelText"
+  (confirm)="onConfirmAction()"
+  (cancel)="closeConfirm()"
+></app-confirmation-modal>

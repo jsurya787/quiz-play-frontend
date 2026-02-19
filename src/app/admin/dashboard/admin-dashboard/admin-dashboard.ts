@@ -1,9 +1,12 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
-import { inject, signal, OnInit, Component, PLATFORM_ID, Inject } from '@angular/core';
+import { inject, signal, OnInit, Component, PLATFORM_ID, Inject, DestroyRef } from '@angular/core';
 import { ToastService } from '../../../services/toast-service';
 import { ConfirmationModalComponent, ConfirmationType } from '../../../shared/modals/confirmation-modal/confirmation-modal.component';
+import { ADMIN_EMAIL_TEMPLATE, TEACHER_EMAIL_TEMPLATE } from '../../../shared/email-templates';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, catchError, debounceTime, distinctUntilChanged, forkJoin, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -15,9 +18,11 @@ import { ConfirmationModalComponent, ConfirmationType } from '../../../shared/mo
 export class AdminDashboard implements OnInit {
   private adminService = inject(AdminService);
   private toaster = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
+  private userSearch$ = new Subject<string>();
 
   activeTab = signal<'subjects' | 'users' | 'redis'>('subjects');
-  userTab = signal<'teachers' | 'students'>('teachers');
+  userTab = signal<'teachers' | 'students' | 'inactive'>('teachers');
   
   stats = signal<any>({
     totalUsers: 0,
@@ -27,7 +32,11 @@ export class AdminDashboard implements OnInit {
 
   teachers = signal<any[]>([]);
   students = signal<any[]>([]);
+  inactiveUsers = signal<any[]>([]);
+  userSearchTerm = signal('');
   loading = signal(false);
+  teacherEmailTemplate = TEACHER_EMAIL_TEMPLATE;
+  adminEmailTemplate = ADMIN_EMAIL_TEMPLATE;
 
   confirmModal = signal<{
     isOpen: boolean;
@@ -48,26 +57,74 @@ export class AdminDashboard implements OnInit {
     // 🚫 Skip API calls on server to prevent 401 errors
     if (isPlatformBrowser(this.platformId)) {
       this.loadStats();
-      this.loadTeachers();
-      this.loadStudents();
+      this.setupUserSearch();
+      this.userSearch$.next('');
     }
   }
 
+  onUserSearch(value: string) {
+    this.userSearchTerm.set(value);
+    this.userSearch$.next(value);
+  }
+
+  private setupUserSearch() {
+    this.userSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          forkJoin({
+            active: this.adminService.searchUsers(term),
+            inactive: this.adminService.getInactiveUsers(term),
+          }).pipe(
+            catchError((err: any) => {
+              console.error('Failed to search users', err);
+              return of({
+                active: { teachers: [], students: [] },
+                inactive: [],
+              });
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(({ active, inactive }) => {
+        this.teachers.set(active?.teachers || []);
+        this.students.set(active?.students || []);
+        this.inactiveUsers.set(inactive || []);
+      });
+  }
+
+  private refreshUsers() {
+    forkJoin({
+      active: this.adminService.searchUsers(this.userSearchTerm()),
+      inactive: this.adminService.getInactiveUsers(this.userSearchTerm()),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ active, inactive }) => {
+          this.teachers.set(active?.teachers || []);
+          this.students.set(active?.students || []);
+          this.inactiveUsers.set(inactive || []);
+        },
+      });
+  }
+
   loadStats() {
-    this.adminService.getStats().subscribe(res => this.stats.set(res));
+    this.adminService.getStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => this.stats.set(res));
   }
 
   loadTeachers() {
-    this.adminService.getTeachers().subscribe(res => this.teachers.set(res));
+    this.adminService.getTeachers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => this.teachers.set(res));
   }
 
   loadStudents() {
-    this.adminService.getStudents().subscribe(res => this.students.set(res));
+    this.adminService.getStudents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => this.students.set(res));
   }
 
   syncCache() {
     this.loading.set(true);
-    this.adminService.syncCache().subscribe({
+    this.adminService.syncCache().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.toaster.success(res.message);
         this.loading.set(false);
@@ -79,7 +136,7 @@ export class AdminDashboard implements OnInit {
   clearCache() {
     if (confirm('Are you sure you want to clear ALL Redis cache? This may cause temporary performance degradation.')) {
       this.loading.set(true);
-      this.adminService.clearCache().subscribe({
+      this.adminService.clearCache().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (res) => {
           this.toaster.success(res.message);
           this.loading.set(false);
@@ -101,20 +158,75 @@ export class AdminDashboard implements OnInit {
     this.confirmModal.set({
       isOpen: true,
       title: `${action === 'promote' ? 'Promote' : 'Demote'} User`,
-      message: `Are you sure you want to ${action} ${name} to ${role}?`,
+      message: role === 'TEACHER'
+        ? `Are you sure you want to ${action} ${name} to ${role}? ${this.teacherEmailTemplate.helperText}`
+        : `Are you sure you want to ${action} ${name} to ${role}?`,
       type,
       action: () => this.executeAssignRole(user, role)
     });
   }
 
+  deactivateUser(user: any) {
+    const name = this.getUserName(user);
+    this.confirmModal.set({
+      isOpen: true,
+      title: 'Deactivate User',
+      message: `Deactivate ${name}? This is a soft delete and will block login until reactivated.`,
+      type: 'danger',
+      action: () => this.executeDeactivateUser(user),
+    });
+  }
+
+  private executeDeactivateUser(user: any) {
+    this.loading.set(true);
+    this.adminService.deactivateUser(user._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res: any) => {
+        this.toaster.success(res?.message || 'User deactivated');
+        this.refreshUsers();
+        this.loadStats();
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        this.toaster.error(err?.error?.message || 'Failed to deactivate user');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  activateUser(user: any) {
+    const name = this.getUserName(user);
+    this.confirmModal.set({
+      isOpen: true,
+      title: 'Activate User',
+      message: `Activate ${name}? User will be able to login again.`,
+      type: 'info',
+      action: () => this.executeActivateUser(user),
+    });
+  }
+
+  private executeActivateUser(user: any) {
+    this.loading.set(true);
+    this.adminService.activateUser(user._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res: any) => {
+        this.toaster.success(res?.message || 'User activated');
+        this.refreshUsers();
+        this.loadStats();
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        this.toaster.error(err?.error?.message || 'Failed to activate user');
+        this.loading.set(false);
+      },
+    });
+  }
+
   executeAssignRole(user: any, role: 'STUDENT' | 'TEACHER') {
     this.loading.set(true);
-    this.adminService.assignRole(user._id, role).subscribe({
+    this.adminService.assignRole(user._id, role).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
-        this.toaster.success(`User role updated to ${role}`);
-        // Refresh lists
-        this.loadTeachers();
-        this.loadStudents();
+        this.toaster.success(res?.emailNotice || `User role updated to ${role}`);
+        // Always refresh lists immediately (even if search term hasn't changed).
+        this.refreshUsers();
         this.loadStats();
         this.loading.set(false);
       },

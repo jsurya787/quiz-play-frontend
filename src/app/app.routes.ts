@@ -154,6 +154,13 @@ export const routes: Routes = [
         .then(m => m.NotesPage),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'me',
+    loadComponent: () =>
+      import('./me/me-page')
+        .then(m => m.MePageComponent),
+    canActivate: [AuthGuard],
+  },
 
   // --------------------------------------------------
   // 🛠️ ADMIN (LAZY MODULE)

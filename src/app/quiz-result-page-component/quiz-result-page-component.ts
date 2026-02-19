@@ -39,7 +39,7 @@ export class QuizResultPageComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private authService = inject(AuthService);
   /* ================= UI STATE (Signals) ================= */
-  quizTitle = signal('Maths Mock Test – 1');
+  quizTitle = signal('Quiz Result');
 
   totalMarks = signal(0);
   score = signal(0);
@@ -61,7 +61,6 @@ export class QuizResultPageComponent implements OnInit {
     // ✅ APP_INITIALIZER already called bootstrapAuth() - no need to call again
 
     const attemptId = localStorage.getItem('lastAttemptId');
-    console.log("attemptId -->", attemptId);
 
     // ✅ Hard guard
     if (!attemptId) {
@@ -103,12 +102,12 @@ export class QuizResultPageComponent implements OnInit {
     this.score.set(data.score);
     this.percentage.set(Math.round((data.score / data.totalMarks) * 100) || 0);
 
-    this.correct.set(res.correct);
-    this.wrong.set(res.wrong);
-    this.skipped.set(res.skipped);
+    this.correct.set(data.correct ?? 0);
+    this.wrong.set(data.wrong ?? 0);
+    this.skipped.set(data.skipped ?? 0);
 
-    this.accuracy.set(res.accuracy);
-    this.questions.set(res.questions);
+    this.accuracy.set(data.accuracy ?? 0);
+    this.questions.set(data.questions ?? []);
 
     this.loading.set(false);
   }

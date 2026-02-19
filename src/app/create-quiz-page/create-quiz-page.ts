@@ -4,14 +4,14 @@ import { QuizService } from '../services/quiz.service';
 import { SubjectService, Subject } from '../services/subject.service';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../services/toast-service';
-import { RetryAttemptService } from '../services/retry-attempt-service';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationModalComponent, ConfirmationType } from '../shared/modals/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-create-quiz-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationModalComponent],
   templateUrl: './create-quiz-page.html',
 })
 export class CreateQuizPage {
@@ -21,7 +21,6 @@ export class CreateQuizPage {
   private toast = inject(ToastService);
   public authService = inject(AuthService);
   private router = inject(Router);
-  private _retryAttemptService = inject(RetryAttemptService);
   private route = inject(ActivatedRoute);
 
   // 🔢 marks per question
@@ -30,6 +29,30 @@ export class CreateQuizPage {
   showBulkPopup = signal(false);
   bulkText = '';
   loading = signal(false); // ⏳ Loading state
+  publishConfirm = signal<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: ConfirmationType;
+  }>({
+    isOpen: false,
+    title: 'Publish Quiz',
+    message: '',
+    type: 'info',
+  });
+  notifyStudentsConfirm = signal<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: ConfirmationType;
+  }>({
+    isOpen: false,
+    title: 'Notify Students',
+    message: '',
+    type: 'info',
+  });
+  pendingPublishedQuizId = signal<string | null>(null);
+  questionSubmitAttempted = signal(false);
 
   /* ===============================
      STATE (SIGNALS)
@@ -119,7 +142,6 @@ export class CreateQuizPage {
 
   loadSubjects(): void {
     this.loading.set(true);
-    this._retryAttemptService.resetAll();
     this.subjectService.getSubjects().subscribe({
       next: (res) => {
         if (res.success) {
@@ -139,16 +161,6 @@ export class CreateQuizPage {
   }
 
   saveDraft(): void {
-    if (!this.authService.isAuthenticated() && !this._retryAttemptService.canCreate()) {
-      this.toast.info(
-        'Quiz creation limit reached. Log in with Google to continue OR try again after 24 hours.',
-        4000,
-      );
-      setTimeout(() => {
-        this.router.navigate(['/dashboard/all']);
-      }, 4500);
-      return;
-    }
     if (this.quizForm.invalid) {
       this.quizForm.markAllAsTouched();
       this.quizForm.markAllAsDirty();
@@ -181,6 +193,8 @@ export class CreateQuizPage {
   }
 
   saveQuestion(): void {
+    this.questionSubmitAttempted.set(true);
+
     if (!this.quizId() || this.questionForm.invalid) {
       if (!this.quizId()) {
         this.toast.warning('Please save the draft first');
@@ -216,6 +230,7 @@ export class CreateQuizPage {
             this.totalMarks.set(res.data.totalMarks);
             this.resetQuestionForm();
             this.editingQuestionId.set(null); // ✅ exit edit mode
+            this.questionSubmitAttempted.set(false);
           },
           error: (err) => this.toast.error(err.error?.message || 'Failed to update question'),
         });
@@ -230,6 +245,7 @@ export class CreateQuizPage {
         this.questions.set(res.data.questions);
         this.totalMarks.set(res.data.totalMarks);
         this.resetQuestionForm();
+        this.questionSubmitAttempted.set(false);
       },
       error: (err) => this.toast.error(err.error?.message || 'Failed to add question'),
     });
@@ -253,23 +269,106 @@ export class CreateQuizPage {
       return;
     }
 
-    this.quizService.publishQuiz(this.quizId()!).subscribe({
+    const publishedQuizId = this.quizId()!;
+    this.quizService.publishQuiz(publishedQuizId).subscribe({
       next: () => {
-        this.toast.success('Quiz published 🚀');
-        this.resetQuestionForm();
-        this.quizForm.reset();
-        this.quizId.set(null);
-        this.parsedQuestions = [];
-        this.bulkForm.reset();
-        this.questions.set([]);
-        this.totalMarks.set(0);
-        if (!this.authService.isAuthenticated()) {
-          this._retryAttemptService.increaseQuizCreated();
+        this.toast.success('Quiz published successfully');
+        this.pendingPublishedQuizId.set(publishedQuizId);
+
+        const isTeacherOrAdmin = this.authService.isTeacher() || this.authService.isAdmin();
+        if (isTeacherOrAdmin) {
+          this.notifyStudentsConfirm.set({
+            isOpen: true,
+            title: 'Notify Associated Students',
+            message:
+              'Do you want to notify your associated students about this newly published quiz via email?',
+            type: 'info',
+          });
+        } else {
+          this.resetAfterPublish();
         }
       },
       error: (err) => this.toast.error(err.error?.message || 'Failed to publish quiz'),
       // alert(err.error?.message || 'Failed to publish quiz'),
     });
+  }
+
+  confirmNotifyStudentsAfterPublish(): void {
+    const quizId = this.pendingPublishedQuizId();
+    this.closeNotifyStudentsConfirm();
+
+    if (!quizId) {
+      this.resetAfterPublish();
+      return;
+    }
+
+    this.quizService.notifyAssociatedStudentsForQuiz(quizId).subscribe({
+      next: (res: any) => {
+        const stats = res?.data;
+        const sent = stats?.sent ?? 0;
+        const total = stats?.totalRecipients ?? 0;
+        this.toast.success(
+          total > 0
+            ? `Notification emails sent: ${sent}/${total}`
+            : 'No associated student recipients found',
+        );
+      },
+      error: (err) => {
+        this.toast.error(err?.error?.message || 'Failed to notify students');
+      },
+    });
+
+    this.resetAfterPublish();
+  }
+
+  skipNotifyStudentsAfterPublish(): void {
+    this.closeNotifyStudentsConfirm();
+    this.resetAfterPublish();
+  }
+
+  closeNotifyStudentsConfirm(): void {
+    this.notifyStudentsConfirm.update((state) => ({ ...state, isOpen: false }));
+  }
+
+  private resetAfterPublish(): void {
+    this.resetQuestionForm();
+    this.quizForm.reset();
+    this.quizId.set(null);
+    this.pendingPublishedQuizId.set(null);
+    this.parsedQuestions = [];
+    this.bulkForm.reset();
+    this.questions.set([]);
+    this.totalMarks.set(0);
+  }
+
+  requestPublishQuiz(): void {
+    if (!this.quizId()) {
+      this.publishQuiz();
+      return;
+    }
+
+    const isTeacherOrAdmin = this.authService.isTeacher() || this.authService.isAdmin();
+    if (!isTeacherOrAdmin) {
+      this.publishQuiz();
+      return;
+    }
+
+    this.publishConfirm.set({
+      isOpen: true,
+      title: 'Confirm Quiz Publication',
+      message:
+        'Are you sure you want to publish this quiz? Once published, it will be visible to all students associated with your account.',
+      type: 'info',
+    });
+  }
+
+  confirmPublishQuiz(): void {
+    this.closePublishConfirm();
+    this.publishQuiz();
+  }
+
+  closePublishConfirm(): void {
+    this.publishConfirm.update((state) => ({ ...state, isOpen: false }));
   }
 
   selectCorrectOption(index: number): void {
@@ -287,10 +386,20 @@ export class CreateQuizPage {
     });
 
     this.editingQuestionId.set(null);
+    this.questionSubmitAttempted.set(false);
+  }
+
+  hasSelectedCorrectOption(): boolean {
+    return this.options.controls.some((ctrl) => !!ctrl.get('isCorrect')?.value);
+  }
+
+  hasAnyInvalidOptionText(): boolean {
+    return this.options.controls.some((ctrl) => !!ctrl.get('text')?.invalid);
   }
 
   editQuestion(question: any): void {
     this.editingQuestionId.set(question._id); // ✅ IMPORTANT
+    this.questionSubmitAttempted.set(false);
 
     this.questionForm.patchValue({
       questionText: question.questionText,
@@ -305,6 +414,13 @@ export class CreateQuizPage {
           isCorrect: opt.isCorrect,
         }),
       );
+    });
+
+    this.questionForm.markAsPristine();
+    this.questionForm.markAsUntouched();
+    this.options.controls.forEach((ctrl) => {
+      ctrl.markAsPristine();
+      ctrl.markAsUntouched();
     });
 
     if (typeof window !== 'undefined') {

@@ -68,7 +68,6 @@ export class SignupComponent {
         setTimeout(() => this.focusOtpInput(0), 100);
       },
       error: (err) => {
-        console.log("first", err?.error?.message)
         this.error.set(err?.error?.message || 'Something went wrong. Please try again.');
         this.loading = false;
       }
@@ -94,43 +93,65 @@ export class SignupComponent {
   // ============================
   onOtpInput(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
-    const value = input.value;
+    const raw = input.value || '';
+    const digitsOnly = raw.replace(/\D/g, '');
 
-    // Only allow digits
-    if (!/^\d*$/.test(value)) {
-      input.value = '';
+    if (!digitsOnly) {
       this.otpDigits[index] = '';
       return;
     }
 
-    this.otpDigits[index] = value;
+    if (digitsOnly.length > 1) {
+      this.applyOtpFromString(digitsOnly);
+      return;
+    }
+
+    this.otpDigits[index] = digitsOnly;
+    input.value = digitsOnly;
     this.otpError.set(null);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (index < 5) {
       this.focusOtpInput(index + 1);
     }
   }
 
   onOtpKeydown(event: KeyboardEvent, index: number): void {
-    // Handle backspace
-    if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
-      this.focusOtpInput(index - 1);
+    if (event.key === 'Backspace') {
+      if (this.otpDigits[index]) {
+        this.otpDigits[index] = '';
+        return;
+      }
+      if (index > 0) {
+        this.focusOtpInput(index - 1);
+      }
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.verifyOtp();
     }
   }
 
   onOtpPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const pastedData = event.clipboardData?.getData('text') || '';
-    const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+    this.applyOtpFromString(pastedData);
+  }
 
+  private applyOtpFromString(raw: string): void {
+    const digits = (raw || '').replace(/\D/g, '').slice(0, 6);
     for (let i = 0; i < 6; i++) {
       this.otpDigits[i] = digits[i] || '';
     }
 
-    // Focus last filled input or first empty
-    const lastFilledIndex = Math.min(digits.length - 1, 5);
-    this.focusOtpInput(lastFilledIndex);
+    if (digits.length === 6) {
+      this.focusOtpInput(5);
+    } else {
+      this.focusOtpInput(Math.min(digits.length, 5));
+    }
+    this.otpError.set(null);
   }
 
   private focusOtpInput(index: number): void {

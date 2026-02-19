@@ -18,11 +18,13 @@ import { QuizService } from '../../../services/quiz.service';
   selector: 'app-user-profile',
   standalone: true,
   templateUrl: './user-profile.html',
+  styleUrl: './user-profile.css',
 })
 export class UserProfileModalComponent {
   
   /* ================= OUTPUT ================= */
   @Output() close = new EventEmitter<void>();
+  @Output() changeAccess = new EventEmitter<void>();
 
   /* ================= DI ================= */
   private authService = inject(AuthService);
@@ -82,12 +84,19 @@ export class UserProfileModalComponent {
 
   /* ================= ACTIONS ================= */
   changePassword() {
-    this.close.emit();
+    this.changeAccess.emit();
   }
 
   logout() {
     this.authService.logout();
     this.close.emit();
     this.router.navigate(['/login']);
+  }
+
+  openMe(tab?: 'created' | 'attempted') {
+    this.close.emit();
+    this.router.navigate(['/me'], {
+      queryParams: tab ? { tab } : undefined,
+    });
   }
 }

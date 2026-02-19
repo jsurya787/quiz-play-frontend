@@ -214,7 +214,46 @@ export class AuthService {
     );
   }
 
+  updateProfile(payload: {
+    firstName?: string;
+    lastName?: string;
+    sex?: 'male' | 'female' | 'other' | null;
+    about?: string;
+  }) {
+    return this.http.patch<{ success: boolean; user: any }>(
+      `${environment.apiUrl}/auth/profile`,
+      payload,
+      { withCredentials: true },
+    ).pipe(
+      tap((res) => {
+        if (res?.user) {
+          this.currentUser.update((prev) => ({
+            ...(prev || {}),
+            ...res.user,
+            id: res.user._id || prev?.id,
+          }));
+        }
+      }),
+    );
+  }
+
+  getMyInstitute() {
+    return this.http.get<{ success: boolean; data: any }>(
+      `${environment.apiUrl}/teacher/institute`,
+      { withCredentials: true },
+    );
+  }
+
+  updateMyInstitute(payload: {
+    name?: string;
+    about?: string;
+    logo?: string;
+  }) {
+    return this.http.patch<{ success: boolean; data: any }>(
+      `${environment.apiUrl}/teacher/institute`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
 }
-
-
-
