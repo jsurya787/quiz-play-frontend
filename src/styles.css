@@ -10,7 +10,7 @@
 @layer components {
 
   .btn-primary {
-    @apply px-8 py-3.5 rounded-full bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2;
+    @apply px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 text-white font-bold shadow-lg shadow-indigo-400/30 hover:from-violet-700 hover:via-indigo-700 hover:to-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2;
   }
 
   .btn-secondary {

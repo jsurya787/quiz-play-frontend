@@ -18,6 +18,10 @@ import { LoaderService } from './services/loader-service';
 })
 export class App {
   public isUserMenuOpen = false;
+  readonly primaryAccentClass = 'text-violet-700';
+  readonly primaryGradientHeader = 'from-violet-600 via-indigo-600 to-blue-600';
+  readonly primaryGradientButton =
+    'bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 hover:from-violet-700 hover:via-indigo-700 hover:to-blue-700';
 
   constructor(
     private router: Router,

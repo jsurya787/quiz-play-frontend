@@ -56,3 +56,173 @@
         transform: translateX(100%);
     }
 }
+
+@keyframes arrowSlideLeft {
+    0%,
+    100% {
+        transform: translateX(0);
+        opacity: 0.55;
+    }
+
+    50% {
+        transform: translateX(-6px);
+        opacity: 1;
+    }
+}
+
+@keyframes arrowSlideRight {
+    0%,
+    100% {
+        transform: translateX(0);
+        opacity: 0.55;
+    }
+
+    50% {
+        transform: translateX(6px);
+        opacity: 1;
+    }
+}
+
+.swipe-arrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgb(79 70 229 / 0.85);
+}
+
+.swipe-arrow-left {
+    animation: arrowSlideLeft 1.2s ease-in-out infinite;
+}
+
+.swipe-arrow-right {
+    animation: arrowSlideRight 1.2s ease-in-out infinite;
+}
+
+.swipe-edge-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: rgb(79 70 229 / 0.9);
+    background: rgb(255 255 255 / 0.96);
+    border: 1px solid rgb(199 210 254);
+    border-radius: 9999px;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgb(79 70 229 / 0.16);
+}
+
+.swipe-edge-btn {
+    cursor: pointer;
+    transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.swipe-edge-btn:hover {
+    background: rgb(238 242 255 / 1);
+    color: rgb(67 56 202 / 1);
+    box-shadow: 0 12px 26px rgb(79 70 229 / 0.2);
+}
+
+.swipe-edge-btn:active {
+    transform: translateY(-50%) scale(0.96);
+}
+
+.swipe-edge-btn:focus-visible {
+    outline: 2px solid rgb(129 140 248 / 0.6);
+    outline-offset: 2px;
+}
+
+.swipe-edge-left {
+    left: 0.35rem;
+    animation: arrowSlideLeft 1.2s ease-in-out infinite;
+}
+
+.swipe-edge-right {
+    right: 0.35rem;
+    animation: arrowSlideRight 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .swipe-arrow-left,
+    .swipe-arrow-right,
+    .swipe-edge-left,
+    .swipe-edge-right {
+        animation: none !important;
+    }
+
+    .swipe-edge-btn {
+        transition: none !important;
+    }
+}
+
+@keyframes practiceGlowPulse {
+    0%,
+    100% {
+        box-shadow: 0 10px 26px rgb(79 70 229 / 0.3);
+    }
+
+    50% {
+        box-shadow: 0 14px 30px rgb(124 58 237 / 0.35);
+    }
+}
+
+@keyframes practiceShimmer {
+    0% {
+        transform: translateX(-130%);
+        opacity: 0;
+    }
+
+    45% {
+        opacity: 0.45;
+    }
+
+    100% {
+        transform: translateX(130%);
+        opacity: 0;
+    }
+}
+
+.start-practice-btn {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background-image: linear-gradient(95deg, #7c3aed 0%, #4f46e5 55%, #2563eb 100%);
+    box-shadow: 0 10px 26px rgb(79 70 229 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    transition: transform 220ms ease, filter 220ms ease, box-shadow 220ms ease;
+    animation: practiceGlowPulse 2.8s ease-in-out infinite;
+}
+
+.start-practice-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg,
+            transparent 0%,
+            rgb(255 255 255 / 0.06) 35%,
+            rgb(255 255 255 / 0.4) 50%,
+            rgb(255 255 255 / 0.06) 65%,
+            transparent 100%);
+    transform: translateX(-130%);
+    animation: practiceShimmer 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.start-practice-btn:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.05);
+}
+
+.start-practice-icon {
+    color: rgb(255 255 255 / 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .start-practice-btn,
+    .start-practice-btn::after {
+        animation: none !important;
+    }
+}

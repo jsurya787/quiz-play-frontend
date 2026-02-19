@@ -10,18 +10,18 @@ import { CommonModule } from '@angular/common';
 export class SuccessStoriesComponent {
   stories = [
     {
-      name: 'Aman Verma',
+      name: 'Aman Mehra',
       role: 'Class 10 Topper',
       quote: "QuizPlay helped me clear my concepts in Maths. The instant feedback was a game changer for my board prep.",
       score: '98% in Maths',
-      image: 'https://ui-avatars.com/api/?name=Aman+Verma&background=6366f1&color=fff'
+      image: 'https://ui-avatars.com/api/?name=Aman+Mehra&background=6366f1&color=fff'
     },
     {
-      name: 'Riya Sharma',
+      name: 'Riya Dahiya',
       role: 'NEET Aspirant',
       quote: "The physics quizzes are tough but exactly what I needed. I improved my speed by 30% in just two months.",
       score: '680/720 in Neet Mock',
-      image: 'https://ui-avatars.com/api/?name=Riya+Sharma&background=a855f7&color=fff'
+      image: 'https://ui-avatars.com/api/?name=Riya+Dahiya&background=a855f7&color=fff'
     },
     {
       name: 'Kunal Singh',

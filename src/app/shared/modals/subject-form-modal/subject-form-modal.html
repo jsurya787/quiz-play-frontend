@@ -36,6 +36,45 @@
           }
         </div>
 
+        <!-- TYPE -->
+        <div>
+          <select
+            class="w-full rounded-xl border border-black/10
+                   px-4 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            formControlName="type">
+            <option value="">Select type</option>
+            <option value="entrance">Entrance</option>
+            <option value="government">Government</option>
+            <option value="state">State</option>
+            <option value="bords">Boards</option>
+          </select>
+
+          @if (showErrors() && form.controls.type.invalid) {
+            <p class="text-xs text-red-500 mt-1">
+              Type is required
+            </p>
+          }
+        </div>
+
+        <!-- PRIORITY -->
+        <div>
+          <input
+            type="number"
+            min="0"
+            class="w-full rounded-xl border border-black/10
+                   px-4 py-2.5 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Priority (0, 1, 2...)"
+            formControlName="priority" />
+
+          @if (showErrors() && form.controls.priority.invalid) {
+            <p class="text-xs text-red-500 mt-1">
+              Priority is required and must be 0 or more
+            </p>
+          }
+        </div>
+
         <!-- CLASS -->
         <div>
           <input

@@ -1,0 +1,83 @@
+<section class="relative py-20 md:py-28 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border-t border-slate-800">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute -top-28 -left-16 w-[340px] h-[340px] bg-indigo-500/20 blur-[120px] rounded-full"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-slate-500/10 blur-[120px] rounded-full"></div>
+    <div class="absolute -bottom-24 -right-20 w-[360px] h-[360px] bg-indigo-500/14 blur-[130px] rounded-full"></div>
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-500/60 to-transparent"></div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center">
+      <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold text-slate-200 bg-slate-800/80 border border-slate-700 uppercase tracking-wider mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-300 animate-pulse"></span>
+        Popular right now
+      </p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+        <span class="bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">
+          Trending Exams
+        </span>
+      </h2>
+      <p class="mt-3 text-sm md:text-base text-slate-300 max-w-2xl mx-auto font-medium">
+        Top exam categories students are practicing this week.
+      </p>
+    </div>
+
+    @if (loading()) {
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="h-[180px] rounded-3xl border border-slate-700 bg-slate-800/70 animate-pulse"></div>
+        }
+      </div>
+    } @else if (exams().length > 0) {
+      <div class="mt-8 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        @for (exam of exams(); track exam._id) {
+          <a
+            [routerLink]="['/subject-page', exam._id]"
+            class="group relative overflow-hidden rounded-[1.8rem] border border-slate-700/80 bg-slate-900/70 backdrop-blur-xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.35)] ring-1 ring-inset ring-white/5 hover:-translate-y-1 hover:border-slate-500/60 hover:shadow-[0_16px_30px_rgba(15,23,42,0.5)] transition-all duration-300">
+            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-slate-500/70 via-indigo-400/60 to-slate-500/70"></div>
+            <div class="absolute -right-10 -top-10 w-24 h-24 rounded-full bg-indigo-400/10 blur-2xl group-hover:bg-indigo-400/20 transition-colors"></div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="relative z-10">
+                <h3 class="text-lg font-black text-white group-hover:text-slate-100 transition-colors leading-tight">
+                  {{ exam.name }}
+                </h3>
+                <p class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-slate-200 bg-slate-800/80 border border-slate-600/80">
+                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                  {{ typeLabel(exam.type) }}
+                </p>
+              </div>
+
+              @if (exam.logoUrl) {
+                <div class="relative z-10 w-11 h-11 rounded-xl border border-slate-600 bg-slate-800/90 shadow-sm flex items-center justify-center">
+                  <img
+                    [src]="exam.logoUrl"
+                    alt="Exam Logo"
+                    class="w-8 h-8 object-contain" />
+                </div>
+              }
+            </div>
+
+            <p class="relative z-10 mt-4 text-sm text-slate-300 line-clamp-2">
+              {{ exam.description || 'Practice exam-focused quizzes and improve consistency.' }}
+            </p>
+          </a>
+        }
+      </div>
+
+      <div class="mt-8 text-center">
+        <a
+          routerLink="/all-exams"
+          class="inline-flex items-center gap-2 min-h-11 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold text-sm border border-indigo-300/20 shadow-lg shadow-indigo-900/30 hover:from-indigo-500 hover:to-indigo-400 transition-all duration-200">
+          View All Exams
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+      </div>
+    } @else {
+      <div class="mt-10 text-center py-12 rounded-3xl border border-dashed border-slate-700 bg-slate-900/70">
+        <p class="text-slate-200 font-semibold">No trending exams yet</p>
+      </div>
+    }
+  </div>
+</section>

@@ -29,7 +29,7 @@ interface QuizResultResponse {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './quiz-result-page-component.html',
-  styleUrl: './quiz-result-page-component.css',
+  styleUrl: './quiz-result-page-component.scss',
 })
 export class QuizResultPageComponent implements OnInit {
 
@@ -126,7 +126,7 @@ export class QuizResultPageComponent implements OnInit {
   }
 
   goToDashboard() {
-  this.router.navigate(['/student/dashboard/all']);
+  this.router.navigate(['/dashboard/all']);
 }
 
 goToHome() {

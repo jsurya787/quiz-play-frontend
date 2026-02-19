@@ -1,21 +1,21 @@
 <!-- ================= SIGNUP FLOW ================= -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50">
+<section class="relative min-h-[100dvh] md:min-h-screen flex items-start md:items-center justify-center overflow-x-hidden bg-gradient-to-br from-[#FAFCFF] via-[#F4F7FF] to-[#EEF2FF] pt-[calc(env(safe-area-inset-top)+4.25rem)] sm:pt-[calc(env(safe-area-inset-top)+5rem)] md:pt-20 pb-6 sm:pb-8 md:pb-0">
 
   <!-- Background Decor -->
   <div class="absolute inset-0 z-0">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-200/20 rounded-full blur-[100px] animate-pulse"></div>
-    <div class="absolute bottom-0 right-0 w-[800px] h-[800px] bg-purple-200/20 rounded-full blur-[100px]"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-500/14 rounded-full blur-[100px] animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-[800px] h-[800px] bg-violet-500/14 rounded-full blur-[100px]"></div>
   </div>
 
-  <div class="w-full max-w-md relative z-10 px-6 py-12">
+  <div class="w-full max-w-md relative z-10 px-4 sm:px-6 py-3 sm:py-6 md:py-10">
 
     <!-- ================= SIGNUP FORM ================= -->
     @if (step() == 'form') {
-      <div class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40 p-8 md:p-10 animate-fade-scale-in">
+      <div class="bg-white/92 backdrop-blur-xl rounded-3xl shadow-[0_16px_40px_rgba(15,23,42,0.28)] border border-indigo-100/70 p-8 md:p-10 animate-fade-scale-in">
         
         <!-- Header -->
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white text-2xl mb-4 shadow-lg shadow-indigo-500/30">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 text-white text-2xl mb-4 shadow-lg shadow-indigo-500/35">
             ✨
           </div>
           <h2 class="text-2xl font-bold text-gray-900">Create Your Account</h2>
@@ -104,10 +104,10 @@
 
           <!-- Submit Button -->
           <button
-            class="w-full mt-2 px-6 py-3.5 rounded-xl
-                   bg-indigo-600 text-white font-semibold
-                   shadow-lg shadow-indigo-500/30
-                   hover:bg-indigo-700 hover:shadow-xl
+            class="w-full mt-2 min-h-11 touch-manipulation px-6 py-3.5 rounded-xl
+                   bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 text-white font-semibold
+                   shadow-lg shadow-indigo-500/35
+                   hover:from-violet-700 hover:via-indigo-700 hover:to-blue-700 hover:shadow-xl
                    transition-all duration-200
                    active:scale-95
                    flex items-center justify-center gap-2"
@@ -126,16 +126,16 @@
         <!-- Divider -->
         <div class="relative my-6">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-200"></div>
+            <div class="w-full border-t border-indigo-100"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white/50 text-gray-500 backdrop-blur-xl">Or continue with</span>
+            <span class="px-2 bg-white/70 text-slate-500 backdrop-blur-xl">Or continue with</span>
           </div>
         </div>
 
         <!-- Google Button -->
         <button
-          class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-2xl bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+          class="w-full min-h-11 touch-manipulation flex items-center justify-center gap-3 px-4 py-3 border border-indigo-100 rounded-2xl bg-white hover:bg-indigo-50/40 hover:border-indigo-200 transition-all duration-200"
           (click)="signupWithGoogle()">
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google" />
           <span class="font-semibold text-gray-700">Google</span>
@@ -144,7 +144,7 @@
         <!-- Login Link -->
         <p class="text-center text-sm mt-6 text-gray-600">
           Already have an account?
-          <a routerLink="/login" class="font-bold text-indigo-600 hover:text-indigo-700 hover:underline">
+          <a routerLink="/login" class="font-bold text-indigo-700 hover:text-violet-700 hover:underline">
             Sign in
           </a>
         </p>
@@ -154,11 +154,11 @@
 
     <!-- ================= OTP VERIFICATION ================= -->
     @if (step() == 'otp') {
-      <div class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40 p-8 md:p-10 animate-fade-scale-in">
+      <div class="bg-white/92 backdrop-blur-xl rounded-3xl shadow-[0_16px_40px_rgba(15,23,42,0.28)] border border-indigo-100/70 p-8 md:p-10 animate-fade-scale-in">
         
         <!-- Header -->
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 text-3xl mb-4">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-100/80 text-indigo-700 text-3xl mb-4">
             📧
           </div>
           <h2 class="text-2xl font-bold text-gray-900">Verify Your Email</h2>
@@ -193,10 +193,10 @@
 
         <!-- Verify Button -->
         <button
-          class="w-full px-6 py-3.5 rounded-xl
-                 bg-indigo-600 text-white font-semibold
-                 shadow-lg shadow-indigo-500/30
-                 hover:bg-indigo-700 hover:shadow-xl
+          class="w-full min-h-11 touch-manipulation px-6 py-3.5 rounded-xl
+                 bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 text-white font-semibold
+                 shadow-lg shadow-indigo-500/35
+                 hover:from-violet-700 hover:via-indigo-700 hover:to-blue-700 hover:shadow-xl
                  transition-all duration-200
                  active:scale-95
                  flex items-center justify-center gap-2"
@@ -218,7 +218,7 @@
               <span class="text-gray-400">Resend in {{ resendCooldown }}s</span>
             } @else {
               <button
-                class="font-semibold text-indigo-600 hover:text-indigo-700"
+                class="min-h-11 px-2 touch-manipulation font-semibold text-indigo-600 hover:text-indigo-700"
                 [disabled]="resending"
                 (click)="resendOtp()">
                 @if (resending) {
@@ -233,7 +233,7 @@
 
         <!-- Back Button -->
         <button
-          class="w-full mt-4 text-sm text-gray-500 hover:text-gray-700 transition"
+          class="w-full mt-4 min-h-11 touch-manipulation text-sm text-gray-500 hover:text-gray-700 transition"
           (click)="step.set('form')">
           ← Back to signup
         </button>

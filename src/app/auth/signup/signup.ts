@@ -36,10 +36,7 @@ export class SignupComponent {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {
-   // this.step = 'form';
-    console.log("called :::::")
-  }
+  ) {}
 
   // ============================
   // 📝 SIGNUP

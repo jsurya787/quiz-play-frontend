@@ -1,9 +1,9 @@
-<section class="relative py-20 md:py-32 px-6 overflow-hidden bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0]">
+<section class="relative py-20 md:py-32 px-4 sm:px-6 overflow-hidden bg-gradient-to-br from-[#FCFDFF] via-[#F8FAFF] to-[#F1F5FF]">
   
   <!-- BACKGROUND DECORATIONS -->
   <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-  <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full mix-blend-multiply animate-float-slow pointer-events-none"></div>
-  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-sky-500/5 blur-[100px] rounded-full mix-blend-multiply animate-float-slower pointer-events-none"></div>
+  <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-indigo-500/4 blur-[120px] rounded-full mix-blend-multiply animate-float-slow pointer-events-none"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-sky-500/4 blur-[100px] rounded-full mix-blend-multiply animate-float-slower pointer-events-none"></div>
 
   <div class="relative max-w-7xl mx-auto">
     
@@ -21,6 +21,22 @@
       <p class="text-lg text-gray-600 leading-relaxed">
          Comprehensive coverage of Class 10 & 12 syllabus with chapter-wise quizzes designed to boost your exam performance.
       </p>
+
+      <div class="mt-6">
+        <button
+          type="button"
+          routerLink="/all-exams"
+          class="inline-flex items-center justify-center gap-2 min-h-11 touch-manipulation px-6 py-3 rounded-xl
+                 bg-white/90 text-violet-700 font-semibold text-sm
+                 border border-violet-200 shadow-sm
+                 hover:bg-violet-50 hover:border-violet-300 hover:-translate-y-0.5
+                 transition-all duration-200 active:scale-95">
+          <span>View All Subjects</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </button>
+      </div>
 
       @if (authService.isAdmin()) {
         <div class="mt-8">
@@ -65,7 +81,163 @@
     <!-- 🔹 SUBJECTS GRID -->
     <!-- ===================== -->
     @else {
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="sm:hidden space-y-4">
+        <div class="flex items-center justify-center gap-3 text-xs font-semibold text-indigo-600/80 uppercase tracking-wider">
+          <span>Swipe left or right</span>
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl">
+          @if (evenCanScrollLeft()) {
+            <button
+              type="button"
+              class="swipe-edge-arrow swipe-edge-btn swipe-edge-left"
+              (click)="scrollRow('even', 'left')"
+              aria-label="Scroll subjects left">
+              ←
+            </button>
+          }
+          @if (evenCanScrollRight()) {
+            <button
+              type="button"
+              class="swipe-edge-arrow swipe-edge-btn swipe-edge-right"
+              (click)="scrollRow('even', 'right')"
+              aria-label="Scroll subjects right">
+              →
+            </button>
+          }
+          <div #evenRow (scroll)="onRowScroll('even', $event)" class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          @for (s of subjectService.subjects(); track s._id; let i = $index) {
+            @if (i % 2 === 0) {
+              <div class="snap-start shrink-0 w-[calc(100vw-2.75rem)] max-w-[340px] group relative rounded-3xl bg-white/75 backdrop-blur-md border border-white/60 p-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                @if (authService.isAdmin()) {
+                  <div class="absolute top-3 right-3 z-20 flex gap-2">
+                    <button (click)="editSubject(s); $event.stopPropagation()" class="p-2 rounded-full bg-white/90 text-indigo-600 shadow-sm active:scale-95" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    <button (click)="deleteSubject(s); $event.stopPropagation()" class="p-2 rounded-full bg-white/90 text-red-500 shadow-sm active:scale-95" title="Delete">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                }
+
+                <div class="h-full rounded-[20px] bg-gradient-to-b from-white/60 to-white/85 p-5 flex flex-col relative overflow-hidden">
+                  <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r" [ngClass]="s.color || 'from-indigo-500 to-purple-500'"></div>
+
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-white shadow-inner flex items-center justify-center">
+                      <img [src]="s.logoUrl" class="w-7 h-7 object-contain drop-shadow-sm" alt="Subject Icon" />
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-600 border border-gray-200/50">
+                      {{ s.subjectClass }}
+                    </span>
+                  </div>
+
+                  <h3 class="text-lg font-bold text-gray-900 mb-2">{{ s.name }}</h3>
+                  <p class="text-sm text-gray-500 mb-5 line-clamp-2 leading-relaxed">{{ s.description }}</p>
+
+                  <div class="flex flex-wrap gap-2 mb-6">
+                    @for (item of s.keyPoints.slice(0, 2); track $index) {
+                      <span class="px-2.5 py-1 rounded-md text-[11px] font-medium bg-indigo-50/50 text-indigo-700 border border-indigo-100/50">
+                        {{ item }}
+                      </span>
+                    }
+                    @if (s.keyPoints.length > 2) {
+                      <span class="px-2 py-1 text-[10px] font-medium text-gray-400">+{{s.keyPoints.length - 2}}</span>
+                    }
+                  </div>
+
+                  <div class="mt-auto">
+                    <button
+                      [routerLink]="['subject-page/', s._id]"
+                      class="start-practice-btn w-full min-h-11 touch-manipulation group/btn relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-semibold text-sm shadow-sm active:scale-95">
+                      <span>Start Practicing</span>
+                      <svg class="start-practice-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+          </div>
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl">
+          @if (oddCanScrollLeft()) {
+            <button
+              type="button"
+              class="swipe-edge-arrow swipe-edge-btn swipe-edge-left"
+              (click)="scrollRow('odd', 'left')"
+              aria-label="Scroll subjects left">
+              ←
+            </button>
+          }
+          @if (oddCanScrollRight()) {
+            <button
+              type="button"
+              class="swipe-edge-arrow swipe-edge-btn swipe-edge-right"
+              (click)="scrollRow('odd', 'right')"
+              aria-label="Scroll subjects right">
+              →
+            </button>
+          }
+          <div #oddRow (scroll)="onRowScroll('odd', $event)" class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          @for (s of subjectService.subjects(); track s._id; let i = $index) {
+            @if (i % 2 !== 0) {
+              <div class="snap-start shrink-0 w-[calc(100vw-2.75rem)] max-w-[340px] group relative rounded-3xl bg-white/75 backdrop-blur-md border border-white/60 p-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                @if (authService.isAdmin()) {
+                  <div class="absolute top-3 right-3 z-20 flex gap-2">
+                    <button (click)="editSubject(s); $event.stopPropagation()" class="p-2 rounded-full bg-white/90 text-indigo-600 shadow-sm active:scale-95" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    <button (click)="deleteSubject(s); $event.stopPropagation()" class="p-2 rounded-full bg-white/90 text-red-500 shadow-sm active:scale-95" title="Delete">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                }
+
+                <div class="h-full rounded-[20px] bg-gradient-to-b from-white/60 to-white/85 p-5 flex flex-col relative overflow-hidden">
+                  <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r" [ngClass]="s.color || 'from-indigo-500 to-purple-500'"></div>
+
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-white shadow-inner flex items-center justify-center">
+                      <img [src]="s.logoUrl" class="w-7 h-7 object-contain drop-shadow-sm" alt="Subject Icon" />
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-600 border border-gray-200/50">
+                      {{ s.subjectClass }}
+                    </span>
+                  </div>
+
+                  <h3 class="text-lg font-bold text-gray-900 mb-2">{{ s.name }}</h3>
+                  <p class="text-sm text-gray-500 mb-5 line-clamp-2 leading-relaxed">{{ s.description }}</p>
+
+                  <div class="flex flex-wrap gap-2 mb-6">
+                    @for (item of s.keyPoints.slice(0, 2); track $index) {
+                      <span class="px-2.5 py-1 rounded-md text-[11px] font-medium bg-indigo-50/50 text-indigo-700 border border-indigo-100/50">
+                        {{ item }}
+                      </span>
+                    }
+                    @if (s.keyPoints.length > 2) {
+                      <span class="px-2 py-1 text-[10px] font-medium text-gray-400">+{{s.keyPoints.length - 2}}</span>
+                    }
+                  </div>
+
+                  <div class="mt-auto">
+                    <button
+                      [routerLink]="['subject-page/', s._id]"
+                      class="start-practice-btn w-full min-h-11 touch-manipulation group/btn relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-semibold text-sm shadow-sm active:scale-95">
+                      <span>Start Practicing</span>
+                      <svg class="start-practice-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden sm:grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @for (s of subjectService.subjects(); track s._id) {
           <div class="group relative rounded-3xl bg-white/70 backdrop-blur-md border border-white/50 p-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300">
             
@@ -123,9 +295,9 @@
               <div class="mt-auto">
                 <button 
                   [routerLink]="['subject-page/', s._id]"
-                  class="w-full group/btn relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-900 font-semibold text-sm shadow-sm transition-all hover:bg-gray-50 hover:border-gray-300">
+                  class="start-practice-btn w-full group/btn relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-semibold text-sm transition-all">
                   <span>Start Practicing</span>
-                  <svg class="w-4 h-4 text-gray-400 transition-transform group-hover/btn:translate-x-1 group-hover/btn:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                  <svg class="start-practice-icon w-4 h-4 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </button>
               </div>
 

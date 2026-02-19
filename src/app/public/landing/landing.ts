@@ -1,19 +1,16 @@
 import { Component } from '@angular/core';
   import { Meta, Title } from '@angular/platform-browser'; // for SEO management
 import { HeroComponent } from '../hero/hero';
-import { FeaturesComponent } from '../features/features.js';
+import { FeaturesComponent } from '../features/features';
 import { TestimonialsComponent } from '../testimonials/testimonials';
-import { AboutComponent } from '../about/about';
 import { FooterComponent } from '../footer/footer';
 import { SubjectsComponent } from '../subjects/subjects';
 import { DarkHighlightComponent } from '../dark-highlight/dark-highlight';
 import { StatsComponent } from '../stats/stats';
 import { SyllabusTimelineComponent } from '../syllabus-timeline/syllabus-timeline';
 import { SuccessStoriesComponent } from '../success-stories/success-stories';
-import { ExamsComponent } from '../exams/exams';
+import { TrendingExamsComponent } from '../trending-exams/trending-exams';
 import { QuizDemoComponent } from '../quiz-demo/quiz-demo';
-import { AuthFunnelComponent } from '../../shared-auth/auth-funnel/auth-funnel';
-import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
 
 
 
@@ -25,17 +22,14 @@ import { MobileCtaComponent } from '../mobile-cta/mobile-cta';
     HeroComponent,
     FeaturesComponent,
     TestimonialsComponent,
-   // AboutComponent,
     FooterComponent,
     SubjectsComponent,
     DarkHighlightComponent,
     StatsComponent,
     SyllabusTimelineComponent,
     SuccessStoriesComponent,
-    ExamsComponent,
+    TrendingExamsComponent,
     QuizDemoComponent,
-   // AuthFunnelComponent,
-   // MobileCtaComponent
 ],
   templateUrl: './landing.html'
 })

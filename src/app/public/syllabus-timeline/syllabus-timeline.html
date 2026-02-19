@@ -8,14 +8,14 @@
 
     <!-- HEADER -->
     <div class="text-center max-w-3xl mx-auto mb-20 animate-fade-in">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 text-gray-600 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
-        <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
         Roadmap
       </div>
       <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
         Syllabus to <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Mastery</span>
       </h2>
-      <p class="text-lg text-gray-600">
+      <p class="text-lg text-slate-600">
         A structured path designed to take you from foundational concepts to competitive exam readiness.
       </p>
     </div>
@@ -43,7 +43,7 @@
               [ngClass]="{'md:pr-12 md:text-right': isEven, 'md:pl-12 md:order-last': !isEven}">
               
               <div class="group-hover:-translate-y-2 transition-transform duration-300 ease-out">
-                <div class="relative p-8 rounded-3xl bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-shadow duration-300 overflow-hidden">
+                <div class="relative p-8 rounded-3xl bg-white border border-indigo-100/70 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.12)] transition-shadow duration-300 overflow-hidden">
                   
                   <!-- Gradient Bg Accent -->
                   <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r" [ngClass]="item.color"></div>
@@ -57,16 +57,16 @@
                       {{ item.icon }}
                     </div>
                     <div>
-                      <div class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+                      <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
                         {{ item.subtitle }}
                       </div>
-                      <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                      <h3 class="text-xl font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">
                         {{ item.title }}
                       </h3>
                     </div>
                   </div>
 
-                  <p class="text-gray-600 leading-relaxed relative z-10">
+                  <p class="text-slate-600 leading-relaxed relative z-10">
                     {{ item.desc }}
                   </p>
 

@@ -1,72 +1,96 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { finalize, take } from 'rxjs';
 
-import { SubjectService } from '../../services/subject.service';
+import { Subject, SubjectService } from '../../services/subject.service';
 import { SubjectFormModalComponent } from '../../shared/modals/subject-form-modal/subject-form-modal';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast-service';
+
+interface SubjectItem extends Subject {
+  subjectClass?: string;
+  keyPoints?: string[];
+  logoUrl?: string;
+  color?: string;
+}
+
+interface SubjectFormPayload {
+  name: string;
+  type: 'entrance' | 'government' | 'state' | 'bords';
+  priority: number;
+  subjectClass: string;
+  description: string;
+  keyPoints: string[];
+  isPrimary: boolean;
+  isActive: boolean;
+  logoFile?: File | null;
+}
 
 @Component({
   selector: 'app-subjects',
   standalone: true,
   imports: [CommonModule, RouterLink, SubjectFormModalComponent],
   templateUrl: './subjects.html',
+  styleUrl: './subjects.css',
 })
-export class SubjectsComponent implements OnInit {
-  // ===============================
-  // 🔹 Injected Services
-  // ===============================
-  public subjectService = inject(SubjectService);
-  public authService = inject(AuthService);
-  private toastService = inject(ToastService);
+export class SubjectsComponent implements OnInit, AfterViewInit {
+  public readonly subjectService = inject(SubjectService);
+  public readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
 
-  // ===============================
-  // 🔹 State (Signals)
-  // ===============================
-  loading = signal<boolean>(false);
+  readonly loading = signal(false);
+  readonly submitting = signal(false);
+  readonly deletingId = signal<string | null>(null);
+  readonly showModal = signal(false);
+  readonly isEdit = signal(false);
+  readonly selectedSubject = signal<SubjectItem | null>(null);
+  readonly evenCanScrollLeft = signal(false);
+  readonly evenCanScrollRight = signal(false);
+  readonly oddCanScrollLeft = signal(false);
+  readonly oddCanScrollRight = signal(false);
 
-  // ===============================
-  // 🔹 Modal State
-  // ===============================
-  showModal = signal(false);
-  isEdit = signal(false);
-  selectedSubject = signal<any | null>(null);
+  @ViewChild('evenRow') private evenRow?: ElementRef<HTMLDivElement>;
+  @ViewChild('oddRow') private oddRow?: ElementRef<HTMLDivElement>;
 
-  // ===============================
-  // 🔹 Lifecycle
-  // ===============================
   ngOnInit(): void {
     if (this.subjectService.subjects().length === 0) {
       this.getSubjects();
-    } else {
-      this.loading.set(false);
+      return;
     }
+
+    setTimeout(() => this.refreshMobileArrowState(), 0);
   }
 
-  // ===============================
-  // 🔹 Modal Actions
-  // ===============================
+  ngAfterViewInit(): void {
+    setTimeout(() => this.refreshMobileArrowState(), 0);
+  }
+
   openAdd(): void {
     this.isEdit.set(false);
     this.selectedSubject.set(null);
     this.showModal.set(true);
   }
 
-  editSubject(subject: any): void {
+  editSubject(subject: SubjectItem): void {
     this.isEdit.set(true);
     this.selectedSubject.set(subject);
     this.showModal.set(true);
   }
 
-  deleteSubject(subject: any): void {
+  deleteSubject(subject: SubjectItem): void {
     const id = subject?._id;
-    if (!id) return;
+    if (!id || this.deletingId() === id) return;
 
-    this.subjectService.deleteSubject(id).subscribe({
+    this.deletingId.set(id);
+
+    this.subjectService.deleteSubject(id).pipe(
+      take(1),
+      finalize(() => this.deletingId.set(null))
+    ).subscribe({
       next: () => {
         this.toastService.success('Subject deleted successfully.');
-        this.getSubjects(); // refresh list
+        this.getSubjects();
       },
       error: () => {
         this.toastService.error('Failed to delete subject.');
@@ -78,31 +102,20 @@ export class SubjectsComponent implements OnInit {
     this.showModal.set(false);
   }
 
-  // ===============================
-  // 🔹 Save Subject
-  // ===============================
-  saveSubject(payload: any): void {
-    const fd: any = new FormData();
+  saveSubject(payload: SubjectFormPayload): void {
+    if (this.submitting()) return;
 
-    // 🔹 Common fields
-    fd.append('name', payload.name);
-    fd.append('subjectClass', payload.subjectClass);
-    fd.append('description', payload.description);
-    fd.append('keyPoints', JSON.stringify(payload.keyPoints));
-    fd.append('isPrimary', String(payload.isPrimary));
-    fd.append('isActive', String(payload.isActive));
-
-    // 🔹 Logo (only if selected)
-    if (payload.logoFile) {
-      fd.append('logo', payload.logoFile);
-    }
+    const formData = this.buildSubjectFormData(payload);
+    this.submitting.set(true);
 
     if (!this.isEdit()) {
-      // ➕ CREATE
-      this.subjectService.createNewSubject(fd).subscribe({
+      this.subjectService.createNewSubject(formData as unknown as Subject).pipe(
+        take(1),
+        finalize(() => this.submitting.set(false))
+      ).subscribe({
         next: () => {
           this.toastService.success('Subject created successfully.');
-          this.getSubjects(); // refresh list
+          this.getSubjects();
           this.closeModal();
         },
         error: () => {
@@ -110,11 +123,16 @@ export class SubjectsComponent implements OnInit {
         },
       });
     } else {
-      // ✏️ UPDATE
       const id = this.selectedSubject()?._id;
-      if (!id) return;
+      if (!id) {
+        this.submitting.set(false);
+        return;
+      }
 
-      this.subjectService.updateSubject(id, fd).subscribe({
+      this.subjectService.updateSubject(id, formData as unknown as Partial<Subject>).pipe(
+        take(1),
+        finalize(() => this.submitting.set(false))
+      ).subscribe({
         next: () => {
           this.toastService.success('Subject updated successfully.');
           this.getSubjects();
@@ -127,22 +145,100 @@ export class SubjectsComponent implements OnInit {
     }
   }
 
-  // ===============================
-  // 🔹 Load Subjects
-  // ===============================
   getSubjects(): void {
+    if (this.loading()) return;
+
     this.loading.set(true);
-    this.subjectService.getSubjects().subscribe({
-      next: (res) => {
-        this.subjectService.subjects.set(res?.data ?? []);
+    this.subjectService.loadPrimarySubjects().pipe(
+      take(1),
+      finalize(() => {
         this.loading.set(false);
+        setTimeout(() => this.refreshMobileArrowState(), 0);
+      })
+    ).subscribe({
+      next: (subjects) => {
+        this.subjectService.subjects.set(subjects);
       },
       error: (err) => {
         console.error('Error fetching primary subjects:', err);
         this.toastService.error('Failed to load primary subjects.');
         this.subjectService.subjects.set([]);
-        this.loading.set(false);
       },
     });
+  }
+
+  onRowScroll(row: 'even' | 'odd', event: Event): void {
+    const target = event.target as HTMLDivElement | null;
+    if (!target) return;
+    this.updateScrollState(row, target);
+  }
+
+  scrollRow(row: 'even' | 'odd', direction: 'left' | 'right'): void {
+    const el = row === 'even' ? this.evenRow?.nativeElement : this.oddRow?.nativeElement;
+    if (!el) return;
+
+    const step = Math.max(180, Math.floor(el.clientWidth * 0.82));
+    const delta = direction === 'left' ? -step : step;
+
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+    setTimeout(() => this.updateScrollState(row, el), 220);
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.refreshMobileArrowState();
+  }
+
+  private refreshMobileArrowState(): void {
+    this.updateScrollState('even', this.evenRow?.nativeElement);
+    this.updateScrollState('odd', this.oddRow?.nativeElement);
+  }
+
+  private updateScrollState(
+    row: 'even' | 'odd',
+    el?: HTMLDivElement
+  ): void {
+    if (!el) {
+      if (row === 'even') {
+        this.evenCanScrollLeft.set(false);
+        this.evenCanScrollRight.set(false);
+      } else {
+        this.oddCanScrollLeft.set(false);
+        this.oddCanScrollRight.set(false);
+      }
+      return;
+    }
+
+    const maxScrollLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+    const canLeft = el.scrollLeft > 4;
+    const canRight = maxScrollLeft - el.scrollLeft > 4;
+
+    if (row === 'even') {
+      this.evenCanScrollLeft.set(canLeft);
+      this.evenCanScrollRight.set(canRight);
+      return;
+    }
+
+    this.oddCanScrollLeft.set(canLeft);
+    this.oddCanScrollRight.set(canRight);
+  }
+
+  private buildSubjectFormData(payload: SubjectFormPayload): FormData {
+    const formData = new FormData();
+
+    formData.append('name', payload.name);
+    formData.append('type', payload.type);
+    formData.append('priority', String(payload.priority));
+    formData.append('subjectClass', payload.subjectClass);
+    formData.append('description', payload.description);
+    formData.append('keyPoints', JSON.stringify(payload.keyPoints));
+    formData.append('isPrimary', String(payload.isPrimary));
+    formData.append('isActive', String(payload.isActive));
+
+    if (payload.logoFile) {
+      formData.append('logo', payload.logoFile);
+    }
+
+    return formData;
   }
 }

@@ -1,5 +1,4 @@
 <div class="min-h-screen relative bg-[#fcfcfd] overflow-hidden">
-  <!-- Cinematic Background -->
   <div class="absolute inset-0 pointer-events-none z-0">
     <div class="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-indigo-200/40 rounded-full blur-[120px] animate-float-slow"></div>
     <div class="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-[100px] animate-float-slower"></div>
@@ -7,19 +6,24 @@
 
   <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
     <div class="glass-card p-6 md:p-16 animate-fade-in-up">
-      <div class="mb-10 md:mb-12 border-b border-black/[0.03] pb-10">
+      <div class="mb-8 md:mb-10 border-b border-black/[0.04] pb-8">
         <h1 class="text-3xl md:text-6xl font-black text-slate-950 tracking-tight mb-4">Privacy Policy</h1>
         <p class="text-slate-500 font-medium">Last updated: {{ lastUpdated }}</p>
       </div>
 
-      <div class="space-y-10 text-slate-700 leading-relaxed font-medium">
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">1. Introduction</h2>
+      <div class="mb-8 flex flex-wrap gap-2">
+        <a href="/terms" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition-colors">Terms of Service</a>
+        <a href="/cookie-policy" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100 hover:bg-violet-100 transition-colors">Cookie Policy</a>
+      </div>
+
+      <div class="space-y-6 text-slate-700 leading-relaxed font-medium">
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">1. Introduction</h2>
           <p>Welcome to QuizPlay. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our platform.</p>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">2. Information We Collect</h2>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">2. Information We Collect</h2>
           <p>We collect personal information that you voluntarily provide to us when you register on the platform, express an interest in obtaining information about us or our products and services, or otherwise when you contact us.</p>
           <ul class="list-disc ml-6 mt-4 space-y-2">
             <li><strong>Personal Data:</strong> Name, email address, password, and profile picture.</li>
@@ -28,8 +32,8 @@
           </ul>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">3. How We Use Your Information</h2>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">3. How We Use Your Information</h2>
           <p>We use the information we collect or receive to:</p>
           <ul class="list-disc ml-6 mt-4 space-y-2">
             <li>Facilitate account creation and logon process.</li>
@@ -39,24 +43,24 @@
           </ul>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">4. Data Sharing and Disclosure</h2>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">4. Data Sharing and Disclosure</h2>
           <p>We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations. We do not sell your personal data to third parties.</p>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">5. Data Retention and Security</h2>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">5. Data Retention and Security</h2>
           <p>We keep your information for as long as necessary to fulfill the purposes outlined in this privacy policy unless otherwise required by law. We implement appropriate technical and organizational security measures to protect your personal data.</p>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">6. Your Privacy Rights</h2>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">6. Your Privacy Rights</h2>
           <p>Depending on your location, you may have the right to access, correct, or delete your personal information. You can manage your account settings within the platform or contact us directly.</p>
         </section>
 
-        <section>
-          <h2 class="text-2xl font-black text-slate-900 mb-4 tracking-tight">7. Contact Us</h2>
-          <p>If you have questions or comments about this policy, you may email us at support@quizplay.co.in.</p>
+        <section class="section-card">
+          <h2 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">7. Contact Us</h2>
+          <p>If you have questions or comments about this policy, you may email us at <a href="mailto:support@quizplay.co.in" class="text-indigo-700 font-semibold hover:text-indigo-600">support@quizplay.co.in</a>.</p>
         </section>
       </div>
     </div>

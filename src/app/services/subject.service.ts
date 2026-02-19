@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, finalize, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environment';
 
 /* ===============================
@@ -10,6 +10,8 @@ import { environment } from '../../../environment';
 export interface Subject {
   _id: string;
   name: string;
+  type?: 'entrance' | 'government' | 'state' | 'bords';
+  priority?: number;
   description?: string;
   isActive: boolean;
   isPrimary: boolean;
@@ -66,6 +68,7 @@ export class SubjectService {
   private readonly SUBJECT_INFO_API = `${environment.apiUrl}/subject-info`;
   private readonly CHAPTER_API = `${environment.apiUrl}/chapters`;
   private readonly QUIZ_API = `${environment.apiUrl}/quizzes`;
+  private primarySubjectsRequest$?: Observable<Subject[]>;
   subjects = signal<any[]>([]);
   primarySubjects = signal<any[]>([]);
 
@@ -80,6 +83,38 @@ export class SubjectService {
     return this.http.get<{ success: boolean; data: Subject[] }>(
       this.SUBJECT_API + '/primary'
     );
+  }
+
+  loadPrimarySubjects(forceRefresh = false): Observable<Subject[]> {
+    if (!forceRefresh && this.primarySubjects().length > 0) {
+      return of(this.primarySubjects());
+    }
+
+    if (!forceRefresh && this.primarySubjectsRequest$) {
+      return this.primarySubjectsRequest$;
+    }
+
+    this.primarySubjectsRequest$ = this.getPrimarySubjects().pipe(
+      map((res) =>
+        [...(res?.data ?? [])].sort(
+          (a, b) =>
+            (a.priority ?? Number.MAX_SAFE_INTEGER) -
+            (b.priority ?? Number.MAX_SAFE_INTEGER)
+        )
+      ),
+      tap((subjects) => this.primarySubjects.set(subjects)),
+      finalize(() => {
+        this.primarySubjectsRequest$ = undefined;
+      }),
+      shareReplay(1)
+    );
+
+    return this.primarySubjectsRequest$;
+  }
+
+  clearPrimarySubjectsCache(): void {
+    this.primarySubjects.set([]);
+    this.primarySubjectsRequest$ = undefined;
   }
 
   /* ===============================

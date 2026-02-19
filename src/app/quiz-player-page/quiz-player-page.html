@@ -1,5 +1,5 @@
 @if (loading()) {
-<div class="min-h-screen bg-[#F8FAFC]">
+<div class="premium-shell min-h-screen bg-gradient-to-br from-[#F6F9FF] via-[#F9FBFF] to-[#EEF3FF]">
   
   <!-- SKELETON HEADER -->
   <header class="h-16 border-b border-gray-100 bg-white/50 backdrop-blur-sm px-6 flex items-center justify-between">
@@ -26,18 +26,24 @@
 }
 
 @if (loading() == false) {
-<div class="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
+<div class="premium-shell min-h-screen bg-gradient-to-br from-[#F6F9FF] via-[#F9FBFF] to-[#EEF3FF] flex flex-col relative overflow-hidden">
+  <div class="pointer-events-none absolute inset-0 z-0">
+    <div class="premium-grid absolute inset-0 opacity-35"></div>
+    <div class="premium-grain absolute inset-0 opacity-[0.04]"></div>
+    <div class="absolute -top-24 -left-16 w-[380px] h-[380px] rounded-full bg-indigo-300/14 blur-[95px]"></div>
+    <div class="absolute -bottom-28 -right-20 w-[420px] h-[420px] rounded-full bg-sky-300/12 blur-[110px]"></div>
+  </div>
 
   <!-- ================= HEADER ================= -->
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all">
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-indigo-100/70 shadow-[0_10px_32px_rgba(79,70,229,0.08)] transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
       
       <!-- Left: Title & Progress -->
       <div class="flex items-center gap-4 sm:gap-6">
-        <div class="relative group cursor-pointer" routerLink="/student/dashboard">
+        <button type="button" class="relative group cursor-pointer min-h-11 touch-manipulation" aria-label="Exit quiz" (click)="openExitConfirm()">
           <div class="absolute -inset-2 bg-gray-100/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <svg class="w-6 h-6 text-gray-500 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </div>
+        </button>
 
         <div class="hidden sm:block h-6 w-px bg-gray-200"></div>
 
@@ -53,7 +59,7 @@
       </div>
 
       <!-- Center: Progress Bar (Desktop) -->
-      <div class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 flex-col gap-1.5">
+      <div class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 flex-col gap-1.5 pointer-events-none">
         <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
           <div class="h-full bg-indigo-600 rounded-full transition-all duration-500 ease-out"
                [style.width.%]="progressPercent()"></div>
@@ -61,19 +67,23 @@
       </div>
 
       <!-- Right: Timer & Submit -->
-      <div class="flex items-center gap-3 sm:gap-4">
+      <div class="relative z-20 flex items-center gap-3 sm:gap-4">
         
         <!-- Timer Pill -->
-        <div class="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border transition-all duration-300"
-             [ngClass]="isTimeLow() 
-               ? 'bg-red-50 border-red-100 text-red-600 animate-pulse ring-2 ring-red-500/20' 
-               : 'bg-white border-gray-200 text-gray-700 shadow-sm'">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span class="font-mono font-bold text-sm sm:text-base tabular-nums">{{ remainingTime() }}</span>
+        <div class="timer-pill flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border transition-all duration-300"
+             [ngClass]="{
+               'timer-safe bg-emerald-50 border-emerald-200 text-emerald-700 ring-2 ring-emerald-500/15': timerTone() === 'safe',
+               'timer-warn bg-amber-50 border-amber-200 text-amber-700 ring-2 ring-amber-500/15': timerTone() === 'warn',
+               'timer-danger bg-red-50 border-red-200 text-red-600 ring-2 ring-red-500/20': timerTone() === 'danger',
+               'timer-neutral bg-white border-gray-200 text-gray-700 shadow-sm': timerTone() === 'normal'
+             }">
+          <svg class="timer-icon w-4 h-4 sm:w-5 sm:h-5" [ngClass]="{'timer-icon-danger': timerTone() === 'danger'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="font-mono font-bold text-sm sm:text-base tabular-nums" [class.timer-value-low]="timerTone() === 'danger'">{{ remainingTime() }}</span>
         </div>
 
         <button
-          class="hidden sm:flex px-6 py-2 rounded-xl bg-gray-900 text-white font-semibold text-sm shadow-lg shadow-gray-900/10 hover:bg-black hover:-translate-y-0.5 active:scale-95 transition-all"
+          type="button"
+          class="hidden sm:flex min-h-11 touch-manipulation cursor-pointer px-6 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-slate-800 text-white font-semibold text-sm shadow-lg shadow-gray-900/15 hover:from-black hover:to-slate-900 hover:-translate-y-0.5 active:scale-95 transition-all"
           (click)="submitQuiz()">
           Submit
         </button>
@@ -88,7 +98,7 @@
   </header>
 
   <!-- ================= MAIN CONTENT ================= -->
-  <main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 pb-32">
+  <main class="relative z-10 flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 pb-32">
     
     <div class="grid lg:grid-cols-[1fr_300px] gap-10 lg:gap-16 items-start">
 
@@ -111,7 +121,7 @@
             <label
               class="group relative w-full flex items-center p-4 sm:p-5 rounded-2xl 
                      border-2 cursor-pointer transition-all duration-200 ease-out
-                     hover:shadow-md hover:border-indigo-200 hover:bg-indigo-50/30"
+                     hover:shadow-md hover:border-indigo-200 hover:bg-indigo-50/30 premium-option min-h-16 sm:min-h-0 touch-manipulation"
               [class.border-indigo-600]="answerForm.value.selectedOptionIndex === $index"
               [class.bg-indigo-50]="answerForm.value.selectedOptionIndex === $index"
               [class.ring-2]="answerForm.value.selectedOptionIndex === $index"
@@ -145,7 +155,8 @@
         <!-- Desktop Play Controls -->
         <div class="hidden lg:flex items-center justify-between mt-12 sm:mt-16 pt-8 border-t border-gray-100">
           <button
-            class="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-500 font-semibold hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            type="button"
+            class="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-500 font-semibold hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent touch-manipulation min-h-11"
             [disabled]="currentIndex() === 0"
             (click)="prev()">
             <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -153,7 +164,8 @@
           </button>
 
           <button
-            class="group flex items-center gap-2 px-8 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            class="next-btn group flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-indigo-200 hover:from-indigo-700 hover:via-violet-700 hover:to-blue-700 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:shadow-none touch-manipulation min-h-11"
             [disabled]="currentIndex() === totalQuestions() - 1"
             (click)="next()">
             Next Step
@@ -176,8 +188,9 @@
           <div class="grid grid-cols-5 gap-2.5">
             @for (q of quiz()?.questions; track q._id; let i = $index) {
               <button
+                type="button"
                 class="w-10 h-10 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center
-                       hover:scale-110 active:scale-95 border-2 shadow-sm"
+                       hover:scale-110 active:scale-95 border-2 shadow-sm touch-manipulation"
                 
                 [class.bg-indigo-600]="hasAnswered(i) && i !== currentIndex()"
                 [class.border-indigo-600]="hasAnswered(i) && i !== currentIndex()"
@@ -221,28 +234,31 @@
   </main>
 
   <!-- ================= MOBILE BOTTOM BAR ================= -->
-  <div class="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-200 px-4 py-3 pb-6 safe-area-pb">
+  <div class="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-indigo-100 px-4 py-3 pb-6 safe-area-pb shadow-[0_-10px_28px_rgba(15,23,42,0.08)]">
     <div class="flex items-center justify-between gap-3 max-w-md mx-auto">
       
       <button 
-        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-600 disabled:opacity-30"
+        type="button"
+        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-600 disabled:opacity-30 touch-manipulation"
         [disabled]="currentIndex() === 0"
         (click)="prev()">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       </button>
 
       <button 
-        class="flex-1 h-12 rounded-2xl bg-gray-900 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform"
+        type="button"
+        class="up-arrow-trigger flex-1 h-12 rounded-2xl bg-gradient-to-r from-gray-900 to-slate-800 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform touch-manipulation"
         (click)="openPalette()">
         <span class="text-gray-400 font-normal">Question</span>
         <span class="text-white">{{ currentIndex() + 1 }}</span>
         <span class="text-gray-500 mx-1">/</span>
         <span class="text-gray-400">{{ totalQuestions() }}</span>
-        <svg class="w-4 h-4 text-gray-500 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+        <svg class="up-arrow-icon w-4 h-4 text-gray-500 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
       </button>
 
       <button 
-        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50"
+        type="button"
+        class="next-btn w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50 touch-manipulation"
         [disabled]="currentIndex() === totalQuestions() - 1 && !hasAnswered(currentIndex())"
         (click)="currentIndex() === totalQuestions() - 1 ? submitQuiz() : next()">
         @if (currentIndex() === totalQuestions() - 1) {
@@ -259,7 +275,7 @@
   @if (showMobilePalette) {
     <div class="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm animate-fade-in" (click)="closePalette()">
       <div 
-        class="absolute bottom-0 inset-x-0 bg-white rounded-t-[2rem] p-6 pb-10 shadow-2xl animate-slide-up-modal"
+        class="absolute bottom-0 inset-x-0 bg-white/95 rounded-t-[2rem] p-5 sm:p-6 pb-10 shadow-2xl animate-slide-up-modal border-t border-indigo-100 max-h-[86vh] overflow-hidden"
         (click)="$event.stopPropagation()">
         
         <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
@@ -268,16 +284,18 @@
           <h3 class="font-bold text-xl text-gray-900">Question Palette</h3>
           <!-- Submit Button Mobile -->
            <button
-            class="px-4 py-2 rounded-xl bg-gray-900 text-white font-semibold text-xs"
+            type="button"
+            class="min-h-11 touch-manipulation px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-slate-800 text-white font-semibold text-xs"
             (click)="submitQuiz()">
             Submit Quiz
           </button>
         </div>
 
-        <div class="grid grid-cols-5 gap-3 max-h-[50vh] overflow-y-auto p-1">
+        <div class="grid grid-cols-5 gap-3 max-h-[55vh] overflow-y-auto p-1">
           @for (q of quiz()?.questions; track q._id; let i = $index) {
             <button
-              class="w-12 h-12 rounded-2xl font-bold text-sm transition-all flex items-center justify-center border-2"
+              type="button"
+              class="w-12 h-12 rounded-2xl font-bold text-sm transition-all flex items-center justify-center border-2 touch-manipulation"
               
               [class.bg-indigo-600]="hasAnswered(i)"
               [class.border-indigo-600]="hasAnswered(i)"
@@ -297,6 +315,36 @@
           }
         </div>
 
+      </div>
+    </div>
+  }
+
+  @if (showExitConfirm()) {
+    <div class="fixed inset-0 z-[70] bg-slate-900/55 backdrop-blur-sm animate-fade-in flex items-end sm:items-center justify-center p-3 sm:p-4" (click)="closeExitConfirm()">
+      <div class="exit-confirm-card w-full max-w-md bg-white/95 rounded-[1.75rem] sm:rounded-[2rem] p-5 sm:p-6 border border-indigo-100 shadow-2xl animate-slide-up-modal" (click)="$event.stopPropagation()">
+        <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Close this quiz?</h3>
+        <p class="mt-2 text-sm text-slate-500 leading-relaxed">
+          Are you sure you want to close this quiz now? You can cancel and continue, or submit your current answers.
+        </p>
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            class="min-h-11 touch-manipulation rounded-2xl bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm active:scale-95 transition-transform"
+            (click)="closeExitConfirm()">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="next-btn min-h-11 touch-manipulation rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-transform"
+            (click)="submitFromExitConfirm()">
+            Submit Quiz
+          </button>
+        </div>
       </div>
     </div>
   }

@@ -1,0 +1,171 @@
+.hero-like-game {
+  display: inline-block;
+  background: linear-gradient(95deg, #0f172a 0%, #7c3aed 58%, #d4a017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 8px 24px rgba(124, 58, 237, 0.22);
+}
+
+.play-quiz-outline {
+  box-shadow:
+    0 10px 24px rgba(124, 58, 237, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@keyframes subjectChipFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes subjectChipShimmer {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 0.45;
+  }
+
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes subjectMorePulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+@keyframes subjectChipGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 6px 16px rgba(124, 58, 237, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  50% {
+    box-shadow:
+      0 10px 22px rgba(124, 58, 237, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+}
+
+@keyframes subjectIconWiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  35% {
+    transform: rotate(-8deg) scale(1.06);
+  }
+
+  70% {
+    transform: rotate(8deg) scale(1.08);
+  }
+}
+
+.subject-chip {
+  position: relative;
+  overflow: hidden;
+  animation:
+    subjectChipFloat 4s ease-in-out infinite,
+    subjectChipGlow 3.2s ease-in-out infinite;
+}
+
+.subject-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0.08) 65%,
+    transparent 100%
+  );
+  animation: subjectChipShimmer 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.subject-chip-icon {
+  display: inline-block;
+  animation: subjectChipFloat 2.4s ease-in-out infinite;
+}
+
+.subject-chip:hover .subject-chip-icon {
+  animation:
+    subjectChipFloat 2.4s ease-in-out infinite,
+    subjectIconWiggle 420ms ease-in-out;
+}
+
+.subject-chip:nth-child(2n) {
+  animation-delay: 0.2s;
+}
+
+.subject-chip:nth-child(3n)::after {
+  animation-delay: 0.5s;
+}
+
+.subject-more-btn {
+  box-shadow:
+    0 10px 20px rgba(99, 102, 241, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.subject-more-icon {
+  animation: subjectMorePulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subject-chip,
+  .subject-chip::after,
+  .subject-chip-icon,
+  .subject-more-icon {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .subject-chip,
+  .subject-chip-icon,
+  .subject-chip::after,
+  .subject-more-icon {
+    animation-timing-function: ease-in-out !important;
+  }
+
+  .subject-chip {
+    animation-duration: 5.4s, 4.4s !important;
+  }
+
+  .subject-chip-icon {
+    animation-duration: 3s !important;
+  }
+
+  .subject-chip::after {
+    animation-duration: 4.2s !important;
+    opacity: 0.65;
+  }
+
+  .subject-more-icon {
+    animation-duration: 2.4s !important;
+  }
+}

@@ -1,30 +1,139 @@
-<section class="py-20 md:py-32 bg-white border-t border-gray-100">
-  <div class="max-w-7xl mx-auto px-6 text-center">
-    
-    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-8">
-      Prepare for excellence in
-    </p>
-
-    <div class="flex flex-wrap justify-center gap-6">
-      @for (exam of exams; track $index) {
-        <div class="group px-8 py-6 rounded-2xl bg-white border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-default flex flex-col items-center min-w-[160px]"
-             [ngClass]="exam.border">
-          
-          <h3 class="text-xl font-bold mb-1" [ngClass]="exam.color">
-            {{ exam.name }}
-          </h3>
-          
-          <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
-            {{ exam.desc }}
-          </p>
-
-        </div>
-      }
+<section class="py-20 md:py-28 bg-white border-t border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center">
+      <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">
+        Prepare for excellence in
+      </p>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+        Trending Exams
+      </h2>
     </div>
 
-    <p class="mt-12 text-gray-400 text-sm">
-      & many more coming soon...
-    </p>
+    <div class="mt-8 rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-5 shadow-sm">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="relative w-full lg:max-w-sm">
+          <input
+            type="text"
+            [value]="search()"
+            (input)="onSearchInput($any($event.target).value)"
+            placeholder="Search exams..."
+            class="w-full min-h-11 rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition" />
+        </div>
 
+        <div class="flex flex-wrap gap-2">
+          @for (type of ['all', 'entrance', 'government', 'state', 'bords']; track type) {
+            <button
+              type="button"
+              class="min-h-10 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition"
+              [class.bg-gradient-to-r]="selectedType() === type"
+              [class.from-violet-600]="selectedType() === type"
+              [class.via-indigo-600]="selectedType() === type"
+              [class.to-blue-600]="selectedType() === type"
+              [class.text-white]="selectedType() === type"
+              [class.border-transparent]="selectedType() === type"
+              [class.shadow-md]="selectedType() === type"
+              [class.bg-white]="selectedType() !== type"
+              [class.text-slate-700]="selectedType() !== type"
+              [class.border-slate-300]="selectedType() !== type"
+              [class.hover:border-violet-300]="selectedType() !== type"
+              [class.hover:text-violet-700]="selectedType() !== type"
+              (click)="setType($any(type))">
+              {{ type === 'all' ? 'All' : typeLabel($any(type)) }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="h-[150px] rounded-2xl border border-slate-200 bg-slate-50 animate-pulse"></div>
+        }
+      </div>
+    } @else if (hasResults()) {
+      <div class="mt-8 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        @for (exam of exams(); track exam._id) {
+          <a
+            [routerLink]="['/subject-page', exam._id]"
+            class="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-bold text-slate-900 group-hover:text-violet-700 transition-colors">
+                  {{ exam.name }}
+                </h3>
+                <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-violet-600">
+                  {{ typeLabel(exam.type) }}
+                </p>
+              </div>
+
+              @if (exam.logoUrl) {
+                <img
+                  [src]="exam.logoUrl"
+                  alt="Exam Logo"
+                  class="w-9 h-9 rounded-lg object-contain border border-slate-100 bg-white" />
+              }
+            </div>
+
+            <p class="mt-3 text-sm text-slate-500 line-clamp-2">
+              {{ exam.description || 'Practice exam-focused quizzes and improve consistency.' }}
+            </p>
+
+            <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+              <span class="text-xs text-slate-400 uppercase tracking-wide">
+                {{ exam.subjectClass || 'General' }}
+              </span>
+              <span class="text-xs font-semibold text-violet-700">Open</span>
+            </div>
+          </a>
+        }
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-slate-500">
+          Showing {{ exams().length }} of {{ total() }} exams
+        </p>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="min-h-10 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="currentPage() <= 1"
+            (click)="prevPage()">
+            Prev
+          </button>
+
+          @for (page of pageNumbers(); track page) {
+            <button
+              type="button"
+              class="min-h-10 min-w-10 rounded-lg border px-3 py-2 text-sm font-semibold transition"
+              [class.bg-violet-600]="currentPage() === page"
+              [class.border-violet-600]="currentPage() === page"
+              [class.text-white]="currentPage() === page"
+              [class.bg-white]="currentPage() !== page"
+              [class.border-slate-300]="currentPage() !== page"
+              [class.text-slate-700]="currentPage() !== page"
+              [class.hover:border-violet-300]="currentPage() !== page"
+              [class.hover:text-violet-700]="currentPage() !== page"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="min-h-10 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 bg-white hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="currentPage() >= totalPages()"
+            (click)="nextPage()">
+            Next
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="mt-10 text-center py-10 rounded-2xl border border-dashed border-slate-300 bg-slate-50">
+        <p class="text-slate-700 font-semibold">No exams found</p>
+        <p class="mt-1 text-sm text-slate-500">Try another filter or search keyword.</p>
+      </div>
+    }
   </div>
 </section>

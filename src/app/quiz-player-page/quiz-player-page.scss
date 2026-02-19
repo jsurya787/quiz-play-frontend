@@ -1,0 +1,313 @@
+.premium-shell {
+  font-family: "Plus Jakarta Sans", "Segoe UI", Roboto, sans-serif;
+}
+
+.premium-grid {
+  background-image:
+    linear-gradient(to right, rgba(99, 102, 241, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at center, black 42%, transparent 90%);
+}
+
+.premium-grain {
+  background-image:
+    radial-gradient(circle at 20% 24%, rgba(15, 23, 42, 0.24) 0.5px, transparent 0.5px),
+    radial-gradient(circle at 72% 66%, rgba(15, 23, 42, 0.18) 0.5px, transparent 0.5px);
+  background-size: 4px 4px, 5px 5px;
+}
+
+.premium-panel {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 24px 64px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.premium-option {
+  overflow: hidden;
+}
+
+.premium-option::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: translateX(-140%);
+  transition: transform 420ms ease;
+  pointer-events: none;
+}
+
+.premium-option:hover::before {
+  transform: translateX(140%);
+}
+
+.timer-pill {
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.08);
+}
+
+.timer-icon {
+  animation: timerTick 1.1s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.timer-safe {
+  animation: timerSafePulse 2.2s ease-in-out infinite;
+}
+
+.timer-warn {
+  animation: timerWarnPulse 1.6s ease-in-out infinite;
+}
+
+.timer-danger {
+  animation: timerDangerPulse 0.9s ease-in-out infinite;
+}
+
+.timer-icon-danger {
+  animation: timerDangerShake 0.8s ease-in-out infinite;
+}
+
+.timer-value-low {
+  animation: timerUrgent 0.9s ease-in-out infinite;
+}
+
+.next-btn {
+  animation: nextPulse 2.2s ease-in-out infinite;
+}
+
+.up-arrow-icon {
+  animation: upArrowFloat 1.6s ease-in-out infinite;
+}
+
+.up-arrow-trigger:hover .up-arrow-icon {
+  animation-duration: 0.9s;
+}
+
+.exit-confirm-card {
+  box-shadow:
+    0 30px 70px rgba(15, 23, 42, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ========================
+   ANIMATIONS
+======================== */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUpModal {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes timerTick {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes timerUrgent {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes timerSafePulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 12px 22px rgba(16, 185, 129, 0.3);
+  }
+}
+
+@keyframes timerWarnPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 18px rgba(245, 158, 11, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.35);
+  }
+}
+
+@keyframes timerDangerPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.25);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 14px 26px rgba(239, 68, 68, 0.42);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes timerDangerShake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes nextPulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.24);
+    transform: translateY(0);
+  }
+
+  50% {
+    box-shadow: 0 14px 30px rgba(79, 70, 229, 0.36);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes upArrowFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.animate-slide-up-modal {
+  animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+/* Safe Area for Mobile */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 24px);
+}
+
+@media (max-width: 640px) {
+  .premium-grid {
+    opacity: 0.2 !important;
+    background-size: 56px 56px;
+  }
+
+  .premium-shell {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .premium-panel {
+    backdrop-filter: blur(16px);
+  }
+
+  .premium-option {
+    border-radius: 1.05rem;
+  }
+
+  .exit-confirm-card {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up,
+  .animate-fade-in-right,
+  .animate-scale-in,
+  .animate-slide-up-modal {
+    animation: none !important;
+  }
+
+  .premium-option::before {
+    transition: none !important;
+  }
+
+  .timer-icon,
+  .timer-value-low,
+  .timer-safe,
+  .timer-warn,
+  .timer-danger,
+  .timer-icon-danger,
+  .next-btn,
+  .up-arrow-icon {
+    animation: none !important;
+  }
+}

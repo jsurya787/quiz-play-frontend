@@ -1,17 +1,82 @@
 <!-- <app-scroll-progress></app-scroll-progress> -->
 
 <app-hero></app-hero>
-<app-subjects></app-subjects>
-<app-features></app-features>
-<app-syllabus-timeline></app-syllabus-timeline>
-<app-quiz-demo></app-quiz-demo>
-<app-dark-highlight></app-dark-highlight>
-<app-stats></app-stats>
-<app-success-stories></app-success-stories>
-<app-exams></app-exams>
-<app-testimonials></app-testimonials>
+
+@defer (on viewport; prefetch on idle) {
+  <app-subjects></app-subjects>
+} @placeholder {
+  <section class="min-h-[320px] bg-white animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-features></app-features>
+} @placeholder {
+  <section class="min-h-[280px] bg-slate-50 animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-syllabus-timeline></app-syllabus-timeline>
+} @placeholder {
+  <section class="min-h-[320px] bg-white animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-quiz-demo></app-quiz-demo>
+} @placeholder {
+  <section class="min-h-[280px] bg-slate-50 animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-dark-highlight></app-dark-highlight>
+} @placeholder {
+  <section class="min-h-[260px] bg-white animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-stats></app-stats>
+} @placeholder {
+  <section class="min-h-[240px] bg-slate-50 animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-success-stories></app-success-stories>
+} @placeholder {
+  <section class="min-h-[320px] bg-white animate-pulse"></section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-trending-exams></app-trending-exams>
+} @placeholder {
+  <section class="relative min-h-[280px] overflow-hidden border-t border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div class="absolute -top-24 -left-8 w-64 h-64 rounded-full bg-indigo-500/20 blur-[110px]"></div>
+    <div class="absolute -bottom-24 -right-10 w-72 h-72 rounded-full bg-violet-500/16 blur-[120px]"></div>
+    <div class="relative h-full min-h-[280px] animate-pulse px-4 sm:px-6 py-10">
+      <div class="mx-auto max-w-7xl">
+        <div class="h-4 w-28 rounded-full bg-slate-700/80 mb-4"></div>
+        <div class="h-10 w-60 rounded-xl bg-slate-700/70 mb-3"></div>
+        <div class="h-4 w-72 max-w-full rounded-xl bg-slate-700/60 mb-8"></div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="h-[180px] rounded-3xl border border-slate-700 bg-slate-800/70"></div>
+          <div class="h-[180px] rounded-3xl border border-slate-700 bg-slate-800/70"></div>
+          <div class="h-[180px] rounded-3xl border border-slate-700 bg-slate-800/70 hidden lg:block"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-testimonials></app-testimonials>
+} @placeholder {
+  <section class="min-h-[300px] bg-white animate-pulse"></section>
+}
 <!-- <app-about></app-about> -->
 <!-- <app-auth-funnel></app-auth-funnel> -->
-<app-footer></app-footer>
+
+@defer (on viewport; prefetch on idle) {
+  <app-footer></app-footer>
+} @placeholder {
+  <section class="min-h-[200px] bg-slate-100 animate-pulse"></section>
+}
 
 <!-- <app-mobile-cta></app-mobile-cta> -->

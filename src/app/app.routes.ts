@@ -66,6 +66,18 @@ export const routes: Routes = [
       import('./public/terms/terms')
         .then(m => m.TermsComponent),
   },
+  {
+    path: 'cookie-policy',
+    loadComponent: () =>
+      import('./public/cookie-policy/cookie-policy')
+        .then(m => m.CookiePolicyComponent),
+  },
+  {
+    path: 'all-exams',
+    loadComponent: () =>
+      import('./public/all-exams/all-exams')
+        .then(m => m.AllExamsComponent),
+  },
 
   // --------------------------------------------------
   // 🎓 PROTECTED STUDENT AREA

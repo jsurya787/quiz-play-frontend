@@ -7,6 +7,7 @@ import { SubjectService } from '../../services/subject.service';
   selector: 'app-hero',
   standalone: true,
   templateUrl: './hero.html',
+  styleUrl: './hero.scss',
 })
 export class HeroComponent {
   private readonly router = inject(Router);
@@ -34,10 +35,14 @@ export class HeroComponent {
     this.router.navigate(['/login']);
   }
 
+  navigateToAllSubjects() {
+    this.router.navigate(['/all-exams']);
+  }
+
   getPrimarySubjects(): void {
-    this.subjectService.getPrimarySubjects().subscribe({
-      next: (res) => {
-        this.subjectService.primarySubjects.set(res?.data ?? []);
+    this.subjectService.loadPrimarySubjects().subscribe({
+      next: (subjects) => {
+        this.subjectService.primarySubjects.set(subjects);
         this.loading.set(true);
       },
       error: (err) => {

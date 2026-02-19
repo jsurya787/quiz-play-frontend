@@ -33,6 +33,8 @@ export class SubjectFormModalComponent {
   constructor(private fb: NonNullableFormBuilder) {
     this.form = this.fb.group({
       name: ['', Validators.required],
+      type: ['', Validators.required],
+      priority: [0, [Validators.required, Validators.min(0)]],
       subjectClass: ['', Validators.required],
       description: ['', Validators.required],
       isPrimary: [false],
@@ -46,6 +48,8 @@ export class SubjectFormModalComponent {
       if (s) {
         this.form.reset({
           name: s.name ?? '',
+          type: s.type ?? '',
+          priority: s.priority ?? 0,
           subjectClass: s.subjectClass ?? '',
           description: s.description ?? '',
           isPrimary: s.isPrimary ?? false,
@@ -59,6 +63,8 @@ export class SubjectFormModalComponent {
       } else {
         this.form.reset({
           name: '',
+          type: '',
+          priority: 0,
           subjectClass: '',
           description: '',
           isPrimary: false,
@@ -131,6 +137,8 @@ export class SubjectFormModalComponent {
   close(): void {
     this.form.reset({
       name: '',
+      type: '',
+      priority: 0,
       subjectClass: '',
       description: '',
       isPrimary: false,

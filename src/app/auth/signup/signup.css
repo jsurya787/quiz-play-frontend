@@ -20,8 +20,8 @@
 }
 
 .input-ios:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: #5b5cf0;
+    box-shadow: 0 0 0 3px rgba(91, 92, 240, 0.2);
     background: rgba(255, 255, 255, 0.95);
 }
 
@@ -48,8 +48,8 @@
 }
 
 .otp-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: #5b5cf0;
+    box-shadow: 0 0 0 3px rgba(91, 92, 240, 0.2);
     background: #fff;
 }
 

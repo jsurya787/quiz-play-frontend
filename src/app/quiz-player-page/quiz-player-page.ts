@@ -11,6 +11,7 @@ import { ToastService } from '../services/toast-service';
   imports: [CommonModule],
   selector: 'app-quiz-player-page',
   templateUrl: './quiz-player-page.html',
+  styleUrl: './quiz-player-page.scss',
 })
 export class QuizPlayerPageComponent implements OnInit {
   quizId!: string;
@@ -63,6 +64,16 @@ export class QuizPlayerPageComponent implements OnInit {
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  });
+
+  timerTone = computed<'safe' | 'warn' | 'danger' | 'normal'>(() => {
+    const remaining = this.remainingSeconds();
+    const total = this.totalTime();
+
+    if (total > 0 && remaining / total <= 0.1) return 'danger';
+    if (remaining < 40) return 'warn';
+    if (remaining > 60) return 'safe';
+    return 'normal';
   });
 
   private timerRef: any;
@@ -258,10 +269,11 @@ selectOption(index: number) {
      ======================= */
 
   isTimeLow(): boolean {
-    return this.remainingSeconds() <= 30;
+    return this.timerTone() === 'danger';
   }
 
 showMobilePalette = false;
+showExitConfirm = signal(false);
 
 openPalette() {
   this.showMobilePalette = true;
@@ -277,5 +289,19 @@ jumpAndClose(i: number) {
 }
 hasAnswered(index: number): boolean {
   return this.answeredMap()[index] !== undefined;
+}
+
+openExitConfirm(): void {
+  this.showMobilePalette = false;
+  this.showExitConfirm.set(true);
+}
+
+closeExitConfirm(): void {
+  this.showExitConfirm.set(false);
+}
+
+submitFromExitConfirm(): void {
+  this.showExitConfirm.set(false);
+  this.submitQuiz();
 }
 }

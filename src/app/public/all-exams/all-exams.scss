@@ -1,0 +1,44 @@
+.hero-like-game {
+  display: inline-block;
+  background: linear-gradient(95deg, #0f172a 0%, #7c3aed 58%, #d4a017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+}
+
+.exam-filter-btn,
+.pagination-pill,
+.pagination-outline {
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.08);
+}
+
+.exam-filter-btn:hover,
+.pagination-pill:hover,
+.pagination-outline:hover {
+  transform: translateY(-1px);
+}
+
+.exam-filter-btn:focus-visible,
+.pagination-pill:focus-visible,
+.pagination-outline:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.35);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exam-filter-btn,
+  .pagination-pill,
+  .pagination-outline {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .exam-filter-btn:hover,
+  .pagination-pill:hover,
+  .pagination-outline:hover {
+    transform: none;
+  }
+}
