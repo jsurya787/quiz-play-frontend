@@ -245,6 +245,50 @@ export class TeacherDashboardComponent implements OnInit {
     }
   }
 
+  isPrivateQuiz(quiz: any): boolean {
+    return quiz?.visibility === 'RESTRICTED';
+  }
+
+  makeQuizPublic(quiz: any) {
+    if (!quiz?._id) return;
+
+    this.teacherService
+      .updateQuizVisibility(quiz, 'PUBLIC')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toast.success('Quiz is now public');
+          this.loadAllQuizzes(this.authService.currentUser()?.id);
+        },
+        error: (err: any) => {
+          this.toast.error(err?.error?.message || 'Failed to update quiz visibility');
+        },
+      });
+  }
+
+  sendQuizEmail(quiz: any) {
+    if (!quiz?._id) return;
+
+    this.teacherService
+      .notifyStudentsForQuiz(quiz._id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          const stats = res?.data;
+          const sent = stats?.sent ?? 0;
+          const total = stats?.totalRecipients ?? 0;
+          this.toast.success(
+            total > 0
+              ? `Notification emails sent: ${sent}/${total}`
+              : 'No student recipients found',
+          );
+        },
+        error: (err: any) => {
+          this.toast.error(err?.error?.message || 'Failed to send notifications');
+        },
+      });
+  }
+
   createNewQuiz() {
     this.router.navigate(['/create-quiz-page']);
   }

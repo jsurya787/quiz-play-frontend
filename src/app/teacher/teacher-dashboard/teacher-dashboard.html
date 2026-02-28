@@ -133,9 +133,19 @@
                 <div class="quiz-card glass-card group animate-slide-up" [style.animation-delay]="i * 50 + 'ms'">
                   <div class="p-4 md:p-6">
                     <div class="flex justify-between items-start mb-4">
-                      <span class="badge" [class.badge-published]="quiz.status === 'published'" [class.badge-draft]="quiz.status !== 'published'">
-                        {{ quiz.status === 'published' ? 'Published' : 'Draft' }}
-                      </span>
+                      <div class="flex items-center gap-2">
+                        <span class="badge" [class.badge-published]="quiz.status === 'published'" [class.badge-draft]="quiz.status !== 'published'">
+                          {{ quiz.status === 'published' ? 'Published' : 'Draft' }}
+                        </span>
+                        @if (isPrivateQuiz(quiz)) {
+                          <span class="badge badge-private inline-flex items-center gap-1" title="Private quiz">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 11c1.105 0 2 .895 2 2v2a2 2 0 11-4 0v-2c0-1.105.895-2 2-2zm6-2h-1V7a5 5 0 00-10 0v2H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2z" />
+                            </svg>
+                            Private
+                          </span>
+                        }
+                      </div>
                       
                       <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button (click)="editQuiz(quiz._id)" class="action-btn hover:bg-indigo-50 hover:text-indigo-600" title="Edit Quiz">
@@ -168,6 +178,27 @@
                       <div class="text-slate-400 text-xs font-bold">
                          {{ quiz.createdAt | date:'mediumDate' }}
                       </div>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        class="quiz-inline-btn"
+                        [disabled]="!isPrivateQuiz(quiz)"
+                        [class.quiz-inline-btn-disabled]="!isPrivateQuiz(quiz)"
+                        (click)="makeQuizPublic(quiz)"
+                      >
+                        {{ isPrivateQuiz(quiz) ? 'Make Public' : 'Already Public' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="quiz-inline-btn quiz-inline-btn-email"
+                        [disabled]="quiz.status !== 'published'"
+                        [class.quiz-inline-btn-disabled]="quiz.status !== 'published'"
+                        (click)="sendQuizEmail(quiz)"
+                      >
+                        Send Email
+                      </button>
                     </div>
                   </div>
                 </div>

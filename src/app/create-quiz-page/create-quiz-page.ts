@@ -7,6 +7,8 @@ import { ToastService } from '../services/toast-service';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationModalComponent, ConfirmationType } from '../shared/modals/confirmation-modal/confirmation-modal.component';
+import { TeacherService } from '../teacher/services/teacher.service';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-create-quiz-page',
@@ -18,6 +20,7 @@ export class CreateQuizPage {
   private fb = inject(NonNullableFormBuilder);
   private quizService = inject(QuizService);
   private subjectService = inject(SubjectService);
+  private teacherService = inject(TeacherService);
   private toast = inject(ToastService);
   public authService = inject(AuthService);
   private router = inject(Router);
@@ -53,6 +56,21 @@ export class CreateQuizPage {
   });
   pendingPublishedQuizId = signal<string | null>(null);
   questionSubmitAttempted = signal(false);
+  associatedStudents = signal<any[]>([]);
+  studentSearchTerm = signal('');
+  selectedStudentIds = signal<string[]>([]);
+  userPickerOpen = signal(false);
+  selectedStudentsCount = computed(() => this.selectedStudentIds().length);
+  filteredStudents = computed(() => {
+    const search = this.studentSearchTerm().trim().toLowerCase();
+    const students = this.associatedStudents();
+    if (!search) return students;
+    return students.filter((student) => {
+      const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim().toLowerCase();
+      const email = (student.email || '').toLowerCase();
+      return fullName.includes(search) || email.includes(search);
+    });
+  });
 
   /* ===============================
      STATE (SIGNALS)
@@ -78,6 +96,10 @@ export class CreateQuizPage {
       this.quizId.set(editId);
       this.loadQuiz(editId);
     }
+
+    if (this.authService.isTeacher()) {
+      this.loadAssociatedStudents();
+    }
   }
 
   loadQuiz(id: string) {
@@ -94,9 +116,15 @@ export class CreateQuizPage {
             subjectId: quiz.subjectId,
             difficulty: quiz.difficulty,
             timeLimit: quiz.timeLimit,
+            visibility: quiz.visibility || 'RESTRICTED',
           });
           this.questions.set(quiz.questions || []);
           this.totalMarks.set(quiz.totalMarks || 0);
+          this.selectedStudentIds.set(
+            (quiz.allowedUserIds || [])
+              .map((item: any) => (typeof item === 'string' ? item : item?._id || item?.id))
+              .filter((id: any) => !!id),
+          );
         }
         this.loading.set(false);
       },
@@ -117,6 +145,7 @@ export class CreateQuizPage {
     subjectId: ['', Validators.required],
     difficulty: ['easy', Validators.required],
     timeLimit: [10, [Validators.required, Validators.min(1)]],
+    visibility: ['RESTRICTED' as 'PUBLIC' | 'RESTRICTED', Validators.required],
   });
 
   questionForm = this.fb.group({
@@ -183,7 +212,8 @@ export class CreateQuizPage {
     // ➕ CREATE DRAFT
     this.quizService.createQuiz(this.quizForm.value as any).subscribe({
       next: (res) => {
-        this.quizId.set(res.data._id);
+        const createdQuizId = res?.data?._id || res?.data?.id || res?._id || res?.id || null;
+        this.quizId.set(createdQuizId);
         this.toast.success('Quiz draft created');
         // alert('Quiz draft created');
       },
@@ -270,18 +300,35 @@ export class CreateQuizPage {
     }
 
     const publishedQuizId = this.quizId()!;
-    this.quizService.publishQuiz(publishedQuizId).subscribe({
+    const isTeacher = this.authService.isTeacher();
+    const selectedUserIds = this.selectedStudentIds();
+    const isPrivateQuiz = this.isPrivateQuizType();
+
+    if (isTeacher && isPrivateQuiz && selectedUserIds.length === 0) {
+      this.toast.warning('Select at least one student before publishing');
+      return;
+    }
+
+    const publishRequest$ = isTeacher && isPrivateQuiz
+      ? this.quizService
+          .assignUsers(publishedQuizId, selectedUserIds)
+          .pipe(switchMap(() => this.quizService.publishQuiz(publishedQuizId)))
+      : this.quizService.publishQuiz(publishedQuizId);
+
+    publishRequest$.subscribe({
       next: () => {
         this.toast.success('Quiz published successfully');
         this.pendingPublishedQuizId.set(publishedQuizId);
 
         const isTeacherOrAdmin = this.authService.isTeacher() || this.authService.isAdmin();
         if (isTeacherOrAdmin) {
+          const notifyMessage = isTeacher && isPrivateQuiz
+            ? 'Do you want to notify selected students about this newly published quiz via email?'
+            : 'Do you want to notify associated students about this newly published quiz via email?';
           this.notifyStudentsConfirm.set({
             isOpen: true,
             title: 'Notify Associated Students',
-            message:
-              'Do you want to notify your associated students about this newly published quiz via email?',
+            message: notifyMessage,
             type: 'info',
           });
         } else {
@@ -333,12 +380,16 @@ export class CreateQuizPage {
   private resetAfterPublish(): void {
     this.resetQuestionForm();
     this.quizForm.reset();
+    this.quizForm.patchValue({ visibility: 'RESTRICTED' });
     this.quizId.set(null);
     this.pendingPublishedQuizId.set(null);
     this.parsedQuestions = [];
     this.bulkForm.reset();
     this.questions.set([]);
     this.totalMarks.set(0);
+    this.selectedStudentIds.set([]);
+    this.studentSearchTerm.set('');
+    this.userPickerOpen.set(false);
   }
 
   requestPublishQuiz(): void {
@@ -357,7 +408,7 @@ export class CreateQuizPage {
       isOpen: true,
       title: 'Confirm Quiz Publication',
       message:
-        'Are you sure you want to publish this quiz? Once published, it will be visible to all students associated with your account.',
+        'Are you sure you want to publish this quiz? Once published, only selected students can see and play it.',
       type: 'info',
     });
   }
@@ -467,6 +518,92 @@ export class CreateQuizPage {
 
   clearBulkText() {
     this.bulkForm.reset();
+  }
+
+  loadAssociatedStudents(): void {
+    this.teacherService.getStudents().subscribe({
+      next: (students) => {
+        const normalizedStudents = (students || []).map((student: any) => ({
+          ...student,
+          _quizUserId: this.resolveStudentUserId(student),
+        }));
+        this.associatedStudents.set(normalizedStudents);
+      },
+      error: () => {
+        this.toast.error('Failed to load associated students');
+      },
+    });
+  }
+
+  toggleUserPicker(): void {
+    this.userPickerOpen.update((value) => !value);
+  }
+
+  isStudentSelected(studentId: string): boolean {
+    return this.selectedStudentIds().includes(studentId);
+  }
+
+  toggleStudentSelection(studentId: string): void {
+    const selected = this.selectedStudentIds();
+    if (selected.includes(studentId)) {
+      this.selectedStudentIds.set(selected.filter((id) => id !== studentId));
+      return;
+    }
+    this.selectedStudentIds.set([...selected, studentId]);
+  }
+
+  selectAllFilteredStudents(): void {
+    const selected = new Set(this.selectedStudentIds());
+    this.filteredStudents().forEach((student) => {
+      const userId = this.resolveStudentUserId(student);
+      if (userId) {
+        selected.add(userId);
+      }
+    });
+    this.selectedStudentIds.set(Array.from(selected));
+  }
+
+  // add every associated student irrespective of search filter
+  selectAllStudents(): void {
+    const ids: string[] = [];
+    this.associatedStudents().forEach((student) => {
+      const userId = this.resolveStudentUserId(student);
+      if (userId) ids.push(userId);
+    });
+    this.selectedStudentIds.set(ids);
+  }
+
+  clearSelectedStudents(): void {
+    this.selectedStudentIds.set([]);
+  }
+
+  setQuizVisibility(visibility: 'PUBLIC' | 'RESTRICTED'): void {
+    this.quizForm.patchValue({ visibility });
+    if (visibility === 'PUBLIC') {
+      this.userPickerOpen.set(false);
+    }
+  }
+
+  isPrivateQuizType(): boolean {
+    return this.quizForm.controls.visibility.value === 'RESTRICTED';
+  }
+
+  getStudentDisplayName(student: any): string {
+    const name = [student?.firstName, student?.lastName].filter(Boolean).join(' ').trim();
+    return name || student?.name || 'Student';
+  }
+
+  private resolveStudentUserId(student: any): string | null {
+    return (
+      student?._quizUserId ||
+      student?.userId ||
+      student?.user?._id ||
+      student?.student?._id ||
+      student?.studentId ||
+      student?._id ||
+      student?.id ||
+      null
+    );
   }
 
   bulkForm = this.fb.group({

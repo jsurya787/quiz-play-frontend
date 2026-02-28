@@ -6,9 +6,11 @@ import { AuthService } from './auth.service';
 
 export interface CreateQuizPayload {
   title: string;
+  description: string;
   subjectId: string;
   difficulty: 'easy' | 'medium' | 'hard';
   timeLimit: number;
+  visibility?: 'PUBLIC' | 'RESTRICTED';
 }
 
 export interface AddQuestionPayload {
@@ -28,9 +30,11 @@ export class QuizService {
   // }
 
   createQuiz(payload: CreateQuizPayload): Observable<any> {
-    let api = this.API
-    if(!this._auth.currentUser()){
-      api = this.API + '/public'
+    let api = this.API;
+    // Use public create only when user is truly unauthenticated.
+    // `currentUser` can be null briefly during bootstrap even with a valid token.
+    if (!this._auth.isAuthenticated()) {
+      api = this.API + '/public';
     }
     return this.http.post(api, payload);
   }
@@ -72,6 +76,10 @@ export class QuizService {
 
   publishQuiz(quizId: string): Observable<any> {
     return this.http.post(`${this.API}/${quizId}/publish`, {});
+  }
+
+  assignUsers(quizId: string, userIds: string[]): Observable<any> {
+    return this.http.post(`${this.API}/${quizId}/assign-users`, { userIds });
   }
 
   notifyAssociatedStudentsForQuiz(quizId: string): Observable<any> {

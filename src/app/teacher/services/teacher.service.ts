@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environment';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TeacherService {
   private http = inject(HttpClient);
   private readonly QUIZ_API = environment.apiUrl + '/quizzes';
@@ -46,6 +46,22 @@ export class TeacherService {
 
   deleteQuiz(quizId: string): Observable<any> {
     return this.http.delete(`${this.QUIZ_API}/${quizId}`);
+  }
+
+  updateQuizVisibility(quiz: any, visibility: 'PUBLIC' | 'RESTRICTED'): Observable<any> {
+    const payload = {
+      title: quiz.title,
+      description: quiz.description,
+      subjectId: quiz.subjectId,
+      difficulty: quiz.difficulty,
+      timeLimit: quiz.timeLimit,
+      visibility,
+    };
+    return this.http.patch<any>(`${this.QUIZ_API}/${quiz._id}/public`, payload);
+  }
+
+  notifyStudentsForQuiz(quizId: string): Observable<any> {
+    return this.http.post<any>(`${this.QUIZ_API}/${quizId}/notify-students`, {});
   }
 
   private normalizeListResponse(res: any): any[] {
