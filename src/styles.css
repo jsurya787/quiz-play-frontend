@@ -277,6 +277,49 @@
 /* =========================
    Quiz List Enhancements
    ========================= */
+
+/* ===============================
+   MOBILE OPTIMIZATIONS FOR HEADER
+   =============================== */
+
+/* Ensure header buttons have adequate touch targets (minimum 44x44px) */
+header button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Prevent text from wrapping on small screens */
+@media (max-width: 360px) {
+  header button {
+    padding-left: 0.5rem /* 8px */;
+    padding-right: 0.5rem /* 8px */;
+    font-size: 0.75rem /* 12px */;
+  }
+
+  header button svg {
+    display: none; /* Hide icon on very small screens to save space */
+  }
+}
+
+/* Improve button spacing for Android devices */
+@media (max-width: 640px) {
+  header {
+    padding: 0 !important;
+  }
+
+  header button {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Ensure links don't get cut off */
+  header a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
 @keyframes quizCardIn {
   from {
     opacity: 0.01;
@@ -515,4 +558,24 @@ html {
 
 .animate-slide-in-right {
   animation: slideInRightBuilder 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* =========================
+   Global Loaders
+   ========================= */
+.loader-sm {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

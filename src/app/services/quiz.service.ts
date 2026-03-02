@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap, of } from 'rxjs';
 import { environment } from '../../../environment';
 import { AuthService } from './auth.service';
 
@@ -25,6 +25,35 @@ export class QuizService {
   private _auth = inject(AuthService);
   private readonly API =  environment.apiUrl + '/quizzes';
 
+  // 📦 Cached States
+  public totalQuizzesCount = signal<number | null>(null);
+  public attemptedQuizzesCount = signal<number | null>(null);
+  public createdQuizzesList = signal<any[] | null>(null);
+
+  /**
+   * 🔄 Update all dashboard signals at once from a consolidated response
+   */
+  updateDashboardStats(data: any) {
+    if (data.totalQuizzesCreated !== undefined) {
+      this.totalQuizzesCount.set(data.totalQuizzesCreated);
+    }
+    if (data.createdQuizzesList !== undefined) {
+      this.createdQuizzesList.set(data.createdQuizzesList);
+    }
+    if (data.totalQuizzesAttempted !== undefined) {
+      this.attemptedQuizzesCount.set(data.totalQuizzesAttempted);
+    }
+  }
+
+  /**
+   * 🧹 Clear all cached local state to force a fresh fetch from the server
+   */
+  clearCachedSignals() {
+    this.totalQuizzesCount.set(null);
+    this.attemptedQuizzesCount.set(null);
+    this.createdQuizzesList.set(null);
+  }
+
   // getQuizes(): Observable<any> {
   //   return this.http.get<any>(this.API+ '?limit=10');
   // }
@@ -36,18 +65,31 @@ export class QuizService {
     if (!this._auth.isAuthenticated()) {
       api = this.API + '/public';
     }
-    return this.http.post(api, payload);
+    return this.http.post(api, payload).pipe(
+      tap(() => {
+        if (this.totalQuizzesCount() !== null) {
+          this.totalQuizzesCount.set(this.totalQuizzesCount()! + 1);
+        }
+        this.clearCachedSignals();
+        this._auth.clearDashboardCache();
+      })
+    );
   }
 
   getQuizById(id: string): Observable<any> {
     return this.http.get<any>(`${this.API}/${id}`);
   }
 
-  updarteQuiz(
+  updateQuiz(
     quizId: string,
     payload: Partial<CreateQuizPayload>,
   ): Observable<any> {
-    return this.http.patch<any>(`${this.API}/${quizId}` + '/public', payload);
+    return this.http.patch<any>(`${this.API}/${quizId}` + '/public', payload).pipe(
+      tap(() => {
+        this.clearCachedSignals();
+        this._auth.clearDashboardCache();
+      })
+    );
   }
 
   addQuestion(
@@ -75,7 +117,12 @@ export class QuizService {
   }
 
   publishQuiz(quizId: string): Observable<any> {
-    return this.http.post(`${this.API}/${quizId}/publish`, {});
+    return this.http.post(`${this.API}/${quizId}/publish`, {}).pipe(
+      tap(() => {
+        this.clearCachedSignals();
+        this._auth.clearDashboardCache();
+      })
+    );
   }
 
   assignUsers(quizId: string, userIds: string[]): Observable<any> {
@@ -111,16 +158,43 @@ export class QuizService {
 }
 
   getCountofQuizes(): Observable<any>  {
-    return this.http.get<any>(`${this.API}/createdByUser`);
+    if (this.totalQuizzesCount() !== null) {
+      return of({ data: this.totalQuizzesCount() });
+    }
+    return this.http.get<any>(`${this.API}/createdByUser`).pipe(
+      tap((res) => {
+        if (res?.data !== undefined) {
+          this.totalQuizzesCount.set(res.data);
+        }
+      })
+    );
   }
 
   getCreatedQuizzesList(): Observable<any> {
-    return this.http.get<any>(`${this.API}/createdByUser/list`);
+    if (this.createdQuizzesList() !== null) {
+      return of({ data: this.createdQuizzesList() });
+    }
+    return this.http.get<any>(`${this.API}/createdByUser/list`).pipe(
+      tap((res) => {
+        if (res?.data !== undefined) {
+          this.createdQuizzesList.set(res.data);
+        }
+      })
+    );
   }
 
   getAttemptedQuizzesCount(): Observable<{ success: boolean; count: number }> {
+    if (this.attemptedQuizzesCount() !== null) {
+      return of({ success: true, count: this.attemptedQuizzesCount()! });
+    }
     return this.http.get<{ success: boolean; count: number }>(
       `${environment.apiUrl}/quiz-player/attempted/count`
+    ).pipe(
+      tap((res) => {
+        if (res?.count !== undefined) {
+          this.attemptedQuizzesCount.set(res.count);
+        }
+      })
     );
   }
 
@@ -129,6 +203,14 @@ export class QuizService {
   }
 
   deleteQuiz(quizId: string): Observable<any> {
-    return this.http.delete(`${this.API}/${quizId}`);
+    return this.http.delete(`${this.API}/${quizId}`).pipe(
+      tap(() => {
+        if (this.totalQuizzesCount() !== null) {
+          this.totalQuizzesCount.set(Math.max(0, this.totalQuizzesCount()! - 1));
+        }
+        this.clearCachedSignals();
+        this._auth.clearDashboardCache();
+      })
+    );
   }
 }

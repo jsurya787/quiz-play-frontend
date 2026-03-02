@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment';
 import { endpoints } from '../../endpoints';
 import { isPlatformBrowser } from '@angular/common';
-import { catchError, firstValueFrom, tap, EMPTY } from 'rxjs';
+import { catchError, firstValueFrom, tap, EMPTY, shareReplay, Observable } from 'rxjs';
 
 
 const ACCESS_TOKEN_KEY: StateKey<string | null> =
@@ -23,6 +23,7 @@ export class AuthService {
 
   private refreshPromise: Promise<void> | null = null;
   private isLoggingOut = false; // 🚫 Flag to block zombie refreshes
+  private dashboardStats$: Observable<any> | null = null;
 
 
   constructor(
@@ -131,6 +132,7 @@ export class AuthService {
     this.accessToken.set(null);
     this.currentUser.set(null);
     this.refreshPromise = null; // Clear any pending promise
+    this.dashboardStats$ = null; // 🧹 Clear cached dashboard stats
     this.router.navigate(['/login']);
 
     // 📞 Call API to invalidate session/cookie (Side effect)
@@ -242,6 +244,29 @@ export class AuthService {
       `${environment.apiUrl}/teacher/institute`,
       { withCredentials: true },
     );
+  }
+
+  getAssignedTeachers() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/student/teachers`,
+      { withCredentials: true },
+    );
+  }
+
+  getMeDashboardStats(forceRefresh = false) {
+    if (forceRefresh || !this.dashboardStats$) {
+      this.dashboardStats$ = this.http.get<{ success: boolean; data: any }>(
+        `${environment.apiUrl}/auth/me/dashboard`,
+        { withCredentials: true },
+      ).pipe(
+        shareReplay({ bufferSize: 1, refCount: true }) // 🔄 Cache with refCount for memory safety
+      );
+    }
+    return this.dashboardStats$;
+  }
+
+  clearDashboardCache() {
+    this.dashboardStats$ = null; // 🧹 Clear the singleton to force refresh on next call
   }
 
   updateMyInstitute(payload: {

@@ -27,11 +27,12 @@ export class MePageComponent {
 
   user = signal<any>(null);
 
-  totalQuizzes = signal(0);
-  attemptedQuizzes = signal(0);
-  createdQuizzesList = signal<any[]>([]);
+  totalQuizzes = computed(() => this.quizService.totalQuizzesCount() || 0);
+  attemptedQuizzes = computed(() => this.quizService.attemptedQuizzesCount() || 0);
+  createdQuizzesList = computed(() => this.quizService.createdQuizzesList() || []);
   attemptedQuizzesList = signal<any[]>([]);
   loadingList = signal(false);
+  loadingDashboard = signal(false);
   activeList = signal<'created' | 'attempted'>('created');
   instituteLoaded = signal(false);
 
@@ -47,6 +48,9 @@ export class MePageComponent {
   instituteAbout = signal('');
   instituteLogo = signal('');
 
+  assignedTeachers = signal<any[]>([]);
+  loadingTeachers = signal(false);
+
   isTeacher = computed(() => this.user()?.role === 'TEACHER');
 
   constructor() {
@@ -58,40 +62,51 @@ export class MePageComponent {
       this.sex.set(u?.sex || '');
       this.about.set(u?.about || '');
       if (u?.role === 'TEACHER' && !this.instituteLoaded()) {
-        this.instituteLoaded.set(true);
-        this.loadInstitute();
+        // Institute details are now loaded via the consolidated dashboard API
+      }
+      
+      if (u?.role === 'STUDENT' && u?.teachers?.length > 0 && this.assignedTeachers().length === 0 && !this.loadingTeachers()) {
+        this.loadAssignedTeachers();
       }
     });
 
-    this.loadCounts();
+    this.loadDashboard();
     const initialTab = this.route.snapshot.queryParamMap.get('tab');
     if (initialTab === 'attempted') {
       this.showAttempted();
     } else {
-      this.showCreated();
+      this.activeList.set('created');
     }
-
   }
 
-  private loadCounts() {
-    this.quizService
-      .getCountofQuizes()
+  private loadDashboard() {
+    this.loadingDashboard.set(true);
+    this.auth
+      .getMeDashboardStats()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => this.totalQuizzes.set(res?.data || 0),
-      });
-
-    this.quizService
-      .getAttemptedQuizzesCount()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => this.attemptedQuizzes.set(res?.count || 0),
+        next: (res: any) => {
+          const data = res?.data || {};
+          this.quizService.updateDashboardStats(data);
+          
+          if (data.instituteDetails) {
+            this.instituteName.set(data.instituteDetails.name || '');
+            this.instituteAbout.set(data.instituteDetails.about || '');
+            this.instituteLogo.set(data.instituteDetails.logo || '');
+            this.instituteLoaded.set(true);
+          }
+          
+          this.loadingDashboard.set(false);
+        },
+        error: () => {
+          this.loadingDashboard.set(false);
+        },
       });
   }
 
   showCreated() {
     this.activeList.set('created');
-    if (this.createdQuizzesList().length === 0) this.loadCreatedQuizzes();
+    if (!this.quizService.createdQuizzesList()) this.loadCreatedQuizzes();
   }
 
   showAttempted() {
@@ -105,8 +120,7 @@ export class MePageComponent {
       .getCreatedQuizzesList()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => {
-          this.createdQuizzesList.set(res?.data || []);
+        next: () => {
           this.loadingList.set(false);
         },
         error: () => {
@@ -133,6 +147,22 @@ export class MePageComponent {
       });
   }
 
+  private loadAssignedTeachers() {
+    this.loadingTeachers.set(true);
+    this.auth.getAssignedTeachers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.assignedTeachers.set(res || []);
+          this.loadingTeachers.set(false);
+        },
+        error: () => {
+          this.toast.error('Failed to load assigned teachers');
+          this.loadingTeachers.set(false);
+        }
+      });
+  }
+
   saveBasicProfile() {
     this.savingBasic.set(true);
     this.auth
@@ -156,20 +186,7 @@ export class MePageComponent {
   }
 
   private loadInstitute() {
-    this.auth
-      .getMyInstitute()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          const data = res?.data || {};
-          this.instituteName.set(data?.name || '');
-          this.instituteAbout.set(data?.about || '');
-          this.instituteLogo.set(data?.logo || '');
-        },
-        error: () => {
-          this.toast.error('Failed to load institute details');
-        },
-      });
+    // Redundant - handled by loadDashboard()
   }
 
   saveInstitute() {

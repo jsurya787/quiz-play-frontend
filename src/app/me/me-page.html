@@ -101,6 +101,36 @@
             </button>
           </div>
         }
+
+        @if (!isTeacher() && user()?.role === 'STUDENT' && (user()?.teachers?.length > 0 || assignedTeachers().length > 0)) {
+          <div class="premium-card p-5">
+            <h2 class="section-title">My Teachers</h2>
+            
+            @if (loadingTeachers()) {
+              <p class="text-sm text-slate-500">Loading your teachers...</p>
+            } @else {
+              <div class="space-y-3 mt-3">
+                @for (teacher of assignedTeachers(); track teacher._id) {
+                  <div class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+                      {{ (teacher.firstName || teacher.name || 'T').charAt(0) | uppercase }}
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-sm m-0 leading-tight">
+                        {{ teacher.firstName }} {{ teacher.lastName }}
+                      </p>
+                      <p class="text-xs text-slate-500 m-0 leading-tight mt-0.5">
+                        {{ teacher.email }}
+                      </p>
+                    </div>
+                  </div>
+                } @empty {
+                  <p class="text-sm text-slate-500">No teachers found.</p>
+                }
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="xl:col-span-7 space-y-6">

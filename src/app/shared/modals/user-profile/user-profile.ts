@@ -34,8 +34,8 @@ export class UserProfileModalComponent {
 
   /* ================= STATE ================= */
   userTitle = signal('🎓 Student');
-  totalQuizes = signal(0);
-  attemptedQuizes = signal(0);
+  totalQuizes = computed(() => this.quizService.totalQuizzesCount() || 0);
+  attemptedQuizes = computed(() => this.quizService.attemptedQuizzesCount() || 0);
   user = signal<any>(null);
 
   rank = computed(() => {
@@ -67,18 +67,15 @@ export class UserProfileModalComponent {
 
   /* ================= DATA LOADERS ================= */
   private loadStats() {
-    this.quizService
-      .getCountofQuizes()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(res => {
-        this.totalQuizes.set(res.data);
-      });
+    if (this.quizService.totalQuizzesCount() !== null) return;
 
-    this.quizService
-      .getAttemptedQuizzesCount()
+    this.authService
+      .getMeDashboardStats()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res: any) => {
-        this.attemptedQuizes.set(res.count);
+      .subscribe({
+        next: (res: any) => {
+          this.quizService.updateDashboardStats(res?.data || {});
+        },
       });
   }
 

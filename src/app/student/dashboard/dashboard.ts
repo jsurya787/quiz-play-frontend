@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, SubjectService } from '../../services/subject.service';
 import { QuizService } from '../../services/quiz.service';
 import { AdminRoutingModule } from "../../admin/admin-routing-module";
@@ -7,21 +8,17 @@ import { ToastService } from '../../services/toast-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
   templateUrl:'./dashboard.html',
   styleUrls: ['./dashboard.css'],
-  imports: [AdminRoutingModule, CommonModule],
+  imports: [AdminRoutingModule, CommonModule, FormsModule],
 })
 export class DashboardComponent {
 
-  private subjectService = inject(SubjectService);
-  private quizService = inject(QuizService);
-  private toastService = inject(ToastService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  public authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
   // 🔥 Debounce trigger
   private filterChange$ = new _sb<void>();
 
@@ -33,36 +30,60 @@ export class DashboardComponent {
 
   // 🔍 FILTER STATE
   search = signal('');
-  selectedSubject = signal<string | null>(null);
-  difficulty = signal<string | null>(null);
+  selectedSubject = signal<string>('');
+  difficulty = signal<string>('');
   createdByMe = signal(false);
   teacherQuizzesOnly = signal(false);
 
-constructor() {
-  this.route.paramMap.subscribe(params => {
-    const subjectId = params.get('subjectId');
+  constructor(
+    private subjectService: SubjectService,
+    private quizService: QuizService,
+    private toastService: ToastService,
+    private route: ActivatedRoute,
+    private router: Router,
+    public authService: AuthService
+  ) {
+    this.route.paramMap
+      .pipe(takeUntilDestroyed())
+      .subscribe(params => {
+        this.loading.set(true);
+        const subjectId = params.get('subjectId');
+        console.log('--- DASHBOARD NAV ---');
+        console.log('Route subjectId:', subjectId);
 
-    if (!subjectId || subjectId === 'all') {
-      this.subjectId.set(null);
-      this.selectedSubject.set(null);
-    } else {
-      this.subjectId.set(subjectId);
-      this.selectedSubject.set(subjectId);
-    }
-    if(this.subjectService.subjects().length === 0){
-      this.loadSubjects();
-    }else{
-      this.subjects.set(this.subjectService.subjects());
-    }
-     this.loadQuizes();
-        // ✅ debounce once, globally
+        if (!subjectId || subjectId === 'all') {
+          this.subjectId.set(null);
+          this.selectedSubject.set('');
+        } else {
+          this.subjectId.set(subjectId);
+          this.selectedSubject.set(subjectId);
+        }
+        
+        console.log('Signals set:', {
+          subjectId: this.subjectId(),
+          selectedSubject: this.selectedSubject()
+        });
+
+        if (this.subjectService.subjects().length === 0) {
+          this.loadSubjects();
+        } else {
+          console.log('Using cached subjects from service:', this.subjectService.subjects().length);
+          this.subjects.set(this.subjectService.subjects());
+        }
+        
+        this.loadQuizes();
+      });
+
+    // ✅ debounce once, globally (outside paramMap subscribe)
     this.filterChange$
-      .pipe(debounceTime(500))
+      .pipe(
+        debounceTime(500),
+        takeUntilDestroyed()
+      )
       .subscribe(() => {
         this.loadQuizes();
       });
-  });
- }
+  }
 
   loadSubjects(): void {
     this.subjectService.getSubjects().subscribe({
@@ -105,11 +126,18 @@ constructor() {
 
   resetFilters(): void {
     this.search.set('');
-    this.selectedSubject.set(null);
-    this.difficulty.set(null);
+    this.selectedSubject.set('');
+    this.difficulty.set('');
     this.createdByMe.set(false);
     this.teacherQuizzesOnly.set(false);
-    this.loadQuizes();
+    
+    // Check if we are already on the 'all' route
+    if (this.router.url === '/dashboard/all') {
+      this.loadQuizes();
+    } else {
+      // Primary action: trigger navigation which then triggers the subscription to reload
+      this.router.navigate(['/dashboard/all']);
+    }
   }
 
   onDeleteQuiz(quizId: string): void {

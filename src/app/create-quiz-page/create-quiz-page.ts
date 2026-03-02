@@ -8,7 +8,7 @@ import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationModalComponent, ConfirmationType } from '../shared/modals/confirmation-modal/confirmation-modal.component';
 import { TeacherService } from '../teacher/services/teacher.service';
-import { switchMap } from 'rxjs';
+import { switchMap, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-create-quiz-page',
@@ -31,7 +31,8 @@ export class CreateQuizPage {
   editingQuestionId = signal<string | null>(null);
   showBulkPopup = signal(false);
   bulkText = '';
-  loading = signal(false); // ⏳ Loading state
+  loading = signal(false); // ⏳ Initial loading (subjects/quiz)
+  isSubmitting = signal(false); // 🚀 Action loading (save/publish)
   publishConfirm = signal<{
     isOpen: boolean;
     title: string;
@@ -72,6 +73,13 @@ export class CreateQuizPage {
     });
   });
 
+  selectedStudents = computed(() => {
+    const selectedIds = this.selectedStudentIds();
+    return this.associatedStudents().filter((s) => 
+      selectedIds.includes(this.resolveStudentUserId(s) || '')
+    );
+  });
+
   /* ===============================
      STATE (SIGNALS)
   ================================ */
@@ -105,7 +113,7 @@ export class CreateQuizPage {
   loadQuiz(id: string) {
     this.loading.set(true);
     this.quizService.getQuizById(id).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         // Support both { data: quiz } and direct quiz object
         const quiz = res.data || res;
         
@@ -128,7 +136,7 @@ export class CreateQuizPage {
         }
         this.loading.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.toast.error('Failed to load quiz data');
         this.loading.set(false);
       }
@@ -172,13 +180,13 @@ export class CreateQuizPage {
   loadSubjects(): void {
     this.loading.set(true);
     this.subjectService.getSubjects().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res.success) {
           this.subjects.set(res.data);
         }
         this.loading.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(err.error?.message || 'Failed to load subjects');
         this.loading.set(false);
       },
@@ -199,27 +207,29 @@ export class CreateQuizPage {
 
     if (this.isDraftSaved()) {
       // 🔥 UPDATE DRAFT
-      this.quizService.updarteQuiz(this.quizId()!, this.quizForm.value as any).subscribe({
-        next: (res) => {
-          this.toast.success('Quiz draft updated');
-          // alert('Quiz draft created');
-        },
-        error: (err) => this.toast.error(err.error?.message || 'Failed to update quiz'),
-        // alert(err.error?.message || 'Failed to create quiz'),
-      });
+      this.isSubmitting.set(true);
+      this.quizService.updateQuiz(this.quizId()!, this.quizForm.value as any)
+        .pipe(finalize(() => this.isSubmitting.set(false)))
+        .subscribe({
+          next: (res: any) => {
+            this.toast.success('Quiz draft updated');
+          },
+          error: (err: any) => this.toast.error(err.error?.message || 'Failed to update quiz'),
+        });
       return;
     }
     // ➕ CREATE DRAFT
-    this.quizService.createQuiz(this.quizForm.value as any).subscribe({
-      next: (res) => {
-        const createdQuizId = res?.data?._id || res?.data?.id || res?._id || res?.id || null;
-        this.quizId.set(createdQuizId);
-        this.toast.success('Quiz draft created');
-        // alert('Quiz draft created');
-      },
-      error: (err) => this.toast.error(err.error?.message || 'Failed to create quiz'),
-      // alert(err.error?.message || 'Failed to create quiz'),
-    });
+    this.isSubmitting.set(true);
+    this.quizService.createQuiz(this.quizForm.value as any)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          const createdQuizId = res?.data?._id || res?.data?.id || res?._id || res?.id || null;
+          this.quizId.set(createdQuizId);
+          this.toast.success('Quiz draft created');
+        },
+        error: (err: any) => this.toast.error(err.error?.message || 'Failed to create quiz'),
+      });
   }
 
   saveQuestion(): void {
@@ -247,14 +257,16 @@ export class CreateQuizPage {
 
     // 🔥 EDIT MODE
     if (this.editingQuestionId()) {
+      this.isSubmitting.set(true);
       this.quizService
         .updateQuestion(
           this.quizId()!,
           this.editingQuestionId()!, // 👈 questionId
           this.questionForm.getRawValue(),
         )
+        .pipe(finalize(() => this.isSubmitting.set(false)))
         .subscribe({
-          next: (res) => {
+          next: (res: any) => {
             this.toast.success('Question updated successfully');
             this.questions.set(res.data.questions);
             this.totalMarks.set(res.data.totalMarks);
@@ -262,35 +274,41 @@ export class CreateQuizPage {
             this.editingQuestionId.set(null); // ✅ exit edit mode
             this.questionSubmitAttempted.set(false);
           },
-          error: (err) => this.toast.error(err.error?.message || 'Failed to update question'),
+          error: (err: any) => this.toast.error(err.error?.message || 'Failed to update question'),
         });
 
       return;
     }
 
     // ➕ ADD MODE
-    this.quizService.addQuestion(this.quizId()!, this.questionForm.getRawValue()).subscribe({
-      next: (res) => {
-        this.toast.success('Question added successfully');
-        this.questions.set(res.data.questions);
-        this.totalMarks.set(res.data.totalMarks);
-        this.resetQuestionForm();
-        this.questionSubmitAttempted.set(false);
-      },
-      error: (err) => this.toast.error(err.error?.message || 'Failed to add question'),
-    });
+    this.isSubmitting.set(true);
+    this.quizService.addQuestion(this.quizId()!, this.questionForm.getRawValue())
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          this.toast.success('Question added successfully');
+          this.questions.set(res.data.questions);
+          this.totalMarks.set(res.data.totalMarks);
+          this.resetQuestionForm();
+          this.questionSubmitAttempted.set(false);
+        },
+        error: (err: any) => this.toast.error(err.error?.message || 'Failed to add question'),
+      });
   }
 
   deleteQuestion(questionId: string): void {
     if (!this.quizId()) return;
 
-    this.quizService.deleteQuestion(this.quizId()!, questionId).subscribe({
-      next: (res) => {
-        this.questions.set(res.data.questions);
-        this.totalMarks.set(res.data.totalMarks);
-      },
-      error: (err) => alert(err.error?.message || 'Failed to delete question'),
-    });
+    this.isSubmitting.set(true);
+    this.quizService.deleteQuestion(this.quizId()!, questionId)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          this.questions.set(res.data.questions);
+          this.totalMarks.set(res.data.totalMarks);
+        },
+        error: (err: any) => alert(err.error?.message || 'Failed to delete question'),
+      });
   }
 
   publishQuiz(): void {
@@ -315,29 +333,28 @@ export class CreateQuizPage {
           .pipe(switchMap(() => this.quizService.publishQuiz(publishedQuizId)))
       : this.quizService.publishQuiz(publishedQuizId);
 
-    publishRequest$.subscribe({
-      next: () => {
-        this.toast.success('Quiz published successfully');
-        this.pendingPublishedQuizId.set(publishedQuizId);
+    this.isSubmitting.set(true);
+    publishRequest$
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => {
+          this.toast.success('Quiz published successfully');
+          this.pendingPublishedQuizId.set(publishedQuizId);
 
-        const isTeacherOrAdmin = this.authService.isTeacher() || this.authService.isAdmin();
-        if (isTeacherOrAdmin) {
-          const notifyMessage = isTeacher && isPrivateQuiz
-            ? 'Do you want to notify selected students about this newly published quiz via email?'
-            : 'Do you want to notify associated students about this newly published quiz via email?';
-          this.notifyStudentsConfirm.set({
-            isOpen: true,
-            title: 'Notify Associated Students',
-            message: notifyMessage,
-            type: 'info',
-          });
-        } else {
-          this.resetAfterPublish();
-        }
-      },
-      error: (err) => this.toast.error(err.error?.message || 'Failed to publish quiz'),
-      // alert(err.error?.message || 'Failed to publish quiz'),
-    });
+          const isTeacherOrAdmin = this.authService.isTeacher() || this.authService.isAdmin();
+          if (isTeacherOrAdmin) {
+            this.notifyStudentsConfirm.set({
+              isOpen: true,
+              title: 'Send Notifications?',
+              message: 'Would you like to email the students about this quiz?',
+              type: 'info',
+            });
+          } else {
+            this.resetAfterPublish();
+          }
+        },
+        error: (err: any) => this.toast.error(err.error?.message || 'Failed to publish quiz'),
+      });
   }
 
   confirmNotifyStudentsAfterPublish(): void {
@@ -349,21 +366,24 @@ export class CreateQuizPage {
       return;
     }
 
-    this.quizService.notifyAssociatedStudentsForQuiz(quizId).subscribe({
-      next: (res: any) => {
-        const stats = res?.data;
-        const sent = stats?.sent ?? 0;
-        const total = stats?.totalRecipients ?? 0;
-        this.toast.success(
-          total > 0
-            ? `Notification emails sent: ${sent}/${total}`
-            : 'No associated student recipients found',
-        );
-      },
-      error: (err) => {
-        this.toast.error(err?.error?.message || 'Failed to notify students');
-      },
-    });
+    this.isSubmitting.set(true);
+    this.quizService.notifyAssociatedStudentsForQuiz(quizId)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          const stats = res?.data;
+          const sent = stats?.sent ?? 0;
+          const total = stats?.totalRecipients ?? 0;
+          this.toast.success(
+            total > 0
+              ? `Notification emails sent: ${sent}/${total}`
+              : 'No associated student recipients found',
+          );
+        },
+        error: (err: any) => {
+          this.toast.error(err?.error?.message || 'Failed to notify students');
+        },
+      });
 
     this.resetAfterPublish();
   }
@@ -406,9 +426,8 @@ export class CreateQuizPage {
 
     this.publishConfirm.set({
       isOpen: true,
-      title: 'Confirm Quiz Publication',
-      message:
-        'Are you sure you want to publish this quiz? Once published, only selected students can see and play it.',
+      title: 'Publish Quiz?',
+      message: 'Ready to go live? Only selected students will be able to see and play it.',
       type: 'info',
     });
   }
@@ -522,12 +541,21 @@ export class CreateQuizPage {
 
   loadAssociatedStudents(): void {
     this.teacherService.getStudents().subscribe({
-      next: (students) => {
+      next: (students: any) => {
         const normalizedStudents = (students || []).map((student: any) => ({
           ...student,
           _quizUserId: this.resolveStudentUserId(student),
         }));
         this.associatedStudents.set(normalizedStudents);
+
+        // 🔥 DEFAULT TO ALL SELECTED (for new quizzes only)
+        const isEditMode = !!this.route.snapshot.queryParamMap.get('id');
+        if (!isEditMode) {
+          const ids = normalizedStudents
+            .map((s: any) => s._quizUserId)
+            .filter((id: any) => !!id);
+          this.selectedStudentIds.set(ids);
+        }
       },
       error: () => {
         this.toast.error('Failed to load associated students');
@@ -680,14 +708,17 @@ export class CreateQuizPage {
 
     this.parsedQuestions = cleanQuestions;
     this.showBulkPopup.set(false);
-    this.quizService.sendBulkQuestionsToApi(this.quizId()!, this.parsedQuestions).subscribe({
-      next: (res) => {
-        this.toast.success('Bulk questions added successfully');
-        this.questions.set(res.data.questions);
-        this.totalMarks.set(res.data.totalMarks);
-        this.resetQuestionForm();
-      },
-      error: (err) => this.toast.error(err.error?.message || 'Failed to add bulk questions'),
-    });
+    this.isSubmitting.set(true);
+    this.quizService.sendBulkQuestionsToApi(this.quizId()!, this.parsedQuestions)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          this.toast.success('Bulk questions added successfully');
+          this.questions.set(res.data.questions);
+          this.totalMarks.set(res.data.totalMarks);
+          this.resetQuestionForm();
+        },
+        error: (err: any) => this.toast.error(err.error?.message || 'Failed to add bulk questions'),
+      });
   }
 }

@@ -16,6 +16,7 @@ export class ConfirmationModalComponent {
   @Input() cancelText: string = 'Cancel';
   @Input() type: ConfirmationType = 'info';
   
+  @Input() loading: boolean = false;
   @Input() isOpen: boolean = false;
 
   @Output() confirm = new EventEmitter<void>();

@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '360px',  // Extra small phones (320-360px)
+      },
       keyframes: {
         slideDown: {
           '0%': { opacity: '0', transform: 'translateY(-10px)' },

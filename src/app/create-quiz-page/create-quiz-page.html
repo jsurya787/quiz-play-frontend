@@ -116,12 +116,16 @@
       </div>
     </div>
 
-    <button type="button" class="mt-5 w-full btn-primary active:scale-[0.98]" (click)="saveDraft()">
-      @if (isDraftSaved()) {
-        <span>Update Draft</span>
-      }
-      @if (!isDraftSaved()) {
-        <span>Save Draft</span>
+    <button type="button" class="mt-5 w-full btn-primary active:scale-[0.98] flex items-center justify-center gap-2" (click)="saveDraft()" [disabled]="isSubmitting()">
+      @if (isSubmitting()) {
+        <span class="loader-sm"></span>
+        <span>Saving...</span>
+      } @else {
+        @if (isDraftSaved()) {
+          <span>Update Draft</span>
+        } @else {
+          <span>Save Draft</span>
+        }
       }
     </button>
   </form>
@@ -191,12 +195,16 @@
         <p class="text-gray-600">Total Time: {{ totalMarks() }}</p>
       </div>
 
-      <button class="btn-primary mt-auto active:scale-[0.98]" type="button" (click)="saveDraft()">
-        @if (isDraftSaved()) {
-          <span>Update Draft</span>
-        }
-        @if (!isDraftSaved()) {
-          <span>Save Draft</span>
+      <button class="btn-primary mt-auto active:scale-[0.98] flex items-center justify-center gap-2" type="button" (click)="saveDraft()" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <span class="loader-sm"></span>
+          <span>Saving...</span>
+        } @else {
+          @if (isDraftSaved()) {
+            <span>Update Draft</span>
+          } @else {
+            <span>Save Draft</span>
+          }
         }
       </button>
     </aside>
@@ -214,8 +222,13 @@
           <p class="text-gray-500 text-sm">Create engaging questions with ease</p>
         </div>
 
-        <button type="button" class="btn-success w-full sm:w-auto active:scale-[0.97]" (click)="requestPublishQuiz()">
-          Publish Quiz 🚀
+        <button type="button" class="btn-success w-full sm:w-auto active:scale-[0.97] flex items-center justify-center gap-2" (click)="requestPublishQuiz()" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="loader-sm"></span>
+            <span>Publishing...</span>
+          } @else {
+            Publish Quiz 🚀
+          }
         </button>
       </div>
 
@@ -268,49 +281,69 @@
             </span>
           </div>
 
+          <!-- Selected Students Chips (Horizontal Scroll) -->
+          @if (selectedStudents().length > 0) {
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
+              @for (student of selectedStudents(); track student._quizUserId || student._id) {
+                <div class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold animate-chip-in">
+                  <span>{{ getStudentDisplayName(student) }}</span>
+                  <button type="button" class="hover:text-red-500" (click)="toggleStudentSelection(student._quizUserId || student._id)">
+                    ✕
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
           <div class="relative">
             <button
               type="button"
-              class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:border-indigo-300"
+              class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:border-indigo-300 transition-all"
+              [class.border-indigo-500]="userPickerOpen()"
+              [class.bg-indigo-50/30]="userPickerOpen()"
               (click)="toggleUserPicker()"
             >
-              <span>Select students</span>
-              <span>{{ userPickerOpen() ? '▲' : '▼' }}</span>
+              <span>{{ userPickerOpen() ? 'Close student list' : 'Select students' }}</span>
+              <span class="transition-transform duration-300" [class.rotate-180]="userPickerOpen()">▼</span>
             </button>
 
             @if (userPickerOpen()) {
-              <div class="mt-2 rounded-2xl border border-slate-200 bg-white shadow-lg p-3 space-y-3">
-                <input
-                  type="text"
-                  class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-                  placeholder="Search by name or email"
-                  [value]="studentSearchTerm()"
-                  (input)="studentSearchTerm.set($any($event.target).value)"
-                />
+              <div class="mt-3 rounded-2xl border border-slate-200 bg-white shadow-xl p-4 space-y-4 animate-slide-down">
+                <div class="sticky top-0 bg-white pb-2 space-y-3 z-10">
+                  <input
+                    type="text"
+                    class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                    placeholder="Search name or email..."
+                    [value]="studentSearchTerm()"
+                    (input)="studentSearchTerm.set($any($event.target).value)"
+                  />
 
-                <div class="flex gap-2">
-                  <button type="button" class="text-xs font-semibold text-indigo-600 hover:underline" (click)="selectAllStudents()">
-                    Select all
-                  </button>
-                  <button type="button" class="text-xs font-semibold text-indigo-600 hover:underline" (click)="selectAllFilteredStudents()">
-                    Select visible
-                  </button>
-                  <button type="button" class="text-xs font-semibold text-red-500 hover:underline" (click)="clearSelectedStudents()">
-                    Clear
-                  </button>
+                  <div class="flex items-center justify-between px-1">
+                    <div class="flex gap-4">
+                      <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition" (click)="selectAllStudents()">
+                        Select all
+                      </button>
+                      <button type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition" (click)="selectAllFilteredStudents()">
+                        Select visible
+                      </button>
+                    </div>
+                    <button type="button" class="text-xs font-bold text-red-500 hover:text-red-700 transition" (click)="clearSelectedStudents()">
+                      Clear
+                    </button>
+                  </div>
                 </div>
 
-                <div class="max-h-64 overflow-y-auto space-y-2">
+                <div class="max-h-80 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                   @for (student of filteredStudents(); track student._quizUserId || student._id) {
-                    <label class="flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2 hover:bg-slate-50 cursor-pointer">
+                    <label class="flex items-center gap-3 rounded-xl border border-slate-100 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors">
                       <input
                         type="checkbox"
-                        class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all"
                         [checked]="isStudentSelected(student._quizUserId || student._id)"
                         (change)="toggleStudentSelection(student._quizUserId || student._id)"
                       />
                       <div class="min-w-0">
-                        <p class="text-sm font-semibold text-slate-800 truncate">
+                        <p class="text-sm font-bold text-slate-800 truncate">
                           {{ getStudentDisplayName(student) }}
                         </p>
                         <p class="text-xs text-slate-500 truncate">{{ student.email || 'No email' }}</p>
@@ -318,7 +351,9 @@
                     </label>
                   }
                   @if (filteredStudents().length === 0) {
-                    <p class="text-xs text-slate-500 px-1">No students found.</p>
+                    <div class="py-10 text-center">
+                      <p class="text-sm text-slate-400">No students found matching "{{ studentSearchTerm() }}"</p>
+                    </div>
                   }
                 </div>
               </div>
@@ -410,10 +445,13 @@
 
         <!-- ACTIONS -->
         <div class="flex justify-between items-center">
-          <button type="button" class="text-red-500 hover:underline">Delete</button>
-
-          <button type="button" class="btn-primary active:scale-[0.97]" (click)="saveQuestion()">
-            {{ editingQuestionId() ? 'Update Question' : 'Save Question' }}
+          <button type="button" class="btn-primary active:scale-[0.97] flex items-center justify-center gap-2 min-w-[140px]" (click)="saveQuestion()" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="loader-sm"></span>
+              <span>Saving...</span>
+            } @else {
+              {{ editingQuestionId() ? 'Update Question' : 'Save Question' }}
+            }
           </button>
         </div>
       </form>
@@ -481,9 +519,10 @@
                   <!-- Edit -->
                   <button
                     type="button"
-                    class="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95 transition"
+                    class="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95 transition disabled:opacity-50"
                     title="Edit question"
                     (click)="editQuestion(q)"
+                    [disabled]="isSubmitting()"
                   >
                     ✏️
                   </button>
@@ -491,9 +530,10 @@
                   <!-- Delete -->
                   <button
                     type="button"
-                    class="h-8 w-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition"
+                    class="h-8 w-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition disabled:opacity-50"
                     title="Delete question"
                     (click)="deleteQuestion(q._id)"
+                    [disabled]="isSubmitting()"
                   >
                     🗑️
                   </button>
@@ -567,9 +607,15 @@ Marks: 1
           </button>
 
           <button
-            class="btn-primary"
-            (click)="parseBulkQuestions()">
-            Parse & Preview
+            class="btn-primary flex items-center justify-center gap-2 min-w-[150px]"
+            (click)="parseBulkQuestions()"
+            [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="loader-sm"></span>
+              <span>Adding...</span>
+            } @else {
+              Parse & Preview
+            }
           </button>
         </div>
       </div>
@@ -584,6 +630,7 @@ Marks: 1
   [type]="publishConfirm().type"
   [confirmText]="'Publish Quiz'"
   [cancelText]="'Cancel'"
+  [loading]="isSubmitting()"
   (confirm)="confirmPublishQuiz()"
   (cancel)="closePublishConfirm()"
 ></app-confirmation-modal>
@@ -595,6 +642,7 @@ Marks: 1
   [type]="notifyStudentsConfirm().type"
   [confirmText]="'Yes, Notify'"
   [cancelText]="'No, Skip'"
+  [loading]="isSubmitting()"
   (confirm)="confirmNotifyStudentsAfterPublish()"
   (cancel)="skipNotifyStudentsAfterPublish()"
 ></app-confirmation-modal>

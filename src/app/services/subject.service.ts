@@ -76,6 +76,12 @@ export class SubjectService {
   getSubjects(): Observable<{ success: boolean; data: Subject[] }> {
     return this.http.get<{ success: boolean; data: Subject[] }>(
       this.SUBJECT_API
+    ).pipe(
+      tap(res => {
+        if (res.success) {
+          this.subjects.set(res.data);
+        }
+      })
     );
   }
 

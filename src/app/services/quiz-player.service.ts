@@ -1,10 +1,16 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environment';
+import { QuizService } from './quiz.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class QuizPlayerService {
   private baseUrl =  environment.apiUrl + '/quiz-player';
+  private quizService = inject(QuizService);
+  private auth = inject(AuthService);
+  
   public resultResponse : any;
   public quizData : any;
 
@@ -64,7 +70,18 @@ export class QuizPlayerService {
   submitQuiz(attemptId: string) {
     return this.http.post<any>(`${this.baseUrl}/${attemptId}/submit`, {}, {
       withCredentials: true
-    });
+    }).pipe(
+      tap(() => {
+        // Increment the attempted quizzes count if it's already loaded
+        const currentCount = this.quizService.attemptedQuizzesCount();
+        if (currentCount !== null) {
+          this.quizService.attemptedQuizzesCount.set(currentCount + 1);
+        }
+        // 🧹 Clear the dashboard cache to force refresh on next load
+        this.quizService.clearCachedSignals();
+        this.auth.clearDashboardCache();
+      })
+    );
   }
 
   // 🚀 Submit quiz (guest users - uses cookies)

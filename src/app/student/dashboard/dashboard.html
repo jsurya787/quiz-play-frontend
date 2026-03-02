@@ -95,8 +95,9 @@
                  focus:ring-2 focus:ring-indigo-500/0 focus:bg-indigo-50/35
                  transition-all outline-none"
           placeholder="Search for quizzes..."
-          [value]="search()"
-          (input)="search.set($any($event.target).value); applyFilters()" />
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event); applyFilters()"
+          name="search" />
       </div>
 
       <!-- Divider (Desktop) -->
@@ -109,7 +110,9 @@
                  bg-transparent text-slate-700 font-medium
                  focus:ring-0 focus:bg-indigo-50/35
                  cursor-pointer hover:bg-indigo-50/35 transition-all appearance-none outline-none"
-          (change)="selectedSubject.set($any($event.target).value || null); applyFilters()">
+          [ngModel]="selectedSubject()"
+          (ngModelChange)="selectedSubject.set($event); applyFilters()"
+          name="selectedSubject">
           <option value="">All Subjects</option>
           @for (item of subjects(); track item._id) {
             <option [value]="item._id">{{ item.name }}</option>
@@ -129,7 +132,9 @@
                  bg-transparent text-slate-700 font-medium
                  focus:ring-0 focus:bg-indigo-50/35
                  cursor-pointer hover:bg-indigo-50/35 transition-all appearance-none outline-none"
-          (change)="difficulty.set($any($event.target).value || null); applyFilters()">
+          [ngModel]="difficulty()"
+          (ngModelChange)="difficulty.set($event); applyFilters()"
+          name="difficulty">
           <option value="">All Levels</option>
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
@@ -168,7 +173,7 @@
           </label>
 
           <!-- Teacher Quizzes -->
-           @if (!authService.isTeacher() && !authService.isAdmin()) {
+           @if (!authService.isTeacher() && !authService.isAdmin() && authService.currentUser()?.teachers?.length > 0) {
             <label class="group relative flex items-center justify-center p-3 rounded-xl cursor-pointer hover:bg-gray-50/80 transition-all select-none border border-transparent"
                   [class.bg-purple-100/70]="teacherQuizzesOnly()"
                   [class.border-purple-100]="teacherQuizzesOnly()"
