@@ -17,7 +17,7 @@
     </div>
   </div>
 } @else {
-  <div class="premium-shell min-h-screen bg-gradient-to-br from-[#F6F9FF] via-[#F9FBFF] to-[#EEF3FF] relative overflow-hidden pb-28 md:pb-20">
+  <div class="premium-shell min-h-screen bg-gradient-to-br from-[#F6F9FF] via-[#F9FBFF] to-[#EEF3FF] relative overflow-x-hidden pb-36 md:pb-20">
 
     <!-- ================= CINEMATIC BACKGROUND EFFECTS ================= -->
     <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -168,7 +168,7 @@
       </div>
 
       <!-- ================= QUESTION MAP ================= -->
-      <div class="relative z-20 mt-12 md:mt-16 mb-16 md:mb-24 animate-slide-up delay-500">
+      <div class="relative z-20 mt-12 md:mt-16 mb-32 md:mb-24 animate-slide-up delay-500">
           <div class="flex items-end justify-between mb-8 px-2">
             <div>
               <h3 class="text-2xl font-black text-slate-900 tracking-tight">Question Analysis</h3>
@@ -185,8 +185,7 @@
             <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3 md:gap-4">
                @for (q of questions(); track q.questionId; let i = $index) {
                   <button 
-                    class="question-dot opacity-0 animate-scale-in w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all duration-300 transform hover:scale-110 shadow-sm border-2 touch-manipulation"
-                    [style.animation-delay.ms]="i * 40"
+                    class="question-dot w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all duration-300 transform hover:scale-110 shadow-sm border-2 touch-manipulation"
                     [ngClass]="{
                       'bg-emerald-100 border-emerald-200 text-emerald-700 shadow-emerald-100 hover:shadow-emerald-200': q.status === 'correct',
                       'bg-red-100 border-red-200 text-red-600 shadow-red-100 hover:shadow-red-200': q.status === 'wrong',
