@@ -288,9 +288,24 @@
                 </div>
 
                 <!-- Play Button Action -->
-                <div class="dashboard-play-btn w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 group-hover:from-indigo-600 group-hover:to-violet-600 group-hover:text-white group-active:from-indigo-600 group-active:to-violet-600 group-active:text-white transition-all duration-500 group-hover:scale-110 group-active:scale-105 shadow-sm group-hover:shadow-indigo-500/30">
-                  <svg class="dashboard-play-icon w-5 h-5 ml-0.5 transform group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </div>
+              <div class="dashboard-play-btn w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 group-hover:from-indigo-600 group-hover:to-violet-600 group-hover:text-white group-active:from-indigo-600 group-active:to-violet-600 group-active:text-white transition-all duration-500 group-hover:scale-110 group-active:scale-105 shadow-sm group-hover:shadow-indigo-500/30">
+                <!-- Start Button -->
+                <button
+                  type="button"
+                  class="min-h-10 px-4 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold uppercase tracking-wide shadow-sm hover:shadow-md hover:from-indigo-500 hover:to-violet-500 transition-all duration-300"
+                  [routerLink]="['/quiz-player-page', item._id]"
+                  (click)="$event.stopPropagation()">
+                  Start
+                </button>
+              </div>
+
+              <!-- Commented Code -->
+              <!--
+              <div class="dashboard-play-btn w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 group-hover:from-indigo-600 group-hover:to-violet-600 group-hover:text-white group-active:from-indigo-600 group-active:to-violet-600 group-active:text-white transition-all duration-500 group-hover:scale-110 group-active:scale-105 shadow-sm group-hover:shadow-indigo-500/30">
+                <svg class="dashboard-play-icon w-5 h-5 ml-0.5 transform group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              -->
+
               </div>
 
             </div>
