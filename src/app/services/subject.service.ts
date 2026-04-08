@@ -13,11 +13,28 @@ export interface Subject {
   type?: 'entrance' | 'government' | 'state' | 'bords';
   priority?: number;
   description?: string;
+  subjectClass?: string;
+  keyPoints?: string[];
+  logoUrl?: string;
   isActive: boolean;
   isPrimary: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateSubjectPayload {
+  name: string;
+  type: 'entrance' | 'government' | 'state' | 'bords';
+  priority: number;
+  subjectClass: string;
+  description: string;
+  keyPoints: string[];
+  isPrimary: boolean;
+  isActive: boolean;
+  logoUrl: string;
+}
+
+export type UpdateSubjectPayload = Partial<CreateSubjectPayload>;
 
 export interface HotTopic {
   _id?: string;
@@ -132,7 +149,7 @@ export class SubjectService {
     );
   }
 
-  createNewSubject(payload: Subject): Observable<any> {
+  createNewSubject(payload: CreateSubjectPayload): Observable<any> {
     return this.http.post(this.SUBJECT_API, payload);
   }
 
@@ -141,7 +158,7 @@ export class SubjectService {
   ================================ */
   updateSubject(
     subjectId: string,
-    payload: Partial<Subject>
+    payload: UpdateSubjectPayload
   ): Observable<any> {
     return this.http.put(`${this.SUBJECT_API}/${subjectId}`, payload);
   }

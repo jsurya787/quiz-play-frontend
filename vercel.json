@@ -1,3 +1,16 @@
 {
-  "framework": "angular"
+  "version": 2,
+  "buildCommand": "npm run build:ssr",
+  "outputDirectory": "dist/LearnGround/browser",
+  "functions": {
+    "api/ssr.ts": {
+      "runtime": "nodejs20.x",
+      "includeFiles": "dist/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*\\..*)", "destination": "/$1" },
+    { "source": "/(.*)", "destination": "/api/ssr" }
+  ]
 }

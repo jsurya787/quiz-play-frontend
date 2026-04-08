@@ -1,12 +1,13 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { finalize, take } from 'rxjs';
+import { Observable, catchError, finalize, map, of, switchMap, take, throwError } from 'rxjs';
 
-import { Subject, SubjectService } from '../../services/subject.service';
+import { CreateSubjectPayload, Subject, SubjectService, UpdateSubjectPayload } from '../../services/subject.service';
 import { SubjectFormModalComponent } from '../../shared/modals/subject-form-modal/subject-form-modal';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast-service';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 interface SubjectItem extends Subject {
   subjectClass?: string;
@@ -38,6 +39,7 @@ export class SubjectsComponent implements OnInit, AfterViewInit {
   public readonly subjectService = inject(SubjectService);
   public readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
+  private readonly cloudinaryService = inject(CloudinaryService);
 
   readonly loading = signal(false);
   readonly submitting = signal(false);
@@ -105,44 +107,78 @@ export class SubjectsComponent implements OnInit, AfterViewInit {
   saveSubject(payload: SubjectFormPayload): void {
     if (this.submitting()) return;
 
-    const formData = this.buildSubjectFormData(payload);
     this.submitting.set(true);
 
-    if (!this.isEdit()) {
-      this.subjectService.createNewSubject(formData as unknown as Subject).pipe(
-        take(1),
-        finalize(() => this.submitting.set(false))
-      ).subscribe({
-        next: () => {
-          this.toastService.success('Subject created successfully.');
-          this.getSubjects();
-          this.closeModal();
-        },
-        error: () => {
-          this.toastService.error('Failed to create subject.');
-        },
-      });
-    } else {
-      const id = this.selectedSubject()?._id;
-      if (!id) {
-        this.submitting.set(false);
-        return;
-      }
+    const uploadLogo$: Observable<string | null> = payload.logoFile
+      ? this.cloudinaryService
+          .uploadImage(payload.logoFile, 'subjects')
+          .pipe(map((r) => r.url))
+      : of(null);
 
-      this.subjectService.updateSubject(id, formData as unknown as Partial<Subject>).pipe(
+    uploadLogo$
+      .pipe(
+        switchMap((uploadedLogoUrl) => {
+          if (!this.isEdit()) {
+            const logoUrl = uploadedLogoUrl;
+            if (!logoUrl) {
+              return throwError(() => new Error('Logo upload is required'));
+            }
+
+            const body: CreateSubjectPayload = {
+              name: payload.name,
+              type: payload.type,
+              priority: payload.priority,
+              subjectClass: payload.subjectClass,
+              description: payload.description,
+              keyPoints: payload.keyPoints,
+              isPrimary: payload.isPrimary,
+              isActive: payload.isActive,
+              logoUrl,
+            };
+
+            return this.subjectService.createNewSubject(body);
+          }
+
+          const id = this.selectedSubject()?._id;
+          if (!id) {
+            return throwError(() => new Error('Missing subject id'));
+          }
+
+          const body: UpdateSubjectPayload = {
+            name: payload.name,
+            type: payload.type,
+            priority: payload.priority,
+            subjectClass: payload.subjectClass,
+            description: payload.description,
+            keyPoints: payload.keyPoints,
+            isPrimary: payload.isPrimary,
+            isActive: payload.isActive,
+            ...(uploadedLogoUrl ? { logoUrl: uploadedLogoUrl } : {}),
+          };
+
+          return this.subjectService.updateSubject(id, body);
+        }),
         take(1),
-        finalize(() => this.submitting.set(false))
-      ).subscribe({
+        finalize(() => this.submitting.set(false)),
+        catchError((err) => {
+          console.error(err);
+          return throwError(() => err);
+        }),
+      )
+      .subscribe({
         next: () => {
-          this.toastService.success('Subject updated successfully.');
+          this.toastService.success(
+            this.isEdit() ? 'Subject updated successfully.' : 'Subject created successfully.',
+          );
           this.getSubjects();
           this.closeModal();
         },
         error: () => {
-          this.toastService.error('Failed to update subject.');
+          this.toastService.error(
+            this.isEdit() ? 'Failed to update subject.' : 'Failed to create subject.',
+          );
         },
       });
-    }
   }
 
   getSubjects(): void {
@@ -223,22 +259,5 @@ export class SubjectsComponent implements OnInit, AfterViewInit {
     this.oddCanScrollRight.set(canRight);
   }
 
-  private buildSubjectFormData(payload: SubjectFormPayload): FormData {
-    const formData = new FormData();
-
-    formData.append('name', payload.name);
-    formData.append('type', payload.type);
-    formData.append('priority', String(payload.priority));
-    formData.append('subjectClass', payload.subjectClass);
-    formData.append('description', payload.description);
-    formData.append('keyPoints', JSON.stringify(payload.keyPoints));
-    formData.append('isPrimary', String(payload.isPrimary));
-    formData.append('isActive', String(payload.isActive));
-
-    if (payload.logoFile) {
-      formData.append('logo', payload.logoFile);
-    }
-
-    return formData;
-  }
+  // FormData no longer needed — images upload directly to Cloudinary
 }

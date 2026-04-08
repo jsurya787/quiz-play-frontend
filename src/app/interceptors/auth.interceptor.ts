@@ -11,6 +11,11 @@ import {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
 
+  // ✅ Never attach custom headers/tokens/cookies to Cloudinary requests (prevents CORS preflight failures)
+  if (req.url.includes('api.cloudinary.com')) {
+    return next(req);
+  }
+
   // ✅ ADD ONLY THIS (client origin)
   const clientOrigin =
     typeof window !== 'undefined' ? window.location.origin : '';
