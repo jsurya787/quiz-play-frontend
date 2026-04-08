@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "ng build",
-    "build:ssr": "ng build && ng run LearnGround:server",
+    "build:ssr": "ng build",
     "serve:ssr": "node dist/LearnGround/server/server.mjs"
   },
   "prettier": {
