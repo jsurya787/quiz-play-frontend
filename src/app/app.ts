@@ -9,6 +9,7 @@ import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { LoaderService } from './services/loader-service';
+import { KeepAliveService } from './services/keep-alive.service';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,7 @@ export class App {
     private title: Title,
     public _authService:AuthService,
     public _loaderService: LoaderService,
+    private _keepAliveService: KeepAliveService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.title.setTitle('QuizPlay – Learn with Fun');

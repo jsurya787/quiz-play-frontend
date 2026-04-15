@@ -5,8 +5,18 @@
   "functions": {
     "api/ssr.ts": {
       "includeFiles": "dist/**"
+    },
+    "api/keep-alive.ts": {
+      "memory": 128,
+      "maxDuration": 10
     }
   },
+  "crons": [
+    {
+      "path": "/api/keep-alive",
+      "schedule": "*/5 * * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*\\..*)", "destination": "/$1" },
