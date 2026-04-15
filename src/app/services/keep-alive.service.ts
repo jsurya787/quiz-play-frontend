@@ -13,7 +13,7 @@ export class KeepAliveService {
   private readonly KEEP_ALIVE_INTERVAL = 5 * 60 * 1000; // 5 minutes
   private readonly KEEP_ALIVE_URL = '/api/keep-alive';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) { 
     this.initializeKeepAlive();
   }
 
