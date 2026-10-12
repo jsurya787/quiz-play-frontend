@@ -10,6 +10,20 @@ import { roleGuard } from './guards/role.guard';
 // ==============================
 export const routes: Routes = [
 
+  // MSAL v5 popup response bridge. Keep outside authenticated routes.
+  {
+    path: 'redirect',
+    loadComponent: () =>
+      import('./auth/microsoft-redirect/microsoft-redirect')
+        .then(m => m.MicrosoftRedirectComponent),
+  },
+  {
+    path: 'microsoft-auth-test',
+    loadComponent: () =>
+      import('./auth/microsoft-auth-test/microsoft-auth-test')
+        .then(m => m.MicrosoftAuthTestComponent),
+  },
+
   // --------------------------------------------------
   // 🔐 GOOGLE OAUTH CALLBACK (MUST BE FIRST)
   // --------------------------------------------------
