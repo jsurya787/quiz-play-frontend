@@ -4,7 +4,8 @@
   "scripts": {
     "build": "ng build",
     "build:ssr": "ng build",
-    "serve:ssr": "node dist/LearnGround/server/server.mjs"
+    "serve:ssr": "node dist/LearnGround/server/server.mjs",
+    "start": "npm run serve:ssr"
   },
   "prettier": {
     "printWidth": 100,
