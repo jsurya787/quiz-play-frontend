@@ -1,4 +1,4 @@
-import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { Component, computed, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, SubjectService } from '../../services/subject.service';
 import { QuizService } from '../../services/quiz.service';
@@ -35,6 +35,33 @@ export class DashboardComponent {
   createdByMe = signal(false);
   teacherQuizzesOnly = signal(false);
 
+  readonly pageSize = 10;
+  currentPage = signal(1);
+  total = signal(0);
+  private quizRequestId = 0;
+
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.total() / this.pageSize)),
+  );
+
+  readonly pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const span = 5;
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + span - 1);
+    start = Math.max(1, end - span + 1);
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  });
+
+  readonly rangeStart = computed(() =>
+    this.total() === 0 ? 0 : (this.currentPage() - 1) * this.pageSize + 1,
+  );
+
+  readonly rangeEnd = computed(() =>
+    Math.min(this.currentPage() * this.pageSize, this.total()),
+  );
+
   constructor(
     private subjectService: SubjectService,
     private quizService: QuizService,
@@ -70,7 +97,8 @@ export class DashboardComponent {
           console.log('Using cached subjects from service:', this.subjectService.subjects().length);
           this.subjects.set(this.subjectService.subjects());
         }
-        
+
+        this.currentPage.set(1);
         this.loadQuizes();
       });
 
@@ -98,20 +126,41 @@ export class DashboardComponent {
   }
 
   loadQuizes(): void {
+    const requestId = ++this.quizRequestId;
+    const skip = (this.currentPage() - 1) * this.pageSize;
+
     this.quizService.getQuizes({
       search: this.search(),
       subjectId: this.selectedSubject(),
       difficulty: this.difficulty(),
       createdByMe: this.createdByMe(),
       teacherQuizzesOnly: this.teacherQuizzesOnly(),
-    }).subscribe({
+      limit: this.pageSize,
+      skip,
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: res => {
+        if (requestId !== this.quizRequestId) return;
+
         if (res.success) {
-          this.quizess.set(res.data);
+          const total = typeof res.total === 'number' ? res.total : 0;
+          const pages = Math.max(1, Math.ceil(total / this.pageSize));
+          if (this.currentPage() > pages) {
+            this.total.set(total);
+            this.currentPage.set(pages);
+            this.loadQuizes();
+            return;
+          }
+
+          this.total.set(total);
+          this.quizess.set(Array.isArray(res.data) ? res.data : []);
           this.loading.set(false);
+          return;
         }
+
+        this.loading.set(false);
       },
       error: err => {
+        if (requestId !== this.quizRequestId) return;
         this.loading.set(false);
         this.toastService.error('Failed to load quizzes. Please try again later.');
         console.error(err.error?.message || 'Failed to load quizzes');
@@ -119,8 +168,24 @@ export class DashboardComponent {
     });
   }
 
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) return;
+    this.currentPage.set(page);
+    this.loadQuizes();
+  }
+
+  prevPage(): void {
+    this.goToPage(this.currentPage() - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage() + 1);
+  }
+
   // 🔁 CALL WHEN FILTERS CHANGE
   applyFilters(): void {
+    this.currentPage.set(1);
+    this.quizRequestId++;
     this.filterChange$.next();
   }
 
@@ -130,6 +195,7 @@ export class DashboardComponent {
     this.difficulty.set('');
     this.createdByMe.set(false);
     this.teacherQuizzesOnly.set(false);
+    this.currentPage.set(1);
     
     // Check if we are already on the 'all' route
     if (this.router.url === '/dashboard/all') {

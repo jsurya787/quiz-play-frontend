@@ -139,6 +139,8 @@ export class QuizService {
     difficulty?: string | null;
     createdByMe?: boolean;
     teacherQuizzesOnly?: boolean;
+    limit?: number;
+    skip?: number;
   }) {
   const params: any = {};
 
@@ -150,6 +152,8 @@ export class QuizService {
     const user = this._auth.currentUser();
     params.createdByMe = user?.id || user?._id;
   }
+  if (filters?.limit != null) params.limit = filters.limit;
+  if (filters?.skip != null) params.skip = filters.skip;
 
   return this.http.get<any>(
     `${this.API}`,
