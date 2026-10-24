@@ -1,3 +1,4 @@
+
 {
   "version": 2,
   "buildCommand": "npm run build:ssr",
@@ -11,12 +12,6 @@
       "maxDuration": 10
     }
   },
-  "crons": [
-    {
-      "path": "/api/keep-alive",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*\\..*)", "destination": "/$1" },
